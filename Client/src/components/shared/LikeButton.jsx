@@ -95,7 +95,7 @@
 //   );
 // };
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 import { useBlogStore } from "@/features/blogs/blogStore";
@@ -103,6 +103,7 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/utils/constant";
+import { useToast } from "@/hooks/use-toast";
 
 export const LikeButton = ({
   blogId,
