@@ -201,6 +201,7 @@ import {
 } from "lucide-react";
 import { LikeButton } from "@/components/shared/LikeButton";
 import { useToast } from "@/hooks/use-toast";
+import { bookmarkService } from "@/services/bookmarkService";
 import LazyImage, {
   LazyCoverImage,
   LazyAvatar,
@@ -240,13 +241,27 @@ export const BlogCard = memo(
 
     const handleBookmark = async (e) => {
       e.stopPropagation();
-      // TODO: Implement actual bookmark API call
-      // For now, just show success message
-      toast({
-        title: "Bookmarked!",
-        description: "Blog saved to your bookmarks",
-        duration: 2000,
-      });
+
+      try {
+        const result = await bookmarkService.toggleBookmark(
+          blog._id || blog.id,
+        );
+
+        toast({
+          title: result.bookmarked ? "Bookmarked!" : "Bookmark removed",
+          description: result.bookmarked
+            ? "Blog saved to your bookmarks"
+            : "Blog removed from bookmarks",
+          duration: 2000,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to bookmark blog",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
     };
 
     const handleShare = async (e) => {
