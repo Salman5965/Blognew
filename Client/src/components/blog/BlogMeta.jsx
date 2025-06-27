@@ -379,6 +379,7 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
           <LikeButton
             blogId={blog.id || blog._id}
             likeCount={blog.likeCount || 0}
+            isLiked={blog.isLiked}
             blogLikes={blog.likes || []}
           />
           <Button variant="outline" size="sm" onClick={handleShare}>
