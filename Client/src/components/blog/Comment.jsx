@@ -40,8 +40,12 @@ export const Comment = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const isOwner = user && comment.author.id === user.id;
-  const isLiked = comment.likes?.some((like) => like.user === user?.id);
+  const commentId = comment._id || comment.id;
+  const authorId = comment.author._id || comment.author.id;
+  const userId = user?._id || user?.id;
+
+  const isOwner = user && authorId === userId;
+  const isLiked = comment.likes?.some((like) => like.user === userId);
   const likeCount = comment.likes?.length || 0;
 
   const handleReply = async () => {
@@ -50,7 +54,7 @@ export const Comment = ({
     try {
       setIsSubmitting(true);
       setError(null);
-      await onReply(comment.id, replyContent);
+      await onReply(commentId, replyContent);
       setReplyContent("");
       setIsReplying(false);
     } catch (err) {
