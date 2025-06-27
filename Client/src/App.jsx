@@ -1,4 +1,3 @@
-
 // import React from "react";
 // import { Toaster } from "@/components/ui/toaster";
 // import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -137,16 +136,6 @@
 
 // export default App;
 
-
-
-
-
-
-
-
-
-
-
 import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -198,6 +187,9 @@ const Cookies = React.lazy(() => import("./pages/Cookies"));
 const Gdpr = React.lazy(() => import("./pages/Gdpr"));
 const Help = React.lazy(() => import("./pages/Help"));
 const Feed = React.lazy(() => import("./pages/Feed"));
+const Analytics = React.lazy(() =>
+  import("./pages/Analytics").then((module) => ({ default: module.Analytics })),
+);
 
 // Loading component for suspense
 const PageLoader = () => (
