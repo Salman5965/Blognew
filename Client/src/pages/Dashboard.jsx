@@ -532,11 +532,6 @@
 
 // export default Dashboard;
 
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -583,6 +578,7 @@ export const Dashboard = () => {
   // State management
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
   const [userStats, setUserStats] = useState(null);
+  const [previousStats, setPreviousStats] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
