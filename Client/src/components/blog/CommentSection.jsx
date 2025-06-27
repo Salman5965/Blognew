@@ -150,13 +150,13 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       // Update the comment like status
       setComments((prev) =>
         prev.map((comment) =>
-          comment.id === commentId
+          (comment._id || comment.id) === commentId
             ? {
                 ...comment,
                 likes: response.data.isLiked
-                  ? [...(comment.likes || []), { user: user.id }]
+                  ? [...(comment.likes || []), { user: user._id || user.id }]
                   : (comment.likes || []).filter(
-                      (like) => like.user !== user.id,
+                      (like) => like.user !== (user._id || user.id),
                     ),
               }
             : comment,
