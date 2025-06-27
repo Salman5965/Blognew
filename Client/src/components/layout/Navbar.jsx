@@ -25,6 +25,7 @@ import {
   Sun,
   Moon,
   Monitor,
+  HelpCircle,
 } from "lucide-react";
 import { useBlogStore } from "@/features/blogs/blogStore";
 
