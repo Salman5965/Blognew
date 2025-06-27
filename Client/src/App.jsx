@@ -302,6 +302,14 @@ const App = () => (
                         </PrivateRoute>
                       }
                     />
+                    <Route
+                      path="/dashboard/analytics"
+                      element={
+                        <PrivateRoute>
+                          <Analytics />
+                        </PrivateRoute>
+                      }
+                    />
 
                     {/* Catch-all route */}
                     <Route path="*" element={<NotFound />} />
