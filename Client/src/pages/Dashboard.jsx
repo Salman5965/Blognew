@@ -946,7 +946,7 @@ export const Dashboard = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => navigate("/dashboard/blogs")}
+                    onClick={() => navigate(ROUTES.MY_BLOGS)}
                   >
                     View all
                   </Button>
