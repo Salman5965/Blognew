@@ -191,7 +191,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatBlogDate } from "@/utils/formatDate";
 import { ROUTES, DEFAULT_COVER_IMAGE } from "@/utils/constant";
-import { Heart, MessageCircle, Eye, Clock, Bookmark, Share2 } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Eye,
+  Clock,
+  Bookmark,
+  Share2,
+} from "lucide-react";
 import { LikeButton } from "@/components/shared/LikeButton";
 import { useToast } from "@/hooks/use-toast";
 import LazyImage, {
@@ -401,7 +408,12 @@ export const BlogCard = memo(
                     className="flex items-center space-x-1 hover:text-foreground transition-colors"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    <span>{blog.commentsCount || blog.commentCount || blog.comments?.length || 0}</span>
+                    <span>
+                      {blog.commentsCount ||
+                        blog.commentCount ||
+                        blog.comments?.length ||
+                        0}
+                    </span>
                   </button>
                   <div className="flex items-center space-x-1">
                     <Clock className="h-4 w-4" />
@@ -428,13 +440,18 @@ export const BlogCard = memo(
                   </Button>
                   <LikeButton
                     blogId={blog._id || blog.id}
-                    likeCount={blog.likesCount || blog.likeCount || blog.likes?.length || 0}
+                    likeCount={
+                      blog.likesCount ||
+                      blog.likeCount ||
+                      blog.likes?.length ||
+                      0
+                    }
                     isLiked={blog.isLiked}
                     size="sm"
                   />
                 </div>
               </div>
-            </CardFooter>)
+            </CardFooter>
           )}
         </>
       );
