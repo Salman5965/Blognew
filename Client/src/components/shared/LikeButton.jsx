@@ -117,9 +117,12 @@ export const LikeButton = ({
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthContext();
   const { likeBlog, unlikeBlog, blogs } = useBlogStore();
+  const { toast } = useToast();
 
   // Find the current blog from store to get the most up-to-date like status
-  const currentBlog = blogs.find((blog) => (blog._id || blog.id) === blogId);
+  const currentBlog = blogs.find(blog =>
+    (blog._id || blog.id) === blogId
+  );
 
   // Determine if user has liked based on current blog data or props
   const userHasLiked = currentBlog?.isLiked ?? isLiked;
@@ -129,13 +132,16 @@ export const LikeButton = ({
   const [count, setCount] = useState(currentLikeCount);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Rate limiting state
+  const lastClickTime = useRef(0);
+  const isRequestInProgress = useRef(false);
+  const RATE_LIMIT_DELAY = 1000; // 1 second between requests
+
   // Sync with prop changes and store updates
   useEffect(() => {
     setLiked(userHasLiked);
     setCount(currentLikeCount);
   }, [userHasLiked, currentLikeCount, blogId]);
-
-  const handleLike = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
