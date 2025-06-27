@@ -893,7 +893,10 @@ export const Dashboard = () => {
             icon={BookOpen}
             title="Total Blogs"
             value={userStats?.blogs?.totalBlogs}
-            change={12}
+            change={calculatePercentageChange(
+              userStats?.blogs?.totalBlogs || 0,
+              previousStats?.blogs?.totalBlogs || 0,
+            )}
             color="blue"
             loading={loading}
           />
@@ -901,7 +904,10 @@ export const Dashboard = () => {
             icon={Eye}
             title="Total Views"
             value={userStats?.blogs?.totalViews}
-            change={8}
+            change={calculatePercentageChange(
+              userStats?.blogs?.totalViews || 0,
+              previousStats?.blogs?.totalViews || 0,
+            )}
             color="green"
             loading={loading}
           />
@@ -909,7 +915,10 @@ export const Dashboard = () => {
             icon={Heart}
             title="Total Likes"
             value={userStats?.blogs?.totalLikes}
-            change={15}
+            change={calculatePercentageChange(
+              userStats?.blogs?.totalLikes || 0,
+              previousStats?.blogs?.totalLikes || 0,
+            )}
             color="red"
             loading={loading}
           />
@@ -917,7 +926,10 @@ export const Dashboard = () => {
             icon={MessageCircle}
             title="Comments"
             value={userStats?.comments?.totalComments}
-            change={-3}
+            change={calculatePercentageChange(
+              userStats?.comments?.totalComments || 0,
+              previousStats?.comments?.totalComments || 0,
+            )}
             color="purple"
             loading={loading}
           />
