@@ -74,26 +74,17 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       setIsSubmitting(true);
       setError(null);
 
-      const response = await fetch("/api/comments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify({
-          content: newComment.trim(),
-          blog: blogId,
-        }),
+      const response = await apiService.post("/comments", {
+        content: newComment.trim(),
+        blog: blogId,
       });
 
-      const data = await response.json();
-
-      if (data.status === "success") {
+      if (response.status === "success") {
         setNewComment("");
         // Add new comment to the beginning of the list
-        setComments((prev) => [data.data.comment, ...prev]);
+        setComments((prev) => [response.data.comment, ...prev]);
       } else {
-        throw new Error(data.message || "Failed to post comment");
+        throw new Error(response.message || "Failed to post comment");
       }
     } catch (err) {
       setError(err.message || "Failed to post comment");
