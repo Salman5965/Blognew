@@ -92,7 +92,7 @@ export const Comment = ({
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this comment?")) {
       try {
-        await onDelete(comment.id);
+        await onDelete(commentId);
       } catch (err) {
         console.error("Failed to delete comment:", err);
       }
