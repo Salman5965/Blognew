@@ -448,7 +448,7 @@ export const BlogDetails = () => {
         </article>
 
         {/* Comments Section */}
-        <section className="mt-12">
+        <section id="comments" className="mt-12">
           <div className="border-t pt-8">
             <CommentSection
               blogId={currentBlog._id || currentBlog.id}
