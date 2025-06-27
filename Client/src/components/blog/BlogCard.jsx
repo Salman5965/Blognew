@@ -342,24 +342,31 @@ export const BlogCard = memo(
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <div className="flex items-center space-x-1">
                     <Eye className="h-4 w-4" />
-                    <span>{blog.viewCount}</span>
+                    <span>{blog.views || blog.viewCount || 0}</span>
                   </div>
                   <button
                     onClick={handleCommentClick}
                     className="flex items-center space-x-1 hover:text-foreground transition-colors"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    <span>{blog.commentCount}</span>
+                    <span>
+                      {blog.commentsCount ||
+                        blog.commentCount ||
+                        blog.comments?.length ||
+                        0}
+                    </span>
                   </button>
                   <div className="flex items-center space-x-1">
                     <Clock className="h-4 w-4" />
-                    <span>{Math.ceil(blog.content.length / 200)} min read</span>
+                    <span>{readTime} min read</span>
                   </div>
                 </div>
 
                 <LikeButton
                   blogId={blog._id || blog.id}
-                  likeCount={blog.likeCount}
+                  likeCount={
+                    blog.likesCount || blog.likeCount || blog.likes?.length || 0
+                  }
                   isLiked={blog.isLiked}
                   size="sm"
                 />
