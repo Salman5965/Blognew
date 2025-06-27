@@ -267,7 +267,7 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
         <div className="space-y-6">
           {comments.map((comment) => (
             <Comment
-              key={comment.id}
+              key={comment._id || comment.id}
               comment={comment}
               onReply={handleReply}
               onEdit={handleEditComment}
