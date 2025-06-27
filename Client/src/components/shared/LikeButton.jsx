@@ -145,23 +145,27 @@ export const LikeButton = ({
 
     if (isLoading) return;
 
+    const originalLiked = liked;
+    const originalCount = count;
+
     try {
       setIsLoading(true);
 
-      if (liked) {
-        await unlikeBlog(blogId);
-        setLiked(false);
-        setCount((prev) => prev - 1);
-      } else {
-        await likeBlog(blogId);
-        setLiked(true);
-        setCount((prev) => prev + 1);
-      }
+      // Optimistic update
+      setLiked(!liked);
+      setCount((prevCount) => (liked ? prevCount - 1 : prevCount + 1));
+
+      // Make API call - the backend toggles the like state
+      const result = await likeBlog(blogId);
+
+      // Update with server response
+      setLiked(result.isLiked);
+      setCount(result.likeCount);
     } catch (error) {
       console.error("Failed to toggle like:", error);
       // Revert optimistic update
-      setLiked(!liked);
-      setCount(liked ? count + 1 : count - 1);
+      setLiked(originalLiked);
+      setCount(originalCount);
     } finally {
       setIsLoading(false);
     }
