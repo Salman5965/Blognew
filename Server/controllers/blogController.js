@@ -62,6 +62,17 @@ export const getBlogs = async (req, res, next) => {
       .limit(limit)
       .lean();
 
+    // Add user-specific like status if user is authenticated
+    const blogsWithLikeStatus = blogs.map((blog) => ({
+      ...blog,
+      isLiked: req.user
+        ? blog.likes.some(
+            (like) => like.user.toString() === req.user.id.toString(),
+          )
+        : false,
+      likeCount: blog.likes ? blog.likes.length : 0,
+    }));
+
     // Get total count for pagination
     const total = await Blog.countDocuments(filter);
 
@@ -503,9 +514,9 @@ export const getBlogsByCategory = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     // Build filter object
-    const filter = { 
+    const filter = {
       status: "published",
-      category: req.params.category.toLowerCase()
+      category: req.params.category.toLowerCase(),
     };
 
     // Filter by author
@@ -591,13 +602,13 @@ export const getCategories = async (req, res, next) => {
           category: category,
           status: "published",
         });
-        
+
         return {
           name: category,
           slug: category,
           blogCount,
         };
-      })
+      }),
     );
 
     // Sort categories by name
