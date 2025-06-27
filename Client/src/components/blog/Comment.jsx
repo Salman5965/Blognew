@@ -70,7 +70,7 @@ export const Comment = ({
     try {
       setIsSubmitting(true);
       setError(null);
-      await onEdit(comment.id, editContent);
+      await onEdit(commentId, editContent);
       setIsEditing(false);
     } catch (err) {
       setError(err.message || "Failed to update comment");
