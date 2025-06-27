@@ -195,10 +195,6 @@
 //   );
 // };
 
-
-
-
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -284,6 +280,7 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
             <LikeButton
               blogId={blog.id || blog._id}
               likeCount={blog.likeCount || 0}
+              isLiked={blog.isLiked}
               blogLikes={blog.likes || []}
             />
             <Button variant="ghost" size="sm" onClick={handleShare}>
