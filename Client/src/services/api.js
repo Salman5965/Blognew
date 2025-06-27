@@ -1,4 +1,3 @@
-
 // import axios from "axios";
 // import { API_BASE_URL, LOCAL_STORAGE_KEYS } from "@/utils/constant";
 
@@ -114,9 +113,6 @@
 // export const apiService = new ApiService();
 // export default apiService;
 
-
-
-
 import axios from "axios";
 import { API_BASE_URL, LOCAL_STORAGE_KEYS } from "@/utils/constant";
 import { ApiCache } from "@/utils/cache";
@@ -158,6 +154,19 @@ class ApiService {
           const networkError = new Error("Network connection failed");
           networkError.isNetworkError = true;
           return Promise.reject(networkError);
+        }
+
+        // Handle rate limiting
+        if (error.response?.status === 429) {
+          const retryAfter = error.response.headers["retry-after"];
+          const rateLimitError = new Error(
+            retryAfter
+              ? `Too many requests. Please try again in ${retryAfter} seconds.`
+              : "Too many requests. Please wait before trying again.",
+          );
+          rateLimitError.isRateLimitError = true;
+          rateLimitError.retryAfter = retryAfter;
+          return Promise.reject(rateLimitError);
         }
 
         if (error.response?.status === 401) {
