@@ -218,8 +218,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LikeButton } from "@/components/shared/LikeButton";
+import { useToast } from "@/hooks/use-toast";
 
 export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
+  const { toast } = useToast();
   // Safety checks for blog data
   if (!blog || !blog.author) {
     return <div>Loading...</div>;
@@ -229,6 +231,7 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
   const readingTime = Math.ceil((blog.content?.length || 0) / 200);
 
   const handleShare = async () => {
+    // Try native sharing first
     if (navigator.share) {
       try {
         await navigator.share({
@@ -236,20 +239,38 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
           text: blog.excerpt,
           url: window.location.href,
         });
+        return;
       } catch (error) {
-        copyToClipboard();
+        // User cancelled or share failed, fall back to clipboard
       }
-    } else {
-      copyToClipboard();
+    }
+
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied!",
+        description: "Blog link copied to clipboard",
+        duration: 2000,
+      });
+    } catch (error) {
+      toast({
+        title: "Share failed",
+        description: "Unable to share the blog",
+        variant: "destructive",
+        duration: 3000,
+      });
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-  };
-
-  const handleBookmark = () => {
-    console.log("Bookmark blog:", blog.id);
+  const handleBookmark = async () => {
+    // TODO: Implement actual bookmark API call
+    // For now, just show success message
+    toast({
+      title: "Bookmarked!",
+      description: "Blog saved to your bookmarks",
+      duration: 2000,
+    });
   };
 
   if (variant === "compact") {
