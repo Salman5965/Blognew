@@ -991,7 +991,7 @@ export const Dashboard = () => {
                 <QuickActionButton
                   icon={PlusCircle}
                   label="Create New Post"
-                  onClick={() => navigate("/create")}
+                  onClick={() => navigate(ROUTES.CREATE_BLOG)}
                   color="blue"
                 />
                 <QuickActionButton
@@ -1003,13 +1003,13 @@ export const Dashboard = () => {
                 <QuickActionButton
                   icon={BookOpen}
                   label="My Blogs"
-                  onClick={() => navigate("/dashboard/blogs")}
+                  onClick={() => navigate(ROUTES.MY_BLOGS)}
                   color="purple"
                 />
                 <QuickActionButton
                   icon={Settings}
                   label="Profile Settings"
-                  onClick={() => navigate("/dashboard/profile")}
+                  onClick={() => navigate(ROUTES.PROFILE)}
                   color="gray"
                 />
               </CardContent>
