@@ -45,15 +45,14 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(
-        `/api/comments/blog/${blogId}?sort=${sortOrder}`,
+      const response = await apiService.get(
+        `/comments/blog/${blogId}?sort=${sortOrder}`,
       );
-      const data = await response.json();
 
-      if (data.status === "success") {
-        setComments(data.data.comments || []);
+      if (response.status === "success") {
+        setComments(response.data.comments || []);
       } else {
-        throw new Error(data.message || "Failed to fetch comments");
+        throw new Error(response.message || "Failed to fetch comments");
       }
     } catch (err) {
       console.error("Error fetching comments:", err);
