@@ -344,10 +344,13 @@ export const BlogCard = memo(
                     <Eye className="h-4 w-4" />
                     <span>{blog.viewCount}</span>
                   </div>
-                  <div className="flex items-center space-x-1">
+                  <button
+                    onClick={handleCommentClick}
+                    className="flex items-center space-x-1 hover:text-foreground transition-colors"
+                  >
                     <MessageCircle className="h-4 w-4" />
                     <span>{blog.commentCount}</span>
-                  </div>
+                  </button>
                   <div className="flex items-center space-x-1">
                     <Clock className="h-4 w-4" />
                     <span>{Math.ceil(blog.content.length / 200)} min read</span>
