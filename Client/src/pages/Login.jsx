@@ -201,8 +201,10 @@ export const Login = () => {
   const location = useLocation();
   const { isAuthenticated, login } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
+  const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
   const lastLoginAttempt = useRef(0);
   const isLoginInProgress = useRef(false);
+  const countdownInterval = useRef(null);
 
   // Toast trigger
   const { toast } = useToast();
@@ -217,6 +219,28 @@ export const Login = () => {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]);
+
+  // Cleanup countdown interval on unmount
+  useEffect(() => {
+    return () => {
+      if (countdownInterval.current) {
+        clearInterval(countdownInterval.current);
+      }
+    };
+  }, []);
+
+  const startRateLimitCountdown = (seconds) => {
+    setRateLimitCountdown(seconds);
+    countdownInterval.current = setInterval(() => {
+      setRateLimitCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   const { values, errors, isSubmitting, setValue, handleSubmit } = useForm({
     initialValues: {
@@ -243,6 +267,7 @@ export const Login = () => {
         const waitTime = Math.ceil(
           (RATE_LIMIT_DELAY - timeSinceLastAttempt) / 1000,
         );
+        startRateLimitCountdown(waitTime);
         toast({
           title: "Please wait",
           description: `Too many login attempts. Please wait ${waitTime} second${waitTime !== 1 ? "s" : ""} before trying again.`,
@@ -387,11 +412,19 @@ export const Login = () => {
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting || rateLimitCountdown > 0}
+            >
               {isSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Sign In
+              {rateLimitCountdown > 0
+                ? `Wait ${rateLimitCountdown}s`
+                : isSubmitting
+                  ? "Signing In..."
+                  : "Sign In"}
             </Button>
 
             <div className="text-center text-sm text-muted-foreground">
