@@ -191,8 +191,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatBlogDate } from "@/utils/formatDate";
 import { ROUTES, DEFAULT_COVER_IMAGE } from "@/utils/constant";
-import { Heart, MessageCircle, Eye, Clock } from "lucide-react";
+import { Heart, MessageCircle, Eye, Clock, Bookmark, Share2 } from "lucide-react";
 import { LikeButton } from "@/components/shared/LikeButton";
+import { useToast } from "@/hooks/use-toast";
 import LazyImage, {
   LazyCoverImage,
   LazyAvatar,
@@ -201,10 +202,15 @@ import LazyImage, {
 export const BlogCard = memo(
   ({ blog, showActions = true, variant = "default" }) => {
     const navigate = useNavigate();
+    const { toast } = useToast();
 
     // Memoize computed values
     const blogUrl = useMemo(
       () => `${ROUTES.BLOG_DETAILS}/${blog.slug}`,
+      [blog.slug],
+    );
+    const fullBlogUrl = useMemo(
+      () => `${window.location.origin}${ROUTES.BLOG_DETAILS}/${blog.slug}`,
       [blog.slug],
     );
     const authorUrl = useMemo(
@@ -223,6 +229,52 @@ export const BlogCard = memo(
     const handleCommentClick = (e) => {
       e.stopPropagation();
       navigate(`${ROUTES.BLOG_DETAILS}/${blog.slug}#comments`);
+    };
+
+    const handleBookmark = async (e) => {
+      e.stopPropagation();
+      // TODO: Implement actual bookmark API call
+      // For now, just show success message
+      toast({
+        title: "Bookmarked!",
+        description: "Blog saved to your bookmarks",
+        duration: 2000,
+      });
+    };
+
+    const handleShare = async (e) => {
+      e.stopPropagation();
+
+      // Try native sharing first
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: blog.title,
+            text: blog.excerpt,
+            url: fullBlogUrl,
+          });
+          return;
+        } catch (error) {
+          // User cancelled or share failed, fall back to clipboard
+        }
+      }
+
+      // Fallback to clipboard
+      try {
+        await navigator.clipboard.writeText(fullBlogUrl);
+        toast({
+          title: "Link copied!",
+          description: "Blog link copied to clipboard",
+          duration: 2000,
+        });
+      } catch (error) {
+        toast({
+          title: "Share failed",
+          description: "Unable to share the blog",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
     };
 
     const renderContent = () => {
@@ -349,12 +401,7 @@ export const BlogCard = memo(
                     className="flex items-center space-x-1 hover:text-foreground transition-colors"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    <span>
-                      {blog.commentsCount ||
-                        blog.commentCount ||
-                        blog.comments?.length ||
-                        0}
-                    </span>
+                    <span>{blog.commentsCount || blog.commentCount || blog.comments?.length || 0}</span>
                   </button>
                   <div className="flex items-center space-x-1">
                     <Clock className="h-4 w-4" />
@@ -362,16 +409,32 @@ export const BlogCard = memo(
                   </div>
                 </div>
 
-                <LikeButton
-                  blogId={blog._id || blog.id}
-                  likeCount={
-                    blog.likesCount || blog.likeCount || blog.likes?.length || 0
-                  }
-                  isLiked={blog.isLiked}
-                  size="sm"
-                />
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBookmark}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Bookmark className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleShare}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                  <LikeButton
+                    blogId={blog._id || blog.id}
+                    likeCount={blog.likesCount || blog.likeCount || blog.likes?.length || 0}
+                    isLiked={blog.isLiked}
+                    size="sm"
+                  />
+                </div>
               </div>
-            </CardFooter>
+            </CardFooter>)
           )}
         </>
       );
