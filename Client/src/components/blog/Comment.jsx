@@ -83,7 +83,7 @@ export const Comment = ({
     if (!isAuthenticated) return;
 
     try {
-      await onLike(comment.id);
+      await onLike(commentId);
     } catch (err) {
       console.error("Failed to like comment:", err);
     }
