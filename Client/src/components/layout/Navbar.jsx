@@ -181,6 +181,12 @@ export const Navbar = () => {
                       Settings
                     </Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={ROUTES.HELP}>
+                      <HelpCircle className="mr-2 h-4 w-4" />
+                      Help
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
