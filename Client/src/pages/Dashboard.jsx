@@ -811,7 +811,7 @@ export const Dashboard = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate(`/edit/${blog._id}`)}
+          onClick={() => navigate(`${ROUTES.EDIT_BLOG}/${blog._id}`)}
         >
           <Edit3 className="h-4 w-4" />
         </Button>
