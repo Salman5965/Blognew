@@ -645,8 +645,8 @@ export const Dashboard = () => {
       });
       setRecentBlogs(blogsResponse.blogs || blogsResponse.data || []);
 
-      // Generate realistic activity based on actual stats
-      const activities = generateMockActivity(stats || {});
+      // Load activity from other users on current user's blogs
+      const activities = await userService.getUserActivity(user._id, 5);
       setRecentActivity(activities);
     } catch (error) {
       console.error("Error loading dashboard data:", error);
@@ -659,73 +659,6 @@ export const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const generateMockActivity = (stats = {}) => {
-    const activities = [];
-    const now = new Date();
-
-    // Generate activity based on actual user stats
-    if (stats?.blogs?.totalBlogs > 0) {
-      if (stats.blogs.totalBlogs >= 1) {
-        activities.push({
-          id: 1,
-          type: "blog_published",
-          message: "New blog post published",
-          time: "2 hours ago",
-          color: "bg-green-500",
-        });
-      }
-    }
-
-    if (stats?.blogs?.totalViews > 0) {
-      const dailyViews = Math.max(1, Math.round(stats.blogs.totalViews * 0.1));
-      activities.push({
-        id: 2,
-        type: "views",
-        message: `${dailyViews} new ${dailyViews === 1 ? "view" : "views"} today`,
-        time: "4 hours ago",
-        color: "bg-blue-500",
-      });
-    }
-
-    if (stats?.blogs?.totalLikes > 0) {
-      const newLikes = Math.max(1, Math.round(stats.blogs.totalLikes * 0.1));
-      activities.push({
-        id: 3,
-        type: "likes",
-        message: `${newLikes} new ${newLikes === 1 ? "like" : "likes"} received`,
-        time: "6 hours ago",
-        color: "bg-red-500",
-      });
-    }
-
-    if (stats?.comments?.totalComments > 0) {
-      const newComments = Math.max(
-        1,
-        Math.round(stats.comments.totalComments * 0.15),
-      );
-      activities.push({
-        id: 4,
-        type: "comments",
-        message: `${newComments} new ${newComments === 1 ? "comment" : "comments"} received`,
-        time: "8 hours ago",
-        color: "bg-purple-500",
-      });
-    }
-
-    // Add welcome message if no real activity
-    if (activities.length === 0) {
-      activities.push({
-        id: 1,
-        type: "welcome",
-        message: "Welcome to your dashboard!",
-        time: "Just now",
-        color: "bg-blue-500",
-      });
-    }
-
-    return activities.slice(0, 4); // Limit to 4 activities
   };
 
   const formatDate = (date) => {
@@ -1165,6 +1098,12 @@ export const Dashboard = () => {
                         <div className="flex-1">
                           <p className="text-sm text-gray-900 dark:text-white">
                             {activity.message}
+                            {activity.username &&
+                              activity.username !== "System" && (
+                                <span className="text-primary font-medium ml-1">
+                                  by {activity.username}
+                                </span>
+                              )}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
                             {activity.time}
