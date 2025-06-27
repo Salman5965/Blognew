@@ -321,14 +321,26 @@ export const getBlogsByUser = async (req, res, next) => {
       .populate("commentCount")
       .sort({ publishedAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    // Add user-specific like status if user is authenticated
+    const blogsWithLikeStatus = blogs.map((blog) => ({
+      ...blog,
+      isLiked: req.user
+        ? blog.likes.some(
+            (like) => like.user.toString() === req.user.id.toString(),
+          )
+        : false,
+      likeCount: blog.likes ? blog.likes.length : 0,
+    }));
 
     const total = await Blog.countDocuments(filter);
 
     res.status(200).json({
       status: "success",
       data: {
-        blogs,
+        blogs: blogsWithLikeStatus,
         pagination: {
           currentPage: page,
           totalPages: Math.ceil(total / limit),
