@@ -279,7 +279,7 @@ export const Comment = ({
         <div className="space-y-3">
           {comment.replies.map((reply) => (
             <Comment
-              key={reply.id}
+              key={reply._id || reply.id}
               comment={reply}
               onEdit={onEdit}
               onDelete={onDelete}
