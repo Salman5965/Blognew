@@ -142,23 +142,16 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
     }
   };
   const handleLikeComment = async (commentId) => {
-    const response = await fetch(`/api/comments/${commentId}/like`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-    });
+    const response = await apiService.post(`/comments/${commentId}/like`);
 
-    const data = await response.json();
-
-    if (data.status === "success") {
+    if (response.status === "success") {
       // Update the comment like status
       setComments((prev) =>
         prev.map((comment) =>
           comment.id === commentId
             ? {
                 ...comment,
-                likes: data.data.isLiked
+                likes: response.data.isLiked
                   ? [...(comment.likes || []), { user: user.id }]
                   : (comment.likes || []).filter(
                       (like) => like.user !== user.id,
@@ -169,7 +162,6 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       );
     }
   };
-
   if (!allowComments) {
     return (
       <div className="text-center py-8 text-muted-foreground">
