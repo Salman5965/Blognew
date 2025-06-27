@@ -1,4 +1,3 @@
-
 // import { PAGINATION } from "@/utils/constant";
 // import apiService from "./api";
 
@@ -303,10 +302,6 @@
 // export const blogService = new BlogService();
 // export default blogService;
 
-
-
-
-
 import { PAGINATION } from "@/utils/constant";
 import apiService from "./api";
 
@@ -422,17 +417,18 @@ class BlogService {
       return response.data;
     }
 
-    throw new Error(response.message || "Failed to like blog");
+    throw new Error(response.message || "Failed to toggle like");
   }
 
   async unlikeBlog(id) {
-    const response = await apiService.delete(`/blogs/${id}/like`);
+    // Both like and unlike use the same endpoint (toggle)
+    const response = await apiService.post(`/blogs/${id}/like`);
 
     if (response.status === "success") {
       return response.data;
     }
 
-    throw new Error(response.message || "Failed to unlike blog");
+    throw new Error(response.message || "Failed to toggle like");
   }
 
   async incrementViewCount(id) {
