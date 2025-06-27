@@ -172,7 +172,7 @@
 //   );
 // };
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Card,
@@ -194,11 +194,15 @@ import { Loader2, BookOpen, Eye, EyeOff } from "lucide-react";
 // Import toast hook — adjust path if needed
 import { useToast } from "@/hooks/use-toast";
 
+const RATE_LIMIT_DELAY = 3000; // 3 seconds between login attempts
+
 export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, login } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
+  const lastLoginAttempt = useRef(0);
+  const isLoginInProgress = useRef(false);
 
   // Toast trigger
   const { toast } = useToast();
@@ -231,7 +235,32 @@ export const Login = () => {
       return errors;
     },
     onSubmit: async (values) => {
+      // Rate limiting check
+      const now = Date.now();
+      const timeSinceLastAttempt = now - lastLoginAttempt.current;
+
+      if (timeSinceLastAttempt < RATE_LIMIT_DELAY) {
+        const waitTime = Math.ceil(
+          (RATE_LIMIT_DELAY - timeSinceLastAttempt) / 1000,
+        );
+        toast({
+          title: "Please wait",
+          description: `Too many login attempts. Please wait ${waitTime} second${waitTime !== 1 ? "s" : ""} before trying again.`,
+          variant: "destructive",
+          duration: 3000,
+        });
+        return;
+      }
+
+      // Prevent concurrent requests
+      if (isLoginInProgress.current) {
+        return;
+      }
+
       try {
+        isLoginInProgress.current = true;
+        lastLoginAttempt.current = now;
+
         console.log("Attempting login with:", { email: values.email }); // Debug log
         await login(values); // Make sure login throws error on failure!
         toast({
@@ -242,14 +271,39 @@ export const Login = () => {
         });
       } catch (error) {
         console.error("Login error:", error); // Debug log
+
+        // Handle specific error types
+        let title = "Login failed";
+        let description =
+          "Invalid credentials. Please check your email and password.";
+
+        if (error.response?.status === 429) {
+          title = "Too many attempts";
+          description =
+            "You've made too many login attempts. Please wait a few minutes before trying again.";
+        } else if (error.response?.status === 401) {
+          description =
+            "Invalid email or password. Please check your credentials.";
+        } else if (error.response?.status >= 500) {
+          title = "Server error";
+          description =
+            "Our servers are experiencing issues. Please try again later.";
+        } else if (error.isNetworkError || !error.response) {
+          title = "Connection error";
+          description =
+            "Unable to connect to our servers. Please check your internet connection.";
+        } else if (error.message) {
+          description = error.message;
+        }
+
         toast({
-          title: "Login failed",
-          description:
-            error.message ||
-            "Invalid credentials. Please check your email and password.",
+          title,
+          description,
           variant: "destructive",
           duration: 5000,
         });
+      } finally {
+        isLoginInProgress.current = false;
       }
     },
   });
