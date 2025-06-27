@@ -348,8 +348,9 @@ export const BlogCard = memo(
                 </div>
 
                 <LikeButton
-                  blogId={blog.id}
+                  blogId={blog._id || blog.id}
                   likeCount={blog.likeCount}
+                  isLiked={blog.isLiked}
                   size="sm"
                 />
               </div>
