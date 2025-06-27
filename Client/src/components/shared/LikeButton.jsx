@@ -95,8 +95,6 @@
 //   );
 // };
 
-
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
@@ -108,7 +106,7 @@ import { ROUTES } from "@/utils/constant";
 
 export const LikeButton = ({
   blogId,
-  likeCount,
+  likeCount = 0,
   isLiked = false,
   blogLikes = [],
   size = "md",
@@ -117,23 +115,24 @@ export const LikeButton = ({
 }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthContext();
-  const { likeBlog, unlikeBlog } = useBlogStore();
+  const { likeBlog, unlikeBlog, blogs } = useBlogStore();
 
-  // Determine if user has liked based on blog likes array
-  const userHasLiked =
-    blogLikes?.some((like) => like.user === user?.id) || isLiked;
+  // Find the current blog from store to get the most up-to-date like status
+  const currentBlog = blogs.find((blog) => (blog._id || blog.id) === blogId);
+
+  // Determine if user has liked based on current blog data or props
+  const userHasLiked = currentBlog?.isLiked ?? isLiked;
+  const currentLikeCount = currentBlog?.likeCount ?? likeCount;
 
   const [liked, setLiked] = useState(userHasLiked);
-  const [count, setCount] = useState(likeCount || blogLikes?.length || 0);
+  const [count, setCount] = useState(currentLikeCount);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Sync with prop changes
+  // Sync with prop changes and store updates
   useEffect(() => {
-    const userHasLiked =
-      blogLikes?.some((like) => like.user === user?.id) || isLiked;
     setLiked(userHasLiked);
-    setCount(likeCount || blogLikes?.length || 0);
-  }, [blogLikes, isLiked, likeCount, user?.id]);
+    setCount(currentLikeCount);
+  }, [userHasLiked, currentLikeCount, blogId]);
 
   const handleLike = async (e) => {
     e.preventDefault();
