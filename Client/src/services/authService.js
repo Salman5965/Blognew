@@ -131,12 +131,6 @@
 // export const authService = new AuthService();
 // export default authService;
 
-
-
-
-
-
-
 import { LOCAL_STORAGE_KEYS } from "@/utils/constant";
 import apiService from "./api";
 
@@ -153,6 +147,36 @@ class AuthService {
 
       throw new Error(response.message || "Login failed");
     } catch (error) {
+      // Enhance error messages for better user experience
+      if (error.isRateLimitError) {
+        throw new Error(
+          "Too many login attempts. Please wait before trying again.",
+        );
+      }
+
+      if (error.response?.status === 429) {
+        const retryAfter = error.response.headers["retry-after"];
+        throw new Error(
+          retryAfter
+            ? `Too many login attempts. Please try again in ${retryAfter} seconds.`
+            : "Too many login attempts. Please wait before trying again.",
+        );
+      }
+
+      if (error.response?.status === 401) {
+        throw new Error("Invalid email or password.");
+      }
+
+      if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+
+      if (error.isNetworkError || !error.response) {
+        throw new Error(
+          "Network connection failed. Please check your internet connection.",
+        );
+      }
+
       throw error;
     }
   }
