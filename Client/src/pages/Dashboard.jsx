@@ -964,7 +964,7 @@ export const Dashboard = () => {
                     <p className="text-muted-foreground mb-4">
                       Start creating your first blog post
                     </p>
-                    <Button onClick={() => navigate("/create")}>
+                    <Button onClick={() => navigate(ROUTES.CREATE_BLOG)}>
                       <PlusCircle className="h-4 w-4 mr-2" />
                       Create Blog
                     </Button>
