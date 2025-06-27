@@ -121,7 +121,7 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       // Update the comment in the list
       setComments((prev) =>
         prev.map((comment) =>
-          comment.id === commentId
+          (comment._id || comment.id) === commentId
             ? { ...comment, content: content.trim(), isEdited: true }
             : comment,
         ),
