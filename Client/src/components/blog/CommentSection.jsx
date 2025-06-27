@@ -136,7 +136,9 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
 
     if (response.status === "success") {
       // Remove the comment from the list
-      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+      setComments((prev) =>
+        prev.filter((comment) => (comment._id || comment.id) !== commentId),
+      );
     } else {
       throw new Error(response.message || "Failed to delete comment");
     }
