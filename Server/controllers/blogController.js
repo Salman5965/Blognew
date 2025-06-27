@@ -123,10 +123,21 @@ export const getBlogBySlug = async (req, res, next) => {
     blog.views += 1;
     await blog.save();
 
+    // Add user-specific like status
+    const blogWithLikeStatus = {
+      ...blog.toObject(),
+      isLiked: req.user
+        ? blog.likes.some(
+            (like) => like.user.toString() === req.user.id.toString(),
+          )
+        : false,
+      likeCount: blog.likes ? blog.likes.length : 0,
+    };
+
     res.status(200).json({
       status: "success",
       data: {
-        blog,
+        blog: blogWithLikeStatus,
       },
     });
   } catch (error) {
