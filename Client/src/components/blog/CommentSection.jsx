@@ -132,23 +132,15 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
   };
 
   const handleDeleteComment = async (commentId) => {
-    const response = await fetch(`/api/comments/${commentId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-    });
+    const response = await apiService.delete(`/comments/${commentId}`);
 
-    const data = await response.json();
-
-    if (data.status === "success") {
+    if (response.status === "success") {
       // Remove the comment from the list
       setComments((prev) => prev.filter((comment) => comment.id !== commentId));
     } else {
-      throw new Error(data.message || "Failed to delete comment");
+      throw new Error(response.message || "Failed to delete comment");
     }
   };
-
   const handleLikeComment = async (commentId) => {
     const response = await fetch(`/api/comments/${commentId}/like`, {
       method: "POST",
