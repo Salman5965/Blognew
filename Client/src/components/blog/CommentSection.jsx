@@ -113,20 +113,11 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
   const handleEditComment = async (commentId, content) => {
     if (!content.trim()) return;
 
-    const response = await fetch(`/api/comments/${commentId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-      body: JSON.stringify({
-        content: content.trim(),
-      }),
+    const response = await apiService.put(`/comments/${commentId}`, {
+      content: content.trim(),
     });
 
-    const data = await response.json();
-
-    if (data.status === "success") {
+    if (response.status === "success") {
       // Update the comment in the list
       setComments((prev) =>
         prev.map((comment) =>
@@ -136,7 +127,7 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
         ),
       );
     } else {
-      throw new Error(data.message || "Failed to update comment");
+      throw new Error(response.message || "Failed to update comment");
     }
   };
 
