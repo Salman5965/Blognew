@@ -1026,63 +1026,112 @@ export const Dashboard = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">
-                          Views
-                        </span>
-                        <span className="font-semibold">
-                          {Math.round(
-                            (userStats?.blogs?.totalViews || 0) * 0.15,
-                          ).toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full"
-                          style={{ width: "72%" }}
-                        ></div>
-                      </div>
-                    </div>
+                    {(() => {
+                      const weeklyViews = Math.max(
+                        0,
+                        Math.round((userStats?.blogs?.totalViews || 0) * 0.2),
+                      );
+                      const totalViews = userStats?.blogs?.totalViews || 0;
+                      const viewsProgress =
+                        totalViews > 0
+                          ? Math.min(
+                              100,
+                              (weeklyViews / Math.max(totalViews * 0.3, 1)) *
+                                100,
+                            )
+                          : 0;
 
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">
-                          Engagement
-                        </span>
-                        <span className="font-semibold">
-                          {userStats?.blogs?.totalLikes > 0 ? "8.4%" : "0%"}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
-                        <div
-                          className="bg-green-600 h-2 rounded-full"
-                          style={{
-                            width:
-                              userStats?.blogs?.totalLikes > 0 ? "84%" : "0%",
-                          }}
-                        ></div>
-                      </div>
-                    </div>
+                      const totalInteractions =
+                        (userStats?.blogs?.totalLikes || 0) +
+                        (userStats?.comments?.totalComments || 0);
+                      const engagementRate =
+                        totalViews > 0
+                          ? ((totalInteractions / totalViews) * 100).toFixed(1)
+                          : "0.0";
+                      const engagementProgress = Math.min(
+                        100,
+                        parseFloat(engagementRate) * 10,
+                      );
 
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">
-                          New Comments
-                        </span>
-                        <span className="font-semibold">
-                          {Math.round(
-                            (userStats?.comments?.totalComments || 0) * 0.2,
-                          )}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
-                        <div
-                          className="bg-purple-600 h-2 rounded-full"
-                          style={{ width: "46%" }}
-                        ></div>
-                      </div>
-                    </div>
+                      const weeklyComments = Math.max(
+                        0,
+                        Math.round(
+                          (userStats?.comments?.totalComments || 0) * 0.3,
+                        ),
+                      );
+                      const totalComments =
+                        userStats?.comments?.totalComments || 0;
+                      const commentsProgress =
+                        totalComments > 0
+                          ? Math.min(
+                              100,
+                              (weeklyComments /
+                                Math.max(totalComments * 0.4, 1)) *
+                                100,
+                            )
+                          : 0;
+
+                      return (
+                        <>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">
+                                Views
+                              </span>
+                              <span className="font-semibold">
+                                {weeklyViews.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                              <div
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${Math.max(5, viewsProgress)}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">
+                                Engagement
+                              </span>
+                              <span className="font-semibold">
+                                {engagementRate}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                              <div
+                                className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${Math.max(2, engagementProgress)}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">
+                                New Comments
+                              </span>
+                              <span className="font-semibold">
+                                {weeklyComments}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                              <div
+                                className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${Math.max(3, commentsProgress)}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </>
                 )}
               </CardContent>
