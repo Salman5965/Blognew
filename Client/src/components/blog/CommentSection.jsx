@@ -96,26 +96,17 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
   const handleReply = async (parentCommentId, content) => {
     if (!content.trim()) return;
 
-    const response = await fetch("/api/comments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-      body: JSON.stringify({
-        content: content.trim(),
-        blog: blogId,
-        parentComment: parentCommentId,
-      }),
+    const response = await apiService.post("/comments", {
+      content: content.trim(),
+      blog: blogId,
+      parentComment: parentCommentId,
     });
 
-    const data = await response.json();
-
-    if (data.status === "success") {
+    if (response.status === "success") {
       // Refresh comments to show the new reply
       fetchComments();
     } else {
-      throw new Error(data.message || "Failed to post reply");
+      throw new Error(response.message || "Failed to post reply");
     }
   };
 
