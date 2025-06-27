@@ -662,38 +662,58 @@ export const Dashboard = () => {
 
   const generateMockActivity = (stats = {}) => {
     const activities = [];
+    const now = new Date();
 
+    // Generate activity based on actual user stats
     if (stats?.blogs?.totalBlogs > 0) {
-      activities.push({
-        id: 1,
-        type: "blog_published",
-        message: "Blog published successfully",
-        time: "2 hours ago",
-        color: "bg-green-500",
-      });
+      if (stats.blogs.totalBlogs >= 1) {
+        activities.push({
+          id: 1,
+          type: "blog_published",
+          message: "New blog post published",
+          time: "2 hours ago",
+          color: "bg-green-500",
+        });
+      }
     }
 
     if (stats?.blogs?.totalViews > 0) {
+      const dailyViews = Math.max(1, Math.round(stats.blogs.totalViews * 0.1));
       activities.push({
         id: 2,
         type: "views",
-        message: `${Math.round(stats.blogs.totalViews * 0.1)} new views today`,
+        message: `${dailyViews} new ${dailyViews === 1 ? "view" : "views"} today`,
         time: "4 hours ago",
         color: "bg-blue-500",
       });
     }
 
     if (stats?.blogs?.totalLikes > 0) {
+      const newLikes = Math.max(1, Math.round(stats.blogs.totalLikes * 0.1));
       activities.push({
         id: 3,
         type: "likes",
-        message: `${Math.round(stats.blogs.totalLikes * 0.05)} new likes`,
+        message: `${newLikes} new ${newLikes === 1 ? "like" : "likes"} received`,
         time: "6 hours ago",
         color: "bg-red-500",
       });
     }
 
-    // Add default activity if no stats available
+    if (stats?.comments?.totalComments > 0) {
+      const newComments = Math.max(
+        1,
+        Math.round(stats.comments.totalComments * 0.15),
+      );
+      activities.push({
+        id: 4,
+        type: "comments",
+        message: `${newComments} new ${newComments === 1 ? "comment" : "comments"} received`,
+        time: "8 hours ago",
+        color: "bg-purple-500",
+      });
+    }
+
+    // Add welcome message if no real activity
     if (activities.length === 0) {
       activities.push({
         id: 1,
@@ -704,7 +724,7 @@ export const Dashboard = () => {
       });
     }
 
-    return activities;
+    return activities.slice(0, 4); // Limit to 4 activities
   };
 
   const formatDate = (date) => {
