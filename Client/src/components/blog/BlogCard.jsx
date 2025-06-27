@@ -200,6 +200,8 @@ import LazyImage, {
 
 export const BlogCard = memo(
   ({ blog, showActions = true, variant = "default" }) => {
+    const navigate = useNavigate();
+
     // Memoize computed values
     const blogUrl = useMemo(
       () => `${ROUTES.BLOG_DETAILS}/${blog.slug}`,
@@ -217,6 +219,11 @@ export const BlogCard = memo(
       () => blog.author.username.charAt(0).toUpperCase(),
       [blog.author.username],
     );
+
+    const handleCommentClick = (e) => {
+      e.stopPropagation();
+      navigate(`${ROUTES.BLOG_DETAILS}/${blog.slug}#comments`);
+    };
 
     const renderContent = () => {
       if (variant === "compact") {
