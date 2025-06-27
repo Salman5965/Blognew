@@ -274,6 +274,18 @@ export const BlogDetails = () => {
     };
   }, [slug, getBlogBySlug]);
 
+  useEffect(() => {
+    // Scroll to comments section if hash is present
+    if (window.location.hash === "#comments" && !isLoading && currentBlog) {
+      setTimeout(() => {
+        const commentsSection = document.getElementById("comments");
+        if (commentsSection) {
+          commentsSection.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  }, [isLoading, currentBlog]);
+
   const handleDelete = async () => {
     if (!currentBlog) return;
 
