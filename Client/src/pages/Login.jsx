@@ -172,11 +172,6 @@
 //   );
 // };
 
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -237,11 +232,21 @@ export const Login = () => {
     },
     onSubmit: async (values) => {
       try {
+        console.log("Attempting login with:", { email: values.email }); // Debug log
         await login(values); // Make sure login throws error on failure!
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+          variant: "default",
+          duration: 3000,
+        });
       } catch (error) {
+        console.error("Login error:", error); // Debug log
         toast({
           title: "Login failed",
-          description: error.message || "Invalid credentials",
+          description:
+            error.message ||
+            "Invalid credentials. Please check your email and password.",
           variant: "destructive",
           duration: 5000,
         });
