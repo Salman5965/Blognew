@@ -418,10 +418,21 @@ export const getPopularBlogs = async (req, res, next) => {
 
     const blogs = await Blog.getPopularBlogs(limit);
 
+    // Add user-specific like status if user is authenticated
+    const blogsWithLikeStatus = blogs.map((blog) => ({
+      ...blog,
+      isLiked: req.user
+        ? blog.likes.some(
+            (like) => like.user.toString() === req.user.id.toString(),
+          )
+        : false,
+      likeCount: blog.likes ? blog.likes.length : 0,
+    }));
+
     res.status(200).json({
       status: "success",
       data: {
-        blogs,
+        blogs: blogsWithLikeStatus,
       },
     });
   } catch (error) {
