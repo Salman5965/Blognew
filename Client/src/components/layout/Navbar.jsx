@@ -93,10 +93,10 @@ export const Navbar = () => {
                 Feed
               </Link>
               <Link
-                to={ROUTES.HELP}
+                to="/daily-drip"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Help
+                DailyDrip
               </Link>
             </div>
           )}
