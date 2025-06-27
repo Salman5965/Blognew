@@ -219,6 +219,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LikeButton } from "@/components/shared/LikeButton";
 import { useToast } from "@/hooks/use-toast";
+import { bookmarkService } from "@/services/bookmarkService";
 
 export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
   const { toast } = useToast();
@@ -264,13 +265,24 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
   };
 
   const handleBookmark = async () => {
-    // TODO: Implement actual bookmark API call
-    // For now, just show success message
-    toast({
-      title: "Bookmarked!",
-      description: "Blog saved to your bookmarks",
-      duration: 2000,
-    });
+    try {
+      const result = await bookmarkService.toggleBookmark(blog._id || blog.id);
+
+      toast({
+        title: result.bookmarked ? "Bookmarked!" : "Bookmark removed",
+        description: result.bookmarked
+          ? "Blog saved to your bookmarks"
+          : "Blog removed from bookmarks",
+        duration: 2000,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to bookmark blog",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
   if (variant === "compact") {
