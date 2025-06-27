@@ -84,7 +84,7 @@ export const getBlogs = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       data: {
-        blogs,
+        blogs: blogsWithLikeStatus,
         pagination: {
           currentPage: page,
           totalPages,
