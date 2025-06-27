@@ -423,6 +423,16 @@ export const useBlogStore = create(
       setLoading: (loading) => {
         set({ isLoading: loading });
       },
+
+      refreshBlogs: async () => {
+        // Refresh the current blogs list to ensure all like states are up to date
+        const { pagination, filters } = get();
+        await get().getBlogs({
+          page: pagination.page,
+          limit: pagination.limit,
+          ...filters,
+        });
+      },
     }),
     {
       name: "blog-store",
