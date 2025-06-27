@@ -732,15 +732,22 @@ export const Dashboard = () => {
       <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
         <div className="flex items-center space-x-1">
           <Eye className="h-4 w-4" />
-          <span>{blog.views || 0}</span>
+          <span>{blog.views || blog.viewCount || 0}</span>
         </div>
         <div className="flex items-center space-x-1">
           <Heart className="h-4 w-4" />
-          <span>{blog.likeCount || blog.likes?.length || 0}</span>
+          <span>
+            {blog.likesCount || blog.likeCount || blog.likes?.length || 0}
+          </span>
         </div>
         <div className="flex items-center space-x-1">
           <MessageCircle className="h-4 w-4" />
-          <span>{blog.commentsCount || 0}</span>
+          <span>
+            {blog.commentsCount ||
+              blog.commentCount ||
+              blog.comments?.length ||
+              0}
+          </span>
         </div>
         <Button
           variant="ghost"
