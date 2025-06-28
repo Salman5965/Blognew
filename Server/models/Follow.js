@@ -99,7 +99,7 @@ followSchema.statics.isFollowing = function (followerId, followingId) {
 followSchema.statics.findMutualFollows = function (userId) {
   return this.aggregate([
     // Get users that current user follows
-    { $match: { follower: mongoose.Types.ObjectId(userId) } },
+    { $match: { follower: new mongoose.Types.ObjectId(userId) } },
     // Join with follows where these users follow back
     {
       $lookup: {
@@ -111,7 +111,7 @@ followSchema.statics.findMutualFollows = function (userId) {
               $expr: {
                 $and: [
                   { $eq: ["$follower", "$$followingId"] },
-                  { $eq: ["$following", mongoose.Types.ObjectId(userId)] },
+                  { $eq: ["$following", new mongoose.Types.ObjectId(userId)] },
                 ],
               },
             },

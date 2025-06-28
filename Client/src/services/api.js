@@ -261,11 +261,17 @@ class ApiService {
         url: url,
         timestamp: new Date().toISOString(),
       };
-      console.error(`API Error for ${url}:`, errorDetails);
+      console.error(
+        `API Error for ${url}:`,
+        JSON.stringify(errorDetails, null, 2),
+      );
 
       // Also log response data if available
       if (error.response?.data) {
-        console.error("Error response data:", error.response.data);
+        console.error(
+          "Error response data:",
+          JSON.stringify(error.response.data, null, 2),
+        );
       }
 
       // Handle network errors gracefully

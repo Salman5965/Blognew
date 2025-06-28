@@ -1,4 +1,5 @@
 import Notification from "../models/Notification.js";
+import User from "../models/User.js";
 import { validationResult } from "express-validator";
 
 // Get user notifications
