@@ -227,6 +227,16 @@ const App = () => (
                       }
                     />
 
+                    {/* Explore Page */}
+                    <Route
+                      path={ROUTES.EXPLORE}
+                      element={
+                        <PrivateRoute>
+                          <Explore />
+                        </PrivateRoute>
+                      }
+                    />
+
                     {/* Catch-all route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
