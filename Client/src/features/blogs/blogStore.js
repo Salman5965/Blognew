@@ -61,13 +61,13 @@ export const useBlogStore = create(
           const response = await blogService.getBlogs(mergedQuery);
 
           // Handle different response structures
-          let blogs = [];
+          let blogList = [];
           let paginationData = initialPagination;
 
           if (response) {
             // Handle case where response.data exists
             if (response.data) {
-              blogs = Array.isArray(response.data)
+              blogList = Array.isArray(response.data)
                 ? response.data
                 : response.data.blogs
                   ? response.data.blogs
@@ -79,22 +79,22 @@ export const useBlogStore = create(
             }
             // Handle case where response.blogs exists
             else if (response.blogs) {
-              blogs = Array.isArray(response.blogs) ? response.blogs : [];
+              blogList = Array.isArray(response.blogs) ? response.blogs : [];
               paginationData = response.pagination || initialPagination;
             }
             // Handle case where response is array directly
             else if (Array.isArray(response)) {
-              blogs = response;
+              blogList = response;
             }
             // Handle case where response has the data directly
             else {
-              blogs = response.blogs || [];
+              blogList = response.blogs || [];
               paginationData = response.pagination || initialPagination;
             }
           }
 
           set({
-            blogs: blogs,
+            blogs: blogList,
             pagination: {
               ...initialPagination,
               ...paginationData,
