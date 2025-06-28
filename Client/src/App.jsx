@@ -192,6 +192,7 @@ const Analytics = React.lazy(() =>
 );
 const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
+const Discover = React.lazy(() => import("./pages/Discover"));
 
 // Loading component for suspense
 const PageLoader = () => (
@@ -309,6 +310,16 @@ const App = () => (
                       element={
                         <PrivateRoute>
                           <Analytics />
+                        </PrivateRoute>
+                      }
+                    />
+
+                    {/* Discover page */}
+                    <Route
+                      path={ROUTES.DISCOVER}
+                      element={
+                        <PrivateRoute>
+                          <Discover />
                         </PrivateRoute>
                       }
                     />
