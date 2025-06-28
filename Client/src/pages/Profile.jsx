@@ -906,6 +906,209 @@ const Profile = () => {
           {/* Settings Tab */}
           <TabsContent value="settings">
             <div className="space-y-6">
+              {/* Privacy Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Shield className="h-5 w-5" />
+                    <span>Privacy Settings</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Profile Visibility */}
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium">Profile Visibility</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Control who can see your profile and posts
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="profileVisibility"
+                          value="public"
+                          checked={
+                            privacySettings.profileVisibility === "public"
+                          }
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              profileVisibility: e.target.value,
+                            }))
+                          }
+                          className="text-primary"
+                        />
+                        <div>
+                          <div className="font-medium">Public</div>
+                          <div className="text-sm text-muted-foreground">
+                            Anyone can see your profile and posts
+                          </div>
+                        </div>
+                      </label>
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="profileVisibility"
+                          value="private"
+                          checked={
+                            privacySettings.profileVisibility === "private"
+                          }
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              profileVisibility: e.target.value,
+                            }))
+                          }
+                          className="text-primary"
+                        />
+                        <div>
+                          <div className="font-medium">Private</div>
+                          <div className="text-sm text-muted-foreground">
+                            Only your followers can see your posts
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Profile Information */}
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium">Profile Information</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Choose what information to display on your profile
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">Show Email</div>
+                          <div className="text-sm text-muted-foreground">
+                            Display your email address on your profile
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.showEmail}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              showEmail: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">Show Followers</div>
+                          <div className="text-sm text-muted-foreground">
+                            Display your followers list publicly
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.showFollowers}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              showFollowers: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">Show Following</div>
+                          <div className="text-sm text-muted-foreground">
+                            Display who you follow publicly
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.showFollowing}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              showFollowing: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Interaction Settings */}
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium">Interaction Settings</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Control how others can interact with you
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">Allow Messages</div>
+                          <div className="text-sm text-muted-foreground">
+                            Let others send you direct messages
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.allowMessages}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              allowMessages: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">
+                            Allow Follow Requests
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Allow others to follow you
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.allowFollow}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              allowFollow: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <Button
+                      onClick={handleSavePrivacySettings}
+                      disabled={isLoading}
+                    >
+                      {isLoading && (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      )}
+                      Save Privacy Settings
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Account Settings */}
               <Card>
                 <CardHeader>
                   <CardTitle>Account Settings</CardTitle>
