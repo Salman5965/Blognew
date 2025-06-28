@@ -58,12 +58,10 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     // Load initial messages
     const loadMessages = async () => {
       try {
-        const data = await forumService.getChannelMessages(
-          channel.id || channel._id,
-        );
+        const data = await forumService.getChannelMessages(channel.id || channel._id);
         setMessages(data.messages || []);
       } catch (error) {
-        console.error("Failed to load messages:", error);
+        console.error('Failed to load messages:', error);
         // Fall back to mock messages on error
         setMessages(getMockMessages());
       } finally {
@@ -78,59 +76,52 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
 
     // Socket event listeners
     const handleNewMessage = (newMessage) => {
-      setMessages((prev) => [...prev, newMessage]);
+      setMessages(prev => [...prev, newMessage]);
     };
 
     const handleMessageReaction = (data) => {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === data.messageId || msg._id === data.messageId
-            ? { ...msg, reactions: data.reactions }
-            : msg,
-        ),
-      );
+      setMessages(prev => prev.map(msg =>
+        msg.id === data.messageId || msg._id === data.messageId
+          ? { ...msg, reactions: data.reactions }
+          : msg
+      ));
     };
 
     const handleUserTyping = (data) => {
-      if (
-        data.userId !== user.id &&
-        data.channelId === (channel.id || channel._id)
-      ) {
-        setTypingUsers((prev) =>
-          prev.includes(data.username) ? prev : [...prev, data.username],
+      if (data.userId !== user.id && data.channelId === (channel.id || channel._id)) {
+        setTypingUsers(prev =>
+          prev.includes(data.username) ? prev : [...prev, data.username]
         );
       }
     };
 
     const handleUserStoppedTyping = (data) => {
       if (data.channelId === (channel.id || channel._id)) {
-        setTypingUsers((prev) =>
-          prev.filter((username) => username !== data.username),
-        );
+        setTypingUsers(prev => prev.filter(username => username !== data.username));
       }
     };
 
     const handleConnectionStatus = (status) => {
-      setSocketConnected(status === "connected");
+      setSocketConnected(status === 'connected');
     };
 
     // Register socket listeners
-    socketService.on("new_message", handleNewMessage);
-    socketService.on("message_reaction", handleMessageReaction);
-    socketService.on("user_typing", handleUserTyping);
-    socketService.on("user_stopped_typing", handleUserStoppedTyping);
-    socketService.on("connectionStatusChanged", handleConnectionStatus);
+    socketService.on('new_message', handleNewMessage);
+    socketService.on('message_reaction', handleMessageReaction);
+    socketService.on('user_typing', handleUserTyping);
+    socketService.on('user_stopped_typing', handleUserStoppedTyping);
+    socketService.on('connectionStatusChanged', handleConnectionStatus);
 
     // Check initial connection status
     setSocketConnected(socketService.connected);
 
     // Cleanup
     return () => {
-      socketService.off("new_message", handleNewMessage);
-      socketService.off("message_reaction", handleMessageReaction);
-      socketService.off("user_typing", handleUserTyping);
-      socketService.off("user_stopped_typing", handleUserStoppedTyping);
-      socketService.off("connectionStatusChanged", handleConnectionStatus);
+      socketService.off('new_message', handleNewMessage);
+      socketService.off('message_reaction', handleMessageReaction);
+      socketService.off('user_typing', handleUserTyping);
+      socketService.off('user_stopped_typing', handleUserStoppedTyping);
+      socketService.off('connectionStatusChanged', handleConnectionStatus);
       socketService.leaveChannel(channel.id || channel._id);
 
       if (typingTimeoutRef.current) {
@@ -146,19 +137,18 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
       user: {
         id: "user1",
         name: "Community Bot",
-        avatar:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
+        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
         role: "Bot",
         isOnline: true,
       },
-      content: `Welcome to #${channel.name}! 🎉 This is where we discuss ${channel.description?.toLowerCase() || "various topics"}. Feel free to ask questions and share your knowledge!`,
+      content: `Welcome to #${channel.name}! 🎉 This is where we discuss ${channel.description?.toLowerCase() || 'various topics'}. Feel free to ask questions and share your knowledge!`,
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
       reactions: [
         { emoji: "👋", count: 12, users: ["user2", "user3"] },
         { emoji: "🎉", count: 8, users: ["user4"] },
       ],
       isPinned: true,
-    },
+    }
   ];
 
   const scrollToBottom = () => {
@@ -174,8 +164,8 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
 
     const messageData = {
       content: message,
-      type: "text",
-      channelId: channel.id || channel._id,
+      type: 'text',
+      channelId: channel.id || channel._id
     };
 
     try {
@@ -195,17 +185,14 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
         clearTimeout(typingTimeoutRef.current);
       }
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error('Failed to send message:', error);
 
       // Fallback: add message locally if socket/API fails
       const fallbackMessage = {
         id: Date.now(),
         user: {
           id: user.id || user._id,
-          name:
-            `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-            user.username ||
-            "User",
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'User',
           avatar: user.avatar,
           role: "Member",
           isOnline: true,
@@ -268,17 +255,16 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
 
       // Also send via API for persistence
       await forumService.addReaction(messageId, emoji);
+
     } catch (error) {
-      console.error("Failed to add reaction:", error);
+      console.error('Failed to add reaction:', error);
 
       // Fallback: update locally
       setMessages((prev) =>
         prev.map((msg) => {
           if (msg.id === messageId || msg._id === messageId) {
             const userId = user.id || user._id;
-            const existingReaction = msg.reactions?.find(
-              (r) => r.emoji === emoji,
-            );
+            const existingReaction = msg.reactions?.find((r) => r.emoji === emoji);
 
             if (existingReaction) {
               if (existingReaction.users.includes(userId)) {
@@ -303,11 +289,7 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
                   ...msg,
                   reactions: msg.reactions.map((r) =>
                     r.emoji === emoji
-                      ? {
-                          ...r,
-                          count: r.count + 1,
-                          users: [...r.users, userId],
-                        }
+                      ? { ...r, count: r.count + 1, users: [...r.users, userId] }
                       : r,
                   ),
                 };
@@ -372,10 +354,7 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
               {socketConnected ? (
                 <Wifi className="h-4 w-4 text-green-500" title="Connected" />
               ) : (
-                <WifiOff
-                  className="h-4 w-4 text-red-500"
-                  title="Disconnected"
-                />
+                <WifiOff className="h-4 w-4 text-red-500" title="Disconnected" />
               )}
             </div>
             <p className="text-sm text-muted-foreground">
@@ -400,6 +379,14 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+              <p className="text-sm text-muted-foreground">Loading messages...</p>
+            </div>
+          </div>
+        ) : (
         {messages.map((msg, index) => {
           const showAvatar =
             index === 0 || messages[index - 1].user.id !== msg.user.id;
@@ -587,11 +574,7 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim() || !socketConnected}
-            title={
-              !socketConnected
-                ? "Disconnected - cannot send messages"
-                : "Send message"
-            }
+            title={!socketConnected ? "Disconnected - cannot send messages" : "Send message"}
           >
             <Send className="h-4 w-4" />
           </Button>
