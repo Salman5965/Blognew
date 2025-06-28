@@ -25,14 +25,7 @@ export const rateLimiter = (identifier, maxRequests, windowMs) => {
       // Skip rate limiting for admin users
       return req.user && req.user.role === "admin";
     },
-    onLimitReached: (req, res) => {
-      console.warn(`Rate limit exceeded for ${identifier}:`, {
-        ip: req.ip,
-        userId: req.user?.id,
-        userAgent: req.get("User-Agent"),
-        timestamp: new Date().toISOString(),
-      });
-    },
+    // onLimitReached deprecated in v7
   });
 };
 
@@ -50,13 +43,7 @@ export const loginRateLimiter = rateLimit({
   legacyHeaders: false,
   keyGenerator: (req) => req.ip,
   skipSuccessfulRequests: true, // Don't count successful requests
-  onLimitReached: (req, res) => {
-    console.warn("Login rate limit exceeded:", {
-      ip: req.ip,
-      userAgent: req.get("User-Agent"),
-      timestamp: new Date().toISOString(),
-    });
-  },
+  // onLimitReached deprecated in v7
 });
 
 // Progressive rate limiter that increases restrictions based on violations
