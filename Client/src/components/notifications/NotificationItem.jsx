@@ -11,8 +11,8 @@ import {
   Check,
   Eye,
 } from "lucide-react";
-import { Button } from "../ui/button";
-import { formatDistanceToNow } from "date-fns";
+import { Button } from "@/components/ui/button";
+import useNotificationStore from "@/features/notifications/notificationStore";
 import useNotificationStore from "../../features/notifications/notificationStore";
 
 const NotificationItem = ({ notification }) => {

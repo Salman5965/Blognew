@@ -7,12 +7,11 @@ import {
   Trash2,
   RefreshCw,
 } from "lucide-react";
-import { Button } from "../components/ui/button";
-import { Card } from "../components/ui/card";
-import PageWrapper from "../components/layout/PageWrapper";
-import useNotificationStore from "../features/notifications/notificationStore";
-import useAuthStore from "../features/auth/authStore";
-import NotificationList from "../components/notifications/NotificationList";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import useNotificationStore from "@/features/notifications/notificationStore";
+import { useAuthContext } from "@/contexts/AuthContext";
+import NotificationList from "@/components/notifications/NotificationList";
 import { Navigate } from "react-router-dom";
 
 const Notifications = () => {
@@ -20,7 +19,7 @@ const Notifications = () => {
   const [typeFilter, setTypeFilter] = useState("all");
   const [showSettings, setShowSettings] = useState(false);
 
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthContext();
   const {
     notifications,
     unreadCount,
@@ -99,7 +98,7 @@ const Notifications = () => {
   ];
 
   return (
-    <PageWrapper>
+    <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -290,7 +289,7 @@ const Notifications = () => {
           />
         </Card>
       </div>
-    </PageWrapper>
+    </div>
   );
 };
 

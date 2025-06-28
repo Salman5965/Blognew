@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Bell } from "lucide-react";
-import { Button } from "../ui/button";
-import useNotificationStore from "../../features/notifications/notificationStore";
-import useAuthStore from "../../features/auth/authStore";
+import { Button } from "@/components/ui/button";
+import useNotificationStore from "@/features/notifications/notificationStore";
+import { useAuthContext } from "@/contexts/AuthContext";
 import NotificationPanel from "./NotificationPanel";
 
 const NotificationButton = () => {
@@ -11,7 +11,7 @@ const NotificationButton = () => {
   const buttonRef = useRef(null);
   const panelRef = useRef(null);
 
-  const { user, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useAuthContext();
   const { unreadCount, fetchNotifications, fetchUnreadCount, initialize } =
     useNotificationStore();
 

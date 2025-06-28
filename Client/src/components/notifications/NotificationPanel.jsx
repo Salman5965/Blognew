@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Settings, CheckCheck, Filter } from "lucide-react";
-import { Button } from "../ui/button";
-import { Card } from "../ui/card";
-import useNotificationStore from "../../features/notifications/notificationStore";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import useNotificationStore from "@/features/notifications/notificationStore";
 import NotificationList from "./NotificationList";
 
 const NotificationPanel = ({ onClose }) => {
