@@ -1,4 +1,4 @@
-import api from "./api";
+import { apiService as api } from "@/services/api";
 
 class NotificationService {
   // Get all notifications for current user

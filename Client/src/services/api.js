@@ -213,20 +213,7 @@ class ApiService {
       // Debug logging
       debugApiRequest(url, "GET", config.params);
 
-      // Check rate limiting (unless disabled)
-      if (config.skipRateLimit !== true) {
-        const rateCheck = rateLimiter.canMakeRequest(url, 5, 60000); // 5 requests per minute
-        if (!rateCheck.allowed) {
-          const error = new Error(
-            `Rate limit exceeded. Try again in ${rateCheck.retryAfter} seconds.`,
-          );
-          error.isRateLimitError = true;
-          error.retryAfter = rateCheck.retryAfter;
-          error.status = 429;
-          throw error;
-        }
-        rateLimiter.recordRequest(url);
-      }
+      // Rate limiting can be added here if needed
 
       // Check if caching is enabled for this request
       const enableCache = config.cache !== false;
