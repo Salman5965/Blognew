@@ -32,6 +32,7 @@ const CommunityForum = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isChannelListOpen, setIsChannelListOpen] = useState(true);
   const { user, isAuthenticated } = useAuthContext();
+  const { isConnected, connectionStatus, retry } = useForumConnection();
 
   const forumStats = {
     totalMembers: 12453,
