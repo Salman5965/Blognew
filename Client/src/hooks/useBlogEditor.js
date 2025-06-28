@@ -11,6 +11,7 @@ const INITIAL_STATE = {
   category: "", // Added category field
   tags: [],
   isPublished: false,
+  visibility: "public", // Added visibility field
 };
 
 export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
@@ -35,6 +36,9 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
   const [isPublished, setIsPublishedState] = useState(
     initialBlog?.isPublished || INITIAL_STATE.isPublished,
   );
+  const [visibility, setVisibilityState] = useState(
+    initialBlog?.visibility || INITIAL_STATE.visibility,
+  );
 
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,6 +51,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
     coverImage: initialBlog?.coverImage || "",
     category: initialBlog?.category || "", // Added to initial state ref
     tags: initialBlog?.tags || [],
+    visibility: initialBlog?.visibility || "public",
     isPublished: initialBlog?.isPublished || false,
   });
 
