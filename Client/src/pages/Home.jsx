@@ -1,4 +1,3 @@
-
 // import React, { useState } from "react";
 // import { PageWrapper } from "@/components/layout/PageWrapper";
 // import { BlogList } from "@/components/blog/BlogList";
@@ -199,10 +198,6 @@
 //   );
 // };
 
-
-
-
-
 import React, { useState } from "react";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { BlogList } from "@/components/blog/BlogList";
@@ -212,6 +207,7 @@ import { Input } from "@/components/ui/input";
 import { useBlogStore } from "@/features/blogs/blogStore";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { DEBOUNCE_DELAY } from "@/utils/constant";
+import { FollowSuggestions } from "@/components/users/FollowSuggestions";
 import { Search, Filter, Grid, List, X } from "lucide-react";
 
 export const Home = () => {
@@ -396,8 +392,25 @@ export const Home = () => {
           </div>
         )}
 
-        {/* Blog List */}
-        <BlogList variant={viewMode} />
+        {/* Main Content Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content - Blog List */}
+          <div className="lg:col-span-3">
+            <BlogList variant={viewMode} />
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Follow Suggestions */}
+            <div className="sticky top-6">
+              <FollowSuggestions
+                limit={5}
+                variant="compact"
+                title="Suggested for you"
+              />
+            </div>
+          </div>
+        </div>
       </PageWrapper>
     </div>
   );
