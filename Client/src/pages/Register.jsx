@@ -88,32 +88,6 @@ const Register = () => {
               </Alert>
             )}
 
-            {/* Demo credentials notice */}
-            <div className="bg-muted/50 border border-border rounded-lg p-3">
-              <p className="text-sm text-muted-foreground mb-2">
-                <strong>Demo Mode:</strong> Backend may be unavailable. Use demo
-                credentials:
-              </p>
-              <div className="flex flex-col gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setValue("username", "demouser");
-                    setValue("email", "demo@example.com");
-                    setValue("firstName", "Demo");
-                    setValue("lastName", "User");
-                    setValue("password", "demo123");
-                    setValue("confirmPassword", "demo123");
-                  }}
-                  className="text-xs"
-                >
-                  Fill Demo Registration
-                </Button>
-              </div>
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input
