@@ -261,53 +261,72 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     }
   };
 
-  const addReaction = (messageId, emoji) => {
-    setMessages((prev) =>
-      prev.map((msg) => {
-        if (msg.id === messageId) {
-          const existingReaction = msg.reactions.find((r) => r.emoji === emoji);
-          if (existingReaction) {
-            if (existingReaction.users.includes(user.id)) {
-              // Remove reaction
-              return {
-                ...msg,
-                reactions: msg.reactions
-                  .map((r) =>
+  const addReaction = async (messageId, emoji) => {
+    try {
+      // Send reaction via socket for real-time update
+      socketService.addReaction(messageId, emoji);
+
+      // Also send via API for persistence
+      await forumService.addReaction(messageId, emoji);
+    } catch (error) {
+      console.error("Failed to add reaction:", error);
+
+      // Fallback: update locally
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.id === messageId || msg._id === messageId) {
+            const userId = user.id || user._id;
+            const existingReaction = msg.reactions?.find(
+              (r) => r.emoji === emoji,
+            );
+
+            if (existingReaction) {
+              if (existingReaction.users.includes(userId)) {
+                // Remove reaction
+                return {
+                  ...msg,
+                  reactions: msg.reactions
+                    .map((r) =>
+                      r.emoji === emoji
+                        ? {
+                            ...r,
+                            count: r.count - 1,
+                            users: r.users.filter((u) => u !== userId),
+                          }
+                        : r,
+                    )
+                    .filter((r) => r.count > 0),
+                };
+              } else {
+                // Add reaction
+                return {
+                  ...msg,
+                  reactions: msg.reactions.map((r) =>
                     r.emoji === emoji
                       ? {
                           ...r,
-                          count: r.count - 1,
-                          users: r.users.filter((u) => u !== user.id),
+                          count: r.count + 1,
+                          users: [...r.users, userId],
                         }
                       : r,
-                  )
-                  .filter((r) => r.count > 0),
-              };
+                  ),
+                };
+              }
             } else {
-              // Add reaction
+              // New reaction
               return {
                 ...msg,
-                reactions: msg.reactions.map((r) =>
-                  r.emoji === emoji
-                    ? { ...r, count: r.count + 1, users: [...r.users, user.id] }
-                    : r,
-                ),
+                reactions: [
+                  ...(msg.reactions || []),
+                  { emoji, count: 1, users: [userId] },
+                ],
               };
             }
-          } else {
-            // New reaction
-            return {
-              ...msg,
-              reactions: [
-                ...msg.reactions,
-                { emoji, count: 1, users: [user.id] },
-              ],
-            };
           }
-        }
-        return msg;
-      }),
-    );
+          return msg;
+        }),
+      );
+    }
   };
 
   const formatMessageContent = (content) => {
