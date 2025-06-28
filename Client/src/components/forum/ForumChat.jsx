@@ -58,14 +58,14 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     // Load initial messages
     const loadMessages = async () => {
       try {
-        const data = await forumService.getChannelMessages(channel.id || channel._id);
+        const data = await forumService.getChannelMessages(
+          channel.id || channel._id,
+        );
         setMessages(data.messages || []);
       } catch (error) {
-        console.error('Failed to load messages:', error);
+        console.error("Failed to load messages:", error);
         setMessages([]);
       } finally {
-        setIsLoading(false);
-      }
         setIsLoading(false);
       }
     };
