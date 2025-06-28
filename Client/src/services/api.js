@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import { API_BASE_URL, LOCAL_STORAGE_KEYS } from "@/utils/constant";
 import { ApiCache } from "@/utils/cache";
@@ -85,10 +84,13 @@ class ApiService {
         }
 
         if (error.response?.status === 401) {
-          // Clear auth data on unauthorized
-          localStorage.removeItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
-          localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_DATA);
-          window.location.href = "/login";
+          // Only clear auth data and redirect if this is not a login/register attempt
+          const isAuthEndpoint = error.config?.url?.includes("/auth/");
+          if (!isAuthEndpoint) {
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_DATA);
+            window.location.href = "/login";
+          }
         }
 
         return Promise.reject(error);
