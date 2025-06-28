@@ -168,7 +168,7 @@ const validatePrivacySettings = [
     .withMessage("Allow direct messages must be a boolean"),
 ];
 
-module.exports = {
+export {
   validateUserRegistration,
   validateUserLogin,
   validateUserUpdate,
