@@ -548,10 +548,11 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
           <div className="flex-1 relative">
             <Input
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleTyping}
               onKeyPress={handleKeyPress}
               placeholder={`Message #${channel.name}`}
               className="pr-20"
+              disabled={!socketConnected}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
               <Button
