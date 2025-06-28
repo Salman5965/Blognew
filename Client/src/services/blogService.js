@@ -49,6 +49,22 @@ class BlogService {
         };
       }
 
+      // Handle 500 server errors gracefully
+      if (error.status === 500 || error.response?.status === 500) {
+        console.warn("Server error, returning empty data");
+        return {
+          blogs: [],
+          pagination: {
+            currentPage: query.page || 1,
+            totalPages: 0,
+            totalBlogs: 0,
+            hasNextPage: false,
+            hasPrevPage: false,
+            limit: query.limit || PAGINATION.BLOG_LIMIT,
+          },
+        };
+      }
+
       // Log network errors but don't expose them to users
       if (
         error.message?.includes("fetch") ||
