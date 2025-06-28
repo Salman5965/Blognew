@@ -176,20 +176,22 @@ class ApiService {
             retryTime = responseData.retryAfter;
           }
 
+          // Cap retry time to maximum of 60 seconds for UX
+          const cappedRetryTime = Math.min(parseInt(retryTime) || 60, 60);
+
           const rateLimitError = new Error(
-            retryTime
-              ? `Too many requests. Please try again in ${retryTime} seconds.`
-              : "Too many requests. Please wait before trying again.",
+            `Too many requests. Please try again in ${cappedRetryTime} seconds.`,
           );
           rateLimitError.isRateLimitError = true;
-          rateLimitError.retryAfter = retryTime;
+          rateLimitError.retryAfter = cappedRetryTime;
           rateLimitError.status = 429;
           rateLimitError.response = error.response;
 
           // Log rate limiting for debugging
           console.warn("Rate limit hit:", {
             url: error.config?.url,
-            retryAfter: retryTime,
+            retryAfter: cappedRetryTime,
+            originalRetryAfter: retryTime,
             message: responseData?.error || responseData?.message,
           });
 
