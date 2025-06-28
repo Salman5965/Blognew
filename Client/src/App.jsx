@@ -190,6 +190,8 @@ const Feed = React.lazy(() => import("./pages/Feed"));
 const Analytics = React.lazy(() =>
   import("./pages/Analytics").then((module) => ({ default: module.Analytics })),
 );
+const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
+const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 
 // Loading component for suspense
 const PageLoader = () => (
