@@ -23,7 +23,6 @@ export const useBlogStore = create(
       currentBlog: null,
       isLoading: false,
       error: null,
-      isOffline: false,
       filters: initialFilters,
       pagination: initialPagination,
 
@@ -86,7 +85,6 @@ export const useBlogStore = create(
             },
             isLoading: false,
             error: null,
-            isOffline: response?.isOffline || false,
           });
         } catch (error) {
           console.error("Error fetching blogs:", error);
