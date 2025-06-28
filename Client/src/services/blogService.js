@@ -365,13 +365,37 @@ class BlogService {
   }
 
   async getBlogBySlug(slug) {
-    const response = await apiService.get(`/blogs/${slug}`);
+    try {
+      const response = await apiService.get(`/blogs/${slug}`);
 
-    if (response.status === "success") {
-      return response.data;
+      if (response && response.status === "success") {
+        return response.data;
+      }
+
+      // Handle response that exists but indicates failure
+      throw new Error(response?.message || "Blog not found");
+    } catch (error) {
+      // Handle network errors more gracefully
+      if (error.isNetworkError || error.message?.includes("Failed to fetch")) {
+        console.warn(`Network error when fetching blog "${slug}":`, error);
+        // Return a fallback response structure instead of throwing
+        return {
+          data: null,
+          status: "error",
+          message:
+            "Unable to connect to server. Please check your internet connection and try again.",
+          isNetworkError: true,
+        };
+      }
+
+      // Handle 404 or other API errors
+      if (error.response?.status === 404) {
+        throw new Error(`Blog with slug "${slug}" not found`);
+      }
+
+      // Re-throw other errors
+      throw error;
     }
-
-    throw new Error(response.message || "Blog not found");
   }
 
   async getBlogById(id) {

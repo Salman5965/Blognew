@@ -207,11 +207,25 @@ class ApiService {
 
       return response.data;
     } catch (error) {
+      // Log the error for debugging
+      console.error(`API Error for ${url}:`, {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        isNetworkError: error.isNetworkError,
+        code: error.code,
+      });
+
       // Handle network errors gracefully
       if (error.isNetworkError || !error.response) {
         const networkError = new Error("Failed to fetch data");
         networkError.isNetworkError = true;
         networkError.originalError = error;
+        networkError.details = {
+          url: url,
+          baseURL: this.instance.defaults.baseURL,
+          timeout: this.instance.defaults.timeout,
+        };
         throw networkError;
       }
       throw error;

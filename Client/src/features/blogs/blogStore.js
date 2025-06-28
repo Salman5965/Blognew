@@ -111,6 +111,16 @@ export const useBlogStore = create(
           set({ isLoading: true, error: null });
           const response = await blogService.getBlogBySlug(slug);
 
+          // Handle network errors gracefully
+          if (response?.isNetworkError) {
+            set({
+              error: response.message || "Network connection failed",
+              isLoading: false,
+              currentBlog: null,
+            });
+            return null;
+          }
+
           let blog = null;
           if (response?.data) {
             blog = response.data;
