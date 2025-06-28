@@ -72,11 +72,6 @@
 //   debugApiConfig,
 // };
 
-
-
-
-
-
 // Environment-aware API configuration
 const getApiBaseUrl = () => {
   // Check if we have an explicit environment variable
@@ -135,13 +130,24 @@ export const debugApiConfig = () => {
   fetch(getApiUrl("/health"))
     .then((response) => {
       console.log("API Health Check:", response.status, response.statusText);
-      return response.json();
+      // Clone response before reading body to avoid "body stream already read" error
+      const responseClone = response.clone();
+      if (
+        response.ok &&
+        response.headers.get("content-type")?.includes("application/json")
+      ) {
+        return responseClone.json();
+      } else {
+        return responseClone
+          .text()
+          .then((text) => ({ message: text || "OK", status: response.status }));
+      }
     })
     .then((data) => {
       console.log("API Health Data:", data);
     })
     .catch((error) => {
-      console.error("API Health Check Failed:", error);
+      console.error("API Health Check Failed:", error.message || error);
     });
 };
 

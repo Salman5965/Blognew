@@ -164,13 +164,35 @@ class ApiService {
         // Handle rate limiting
         if (error.response?.status === 429) {
           const retryAfter = error.response.headers["retry-after"];
+          const responseData = error.response.data;
+
+          // Extract retry time from response data if available
+          let retryTime = retryAfter;
+          if (
+            responseData &&
+            typeof responseData === "object" &&
+            responseData.retryAfter
+          ) {
+            retryTime = responseData.retryAfter;
+          }
+
           const rateLimitError = new Error(
-            retryAfter
-              ? `Too many requests. Please try again in ${retryAfter} seconds.`
+            retryTime
+              ? `Too many requests. Please try again in ${retryTime} seconds.`
               : "Too many requests. Please wait before trying again.",
           );
           rateLimitError.isRateLimitError = true;
-          rateLimitError.retryAfter = retryAfter;
+          rateLimitError.retryAfter = retryTime;
+          rateLimitError.status = 429;
+          rateLimitError.response = error.response;
+
+          // Log rate limiting for debugging
+          console.warn("Rate limit hit:", {
+            url: error.config?.url,
+            retryAfter: retryTime,
+            message: responseData?.error || responseData?.message,
+          });
+
           return Promise.reject(rateLimitError);
         }
 
@@ -224,15 +246,23 @@ class ApiService {
       // Debug error response
       debugApiResponse(url, null, error);
 
-      // Log the error for debugging
-      console.error(`API Error for ${url}:`, {
+      // Log the error for debugging with proper serialization
+      const errorDetails = {
         message: error.message,
         status: error.response?.status,
         statusText: error.response?.statusText,
         isNetworkError: error.isNetworkError,
         code: error.code,
         baseURL: this.instance.defaults.baseURL,
-      });
+        url: url,
+        timestamp: new Date().toISOString(),
+      };
+      console.error(`API Error for ${url}:`, errorDetails);
+
+      // Also log response data if available
+      if (error.response?.data) {
+        console.error("Error response data:", error.response.data);
+      }
 
       // Handle network errors gracefully
       if (error.isNetworkError || !error.response) {

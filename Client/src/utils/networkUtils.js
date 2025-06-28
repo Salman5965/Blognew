@@ -22,12 +22,28 @@ export const checkApiHealth = async (timeout = 5000) => {
     });
 
     clearTimeout(timeoutId);
+
+    let healthData = null;
+    try {
+      // Clone response to avoid "body stream already read" error
+      const responseClone = response.clone();
+      if (response.headers.get("content-type")?.includes("application/json")) {
+        healthData = await responseClone.json();
+      } else {
+        healthData = await responseClone.text();
+      }
+    } catch (parseError) {
+      // Ignore parsing errors for health checks
+      healthData = "Health check response received";
+    }
+
     return {
       isHealthy: response.ok,
       status: response.status,
       message: response.ok
         ? "API is healthy"
         : `API returned ${response.status}`,
+      data: healthData,
     };
   } catch (error) {
     if (error.name === "AbortError") {

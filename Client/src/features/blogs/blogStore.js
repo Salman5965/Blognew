@@ -116,7 +116,11 @@ export const useBlogStore = create(
             let errorMessage = response.message;
 
             // Customize error messages based on error type
-            if (response.errorType === "network") {
+            if (response.errorType === "rate_limit") {
+              errorMessage = response.retryAfter
+                ? `Too many requests. Please try again in ${response.retryAfter} seconds.`
+                : "Too many requests. Please wait before trying again.";
+            } else if (response.errorType === "network") {
               errorMessage =
                 "Unable to connect to server. Please check your internet connection.";
             } else if (response.errorType === "not_found") {

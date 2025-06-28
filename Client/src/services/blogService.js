@@ -379,7 +379,22 @@ class BlogService {
         message: error.message,
         status: error.response?.status,
         isNetworkError: error.isNetworkError,
+        isRateLimitError: error.isRateLimitError,
+        retryAfter: error.retryAfter,
       });
+
+      // Handle rate limit errors
+      if (error.isRateLimitError || error.status === 429) {
+        return {
+          data: null,
+          status: "error",
+          message:
+            error.message ||
+            "Too many requests. Please wait before trying again.",
+          errorType: "rate_limit",
+          retryAfter: error.retryAfter,
+        };
+      }
 
       // Handle network errors more gracefully
       if (error.isNetworkError || error.message?.includes("Failed to fetch")) {
