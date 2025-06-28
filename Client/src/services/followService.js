@@ -60,9 +60,17 @@ class FollowService {
 
       throw new Error(response.message || "Failed to fetch followers");
     } catch (error) {
-      // If endpoint doesn't exist, return mock data
-      console.warn("Followers endpoint not available yet, returning mock data");
-      return this.generateMockFollowers(query.limit || 20);
+      console.error("Error fetching followers:", error);
+      return {
+        followers: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalFollowers: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
     }
   }
 
@@ -85,9 +93,17 @@ class FollowService {
 
       throw new Error(response.message || "Failed to fetch following");
     } catch (error) {
-      // If endpoint doesn't exist, return mock data
-      console.warn("Following endpoint not available yet, returning mock data");
-      return this.generateMockFollowing(query.limit || 20);
+      console.error("Error fetching following:", error);
+      return {
+        following: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalFollowing: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+        },
+      };
     }
   }
 
@@ -121,11 +137,8 @@ class FollowService {
 
       throw new Error(response.message || "Failed to fetch suggestions");
     } catch (error) {
-      // If endpoint doesn't exist, return mock suggestions
-      console.warn(
-        "Suggestions endpoint not available yet, returning mock data",
-      );
-      return this.generateMockSuggestions(limit);
+      console.error("Error fetching follow suggestions:", error);
+      return [];
     }
   }
 
@@ -144,11 +157,8 @@ class FollowService {
 
       throw new Error(response.message || "Failed to search users");
     } catch (error) {
-      // If endpoint doesn't exist, return mock search results
-      console.warn(
-        "User search endpoint not available yet, returning mock data",
-      );
-      return this.generateMockSearchResults(query, limit);
+      console.error("Error searching users:", error);
+      return [];
     }
   }
 
@@ -163,14 +173,11 @@ class FollowService {
 
       throw new Error(response.message || "Failed to fetch follow stats");
     } catch (error) {
-      // If endpoint doesn't exist, return mock stats
-      console.warn(
-        "Follow stats endpoint not available yet, returning mock data",
-      );
+      console.error("Error fetching follow stats:", error);
       return {
-        followersCount: Math.floor(Math.random() * 500) + 50,
-        followingCount: Math.floor(Math.random() * 200) + 20,
-        mutualFollowsCount: Math.floor(Math.random() * 50) + 5,
+        followersCount: 0,
+        followingCount: 0,
+        mutualFollowsCount: 0,
       };
     }
   }
