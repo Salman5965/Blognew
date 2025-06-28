@@ -120,15 +120,18 @@ export const Discover = () => {
     <PageWrapper>
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center space-x-2">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold">Discover</h1>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold flex items-center space-x-2">
+                <Sparkles className="h-7 w-7 text-primary" />
+                <span>Discover</span>
+              </h1>
+              <p className="text-muted-foreground mt-2">
+                Find amazing writers and connect with like-minded people
+              </p>
+            </div>
           </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Find amazing writers, connect with like-minded people, and discover
-            your next favorite content creator.
-          </p>
         </div>
 
         {/* Search Bar */}
@@ -181,18 +184,18 @@ export const Discover = () => {
               className="flex items-center space-x-2"
             >
               <Sparkles className="h-4 w-4" />
-              <span>Suggested</span>
+              <span>For You</span>
             </TabsTrigger>
             <TabsTrigger value="search" className="flex items-center space-x-2">
               <Search className="h-4 w-4" />
-              <span>Search Results</span>
+              <span>Search</span>
             </TabsTrigger>
             <TabsTrigger
               value="popular"
               className="flex items-center space-x-2"
             >
               <TrendingUp className="h-4 w-4" />
-              <span>Popular Authors</span>
+              <span>Trending</span>
             </TabsTrigger>
           </TabsList>
 
@@ -200,7 +203,7 @@ export const Discover = () => {
           <TabsContent value="suggestions" className="space-y-6">
             <FollowSuggestions
               limit={12}
-              title="People you might like"
+              title="Suggested for you"
               showHeader={false}
             />
           </TabsContent>
@@ -265,7 +268,7 @@ export const Discover = () => {
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold flex items-center space-x-2">
                 <TrendingUp className="h-5 w-5" />
-                <span>Popular Authors</span>
+                <span>Trending Authors</span>
               </h3>
               <Button
                 variant="ghost"
