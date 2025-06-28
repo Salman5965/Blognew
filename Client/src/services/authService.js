@@ -30,33 +30,6 @@ class AuthService {
 
       throw new Error(response.message || "Registration failed");
     } catch (error) {
-      // Fallback demo registration for testing when backend is unavailable
-      if (
-        ((error.status === 500 || error.isNetworkError) &&
-          userData.email?.includes("demo")) ||
-        userData.email?.includes("test")
-      ) {
-        console.warn("Backend unavailable, using demo registration");
-        const demoUser = {
-          _id: "demo-user-" + Date.now(),
-          id: "demo-user-" + Date.now(),
-          email: userData.email,
-          username: userData.username || userData.email.split("@")[0],
-          firstName: userData.firstName || "Demo",
-          lastName: userData.lastName || "User",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-          bio: "Demo user for testing",
-          isEmailVerified: true,
-          createdAt: new Date().toISOString(),
-        };
-
-        const demoToken = "demo-jwt-token-" + Date.now();
-
-        this.setAuthData(demoUser, demoToken);
-        return { user: demoUser, token: demoToken };
-      }
-
       throw error;
     }
   }
