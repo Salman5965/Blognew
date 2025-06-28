@@ -449,14 +449,6 @@
 
 // export default Help;
 
-
-
-
-
-
-
-
-
 import React, { useState } from "react";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -482,6 +474,7 @@ import {
   Phone,
   Clock,
 } from "lucide-react";
+import HelpChatbot from "@/components/help/HelpChatbot";
 
 const Help = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -902,6 +895,9 @@ const Help = () => {
           </div>
         </div>
       </div>
+
+      {/* Help Chatbot */}
+      <HelpChatbot />
     </PageWrapper>
   );
 };
