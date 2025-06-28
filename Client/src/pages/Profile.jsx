@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { userService } from "@/services/userService";
 import { blogService } from "@/services/blogService";
+import { followService } from "@/services/followService";
+import { FollowSuggestions } from "@/components/users/FollowSuggestions";
 import {
   User,
   Mail,
@@ -59,6 +61,7 @@ const Profile = () => {
   const [userStats, setUserStats] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [followStats, setFollowStats] = useState(null);
 
   // Form states
   const [profileForm, setProfileForm] = useState({
