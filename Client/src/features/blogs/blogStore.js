@@ -470,7 +470,7 @@ export const useBlogStore = create(
             error: null,
           });
 
-          return blogs;
+          return userBlogs;
         } catch (error) {
           console.error("Error fetching user blogs:", error);
           set({
