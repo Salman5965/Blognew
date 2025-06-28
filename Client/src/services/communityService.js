@@ -1,13 +1,11 @@
-import { apiRequest } from "./api";
+import { apiService } from "./api";
 
 class CommunityService {
   // Get community statistics
   async getStats() {
     try {
-      const response = await apiRequest("/community/stats", {
-        method: "GET",
-      });
-      return response.data;
+      const response = await apiService.get("/community/stats");
+      return response;
     } catch (error) {
       console.error("Failed to fetch community stats:", error);
       // Return fallback data for better UX
@@ -24,10 +22,8 @@ class CommunityService {
   // Get top community members/contributors
   async getTopMembers() {
     try {
-      const response = await apiRequest("/community/top-members", {
-        method: "GET",
-      });
-      return response.data;
+      const response = await apiService.get("/community/top-members");
+      return response;
     } catch (error) {
       console.error("Failed to fetch top members:", error);
       // Return fallback data
@@ -79,10 +75,8 @@ class CommunityService {
   // Get recent community activity
   async getRecentActivity() {
     try {
-      const response = await apiRequest("/community/recent-activity", {
-        method: "GET",
-      });
-      return response.data;
+      const response = await apiService.get("/community/recent-activity");
+      return response;
     } catch (error) {
       console.error("Failed to fetch recent activity:", error);
       // Return fallback data
@@ -144,10 +138,8 @@ class CommunityService {
   // Get popular topics/hashtags
   async getPopularTopics() {
     try {
-      const response = await apiRequest("/community/popular-topics", {
-        method: "GET",
-      });
-      return response.data;
+      const response = await apiService.get("/community/popular-topics");
+      return response;
     } catch (error) {
       console.error("Failed to fetch popular topics:", error);
       // Return fallback data
@@ -169,10 +161,8 @@ class CommunityService {
   // Get featured discussions
   async getFeaturedDiscussions() {
     try {
-      const response = await apiRequest("/community/featured-discussions", {
-        method: "GET",
-      });
-      return response.data;
+      const response = await apiService.get("/community/featured-discussions");
+      return response;
     } catch (error) {
       console.error("Failed to fetch featured discussions:", error);
       // Return fallback data
@@ -229,10 +219,8 @@ class CommunityService {
   // Get community events
   async getEvents() {
     try {
-      const response = await apiRequest("/community/events", {
-        method: "GET",
-      });
-      return response.data;
+      const response = await apiService.get("/community/events");
+      return response;
     } catch (error) {
       console.error("Failed to fetch community events:", error);
       return [];
@@ -242,10 +230,10 @@ class CommunityService {
   // Join community event
   async joinEvent(eventId) {
     try {
-      const response = await apiRequest(`/community/events/${eventId}/join`, {
-        method: "POST",
-      });
-      return response.data;
+      const response = await apiService.post(
+        `/community/events/${eventId}/join`,
+      );
+      return response;
     } catch (error) {
       console.error("Failed to join event:", error);
       throw error;
@@ -255,10 +243,10 @@ class CommunityService {
   // Get user's community profile
   async getUserCommunityProfile(userId) {
     try {
-      const response = await apiRequest(`/community/users/${userId}/profile`, {
-        method: "GET",
-      });
-      return response.data;
+      const response = await apiService.get(
+        `/community/users/${userId}/profile`,
+      );
+      return response;
     } catch (error) {
       console.error("Failed to fetch user community profile:", error);
       throw error;
@@ -273,10 +261,8 @@ class CommunityService {
         ...filters,
       });
 
-      const response = await apiRequest(`/community/search?${queryParams}`, {
-        method: "GET",
-      });
-      return response.data;
+      const response = await apiService.get(`/community/search?${queryParams}`);
+      return response;
     } catch (error) {
       console.error("Failed to search community:", error);
       return {

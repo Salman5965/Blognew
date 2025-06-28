@@ -97,7 +97,7 @@ class NotificationService {
       const response = await api.get("/notifications/unread-count");
       return {
         success: true,
-        count: response.data.count,
+        count: response?.data?.count || response?.count || 0,
       };
     } catch (error) {
       console.error("Error fetching unread count:", error);
@@ -138,14 +138,20 @@ class NotificationService {
       const response = await api.get("/notifications/preferences");
       return {
         success: true,
-        data: response.data.data,
+        data:
+          response?.data?.data ||
+          response?.data ||
+          this.getDefaultPreferences(),
       };
     } catch (error) {
       console.error("Error fetching notification preferences:", error);
       return {
         success: false,
         data: this.getDefaultPreferences(),
-        error: error.response?.data?.message || "Failed to fetch preferences",
+        error:
+          error.response?.status === 404
+            ? null
+            : error.response?.data?.message || "Failed to fetch preferences",
       };
     }
   }
