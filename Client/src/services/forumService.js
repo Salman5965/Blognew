@@ -33,18 +33,7 @@ class ForumService {
       throw new Error(response.message || "Failed to fetch channels");
     } catch (error) {
       console.error("Error fetching channels:", error);
-
-      // Return mock data as fallback
-      return {
-        channels: this.getMockChannels(),
-        pagination: {
-          currentPage: page,
-          totalPages: 2,
-          totalChannels: 25,
-          hasNextPage: false,
-          hasPrevPage: false,
-        },
-      };
+      throw error;
     }
   }
 
