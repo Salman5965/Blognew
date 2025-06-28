@@ -10,6 +10,7 @@ import { FollowButton } from "@/components/shared/FollowButton";
 import { FollowersList } from "@/components/users/FollowersList";
 import { FollowingList } from "@/components/users/FollowingList";
 import { BlogList } from "@/components/blog/BlogList";
+import { BlogCard } from "@/components/blog/BlogCard";
 import { userService } from "@/services/userService";
 import { blogService } from "@/services/blogService";
 import { followService } from "@/services/followService";
