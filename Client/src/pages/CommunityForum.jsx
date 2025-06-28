@@ -33,15 +33,32 @@ const CommunityForum = () => {
   const [selectedChannel, setSelectedChannel] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isChannelListOpen, setIsChannelListOpen] = useState(true);
+  const [forumStats, setForumStats] = useState({
+    totalMembers: 0,
+    onlineMembers: 0,
+    totalMessages: 0,
+    channelsCount: 0,
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
   const { user, isAuthenticated } = useAuthContext();
   const { isConnected, connectionStatus, retry } = useForumConnection();
 
-  const forumStats = {
-    totalMembers: 12453,
-    onlineMembers: 342,
-    totalMessages: 89234,
-    channelsCount: 28,
-  };
+  // Load forum stats
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const stats = await forumService.getStats();
+        setForumStats(stats);
+      } catch (error) {
+        console.error("Failed to load forum stats:", error);
+        // Keep default empty stats on error
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   if (!isAuthenticated) {
     return (
