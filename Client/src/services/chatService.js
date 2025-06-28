@@ -95,7 +95,7 @@ class ChatService {
   async getConversations() {
     try {
       // Try to get from API first
-      const response = await apiService.get("/chat/conversations");
+      const response = await apiService.get("/api/chat/conversations");
       return response.data || response;
     } catch (error) {
       console.warn(
@@ -113,7 +113,7 @@ class ChatService {
   async getMessages(conversationId) {
     try {
       const response = await apiService.get(
-        `/chat/conversations/${conversationId}/messages`,
+        `/api/chat/conversations/${conversationId}/messages`,
       );
       return response.data || response;
     } catch (error) {
@@ -132,7 +132,7 @@ class ChatService {
   async sendMessage(conversationId, content, type = "text") {
     try {
       const response = await apiService.post(
-        `/chat/conversations/${conversationId}/messages`,
+        `/api/chat/conversations/${conversationId}/messages`,
         {
           content,
           type,
@@ -168,7 +168,7 @@ class ChatService {
 
   async createConversation(participantId) {
     try {
-      const response = await apiService.post("/chat/conversations", {
+      const response = await apiService.post("/api/chat/conversations", {
         participantId,
       });
       return response.data || response;
@@ -198,7 +198,7 @@ class ChatService {
 
   async markAsRead(conversationId) {
     try {
-      await apiService.patch(`/chat/conversations/${conversationId}/read`);
+      await apiService.patch(`/api/chat/conversations/${conversationId}/read`);
     } catch (error) {
       console.warn("Failed to mark as read via API:", error);
       // Update mock data
@@ -214,7 +214,7 @@ class ChatService {
   async searchUsers(query) {
     try {
       const response = await apiService.get(
-        `/users/search?q=${encodeURIComponent(query)}`,
+        `/api/users/search?q=${encodeURIComponent(query)}`,
       );
       return response.data || response;
     } catch (error) {
