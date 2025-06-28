@@ -223,8 +223,8 @@ export const BlogCard = memo(
       [blog.slug],
     );
     const authorUrl = useMemo(
-      () => `${ROUTES.HOME}?author=${blog.author.id}`,
-      [blog.author.id],
+      () => `/users/${blog.author._id || blog.author.id}`,
+      [blog.author._id, blog.author.id],
     );
     const readTime = useMemo(
       () => Math.ceil((blog.content?.length || 0) / 200),
