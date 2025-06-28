@@ -531,11 +531,6 @@
 //   );
 // };
 
-
-
-
-
-
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -706,22 +701,22 @@ export const CreateBlog = () => {
       setError(null);
       setIsSaving(true);
 
-    const blogData = {
-      title,
-      content,
-      excerpt,
-      tags,
-      category,
-      coverImage,
-      status: isPublished ? "published" : "draft",
-      visibility: postVisibility,
-    };
-        if (!validation.isValid) {
-          setError(`Cannot publish: ${validation.errors.join(", ")}`);
-          setIsSaving(false);
-          return;
-        }
+      if (publish && !validation.isValid) {
+        setError(`Cannot publish: ${validation.errors.join(", ")}`);
+        setIsSaving(false);
+        return;
       }
+
+      const blogData = {
+        title,
+        content,
+        excerpt,
+        tags,
+        category,
+        coverImage,
+        status: isPublished ? "published" : "draft",
+        visibility: postVisibility,
+      };
 
       const createdBlog = await createBlog(blogData);
 
