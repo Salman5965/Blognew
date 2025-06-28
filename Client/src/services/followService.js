@@ -9,9 +9,11 @@ class FollowService {
   // Follow a user
   async followUser(userId) {
     try {
-      const response = await apiService.post(`/users/${userId}/follow`);
+      const response = await apiService.post(`/follow/${userId}/toggle`);
 
       if (response.status === "success") {
+        // Clear cache after follow action
+        this._cachedFollowStatus.delete(userId);
         return response.data;
       }
 
@@ -25,9 +27,11 @@ class FollowService {
   // Unfollow a user
   async unfollowUser(userId) {
     try {
-      const response = await apiService.delete(`/users/${userId}/follow`);
+      const response = await apiService.post(`/follow/${userId}/toggle`);
 
       if (response.status === "success") {
+        // Clear cache after unfollow action
+        this._cachedFollowStatus.delete(userId);
         return response.data;
       }
 
@@ -48,7 +52,7 @@ class FollowService {
       if (query.search) params.append("search", query.search);
 
       const response = await apiService.get(
-        `/users/${userId}/followers?${params}`,
+        `/follow/${userId}/followers?${params}`,
       );
 
       if (response.status === "success") {
@@ -81,7 +85,7 @@ class FollowService {
       if (query.search) params.append("search", query.search);
 
       const response = await apiService.get(
-        `/users/${userId}/following?${params}`,
+        `/follow/${userId}/following?${params}`,
       );
 
       if (response.status === "success") {
@@ -178,7 +182,7 @@ class FollowService {
   // Get user's follow stats
   async getFollowStats(userId) {
     try {
-      const response = await apiService.get(`/users/${userId}/follow-stats`);
+      const response = await apiService.get(`/follow/${userId}/stats`);
 
       if (response.status === "success") {
         return response.data;
