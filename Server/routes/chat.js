@@ -55,7 +55,7 @@ const validateEditMessage = [
 ];
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(protect);
 
 // Get user's conversations
 router.get(

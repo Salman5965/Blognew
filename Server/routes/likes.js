@@ -32,7 +32,7 @@ const validateBlogsArray = [
 ];
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(protect);
 
 // Toggle like/unlike a blog
 router.post(

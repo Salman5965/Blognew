@@ -103,7 +103,7 @@ const validateBroadcastNotification = [
 ];
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(protect);
 
 // Get user notifications
 router.get(

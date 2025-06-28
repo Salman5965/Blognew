@@ -57,7 +57,7 @@ const validateBlogsArray = [
 ];
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(protect);
 
 // Toggle bookmark/unbookmark a blog
 router.post(

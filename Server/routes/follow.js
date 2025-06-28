@@ -20,7 +20,7 @@ const validateUserId = [
 ];
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(protect);
 
 // Toggle follow/unfollow
 router.post(

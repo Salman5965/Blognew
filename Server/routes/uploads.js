@@ -29,7 +29,7 @@ const validateFileParams = [
 ];
 
 // Apply authentication to all routes
-router.use(authenticateToken);
+router.use(protect);
 
 // Avatar upload
 router.post(
