@@ -83,30 +83,18 @@ router.get(
 );
 
 // Get all users (admin only)
-router.get("/", authenticateToken, authorizeAdmin, getAllUsers);
+router.get("/", protect, authorize("admin"), getAllUsers);
 
 // Get user by ID
-router.get("/:id", authenticateToken, validateUserId, getUserById);
+router.get("/:id", protect, validateUserId, getUserById);
 
 // Update user
-router.put(
-  "/:id",
-  authenticateToken,
-  validateUserId,
-  validateUpdateUser,
-  updateUser,
-);
+router.put("/:id", protect, validateUserId, validateUpdateUser, updateUser);
 
 // Delete user (admin only)
-router.delete(
-  "/:id",
-  authenticateToken,
-  authorizeAdmin,
-  validateUserId,
-  deleteUser,
-);
+router.delete("/:id", protect, authorize("admin"), validateUserId, deleteUser);
 
 // Get user statistics
-router.get("/:id/stats", authenticateToken, validateUserId, getUserStats);
+router.get("/:id/stats", protect, validateUserId, getUserStats);
 
 export default router;
