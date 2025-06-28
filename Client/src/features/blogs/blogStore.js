@@ -443,23 +443,23 @@ export const useBlogStore = create(
           set({ isLoading: true, error: null });
           const response = await blogService.getUserBlogs(userId, page, limit);
 
-          let blogs = [];
+          let userBlogs = [];
           let paginationData = initialPagination;
 
           if (response?.data) {
-            blogs = Array.isArray(response.data)
+            userBlogs = Array.isArray(response.data)
               ? response.data
               : response.data.blogs || [];
             paginationData = response.data.pagination || initialPagination;
           } else if (response?.blogs) {
-            blogs = response.blogs;
+            userBlogs = response.blogs;
             paginationData = response.pagination || initialPagination;
           } else if (Array.isArray(response)) {
-            blogs = response;
+            userBlogs = response;
           }
 
           set({
-            blogs,
+            blogs: userBlogs,
             pagination: {
               ...initialPagination,
               ...paginationData,
