@@ -1,4 +1,3 @@
-
 import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -60,6 +59,7 @@ const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
+const Explore = React.lazy(() => import("./pages/Explore"));
 
 // Loading component for suspense
 const PageLoader = () => (
