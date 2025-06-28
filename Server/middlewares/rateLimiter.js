@@ -128,13 +128,21 @@ export const uploadRateLimiter = rateLimiter("upload", 10, 60); // 10 uploads pe
 // IP-based rate limiter for public endpoints
 export const publicRateLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 100, // 100 requests per minute per IP
+  max: 300, // 300 requests per minute per IP - more generous for browsing
   message: {
     status: "error",
     message: "Too many requests from this IP, please try again later.",
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting for critical endpoints
+  skip: (req) => {
+    // Skip for health checks
+    if (req.path.includes("/health")) return true;
+    // Skip for authenticated users on basic reads
+    if (req.user && req.method === "GET") return true;
+    return false;
+  },
 });
 
 // Strict rate limiter for sensitive operations
