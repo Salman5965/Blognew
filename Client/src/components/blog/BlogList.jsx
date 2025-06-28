@@ -206,7 +206,6 @@ export const BlogList = ({
     blogs,
     isLoading,
     error,
-    isOffline,
     pagination,
     filters,
     getBlogs,
@@ -289,20 +288,6 @@ export const BlogList = ({
             <span>Loading blogs...</span>
           </div>
         </div>
-      )}
-
-      {/* Offline indicator */}
-      {isOffline && blogs && blogs.length > 0 && (
-        <Alert>
-          <WifiOff className="h-4 w-4" />
-          <AlertDescription className="flex items-center justify-between">
-            <span>You're offline. Showing sample content.</span>
-            <Button variant="outline" size="sm" onClick={handleRetry}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Retry
-            </Button>
-          </AlertDescription>
-        </Alert>
       )}
 
       {/* Error banner that can be dismissed */}
