@@ -19,6 +19,8 @@ import {
   User,
   Code,
   Image as ImageIcon,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +29,8 @@ import { Badge } from "@/components/ui/badge";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 import EmojiPicker from "@/components/shared/EmojiPicker";
+import socketService from "@/services/socketService";
+import forumService from "@/services/forumService";
 
 const ForumChat = ({ channel, onToggleSidebar }) => {
   const [message, setMessage] = useState("");
