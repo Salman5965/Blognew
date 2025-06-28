@@ -102,15 +102,32 @@ class FollowService {
   // Check if current user is following a specific user
   async isFollowing(userId) {
     try {
-      const response = await apiService.get(`/users/${userId}/follow-status`);
+      const response = await apiService.get(`/follow/${userId}/status`);
 
       if (response.status === "success") {
-        return response.data.isFollowing;
+        const isFollowing = response.data.isFollowing;
+        // Cache the result
+        this._cachedFollowStatus.set(userId, isFollowing);
+        setTimeout(() => {
+          this._cachedFollowStatus.delete(userId);
+        }, this._cacheTimeout);
+        return isFollowing;
       }
 
       return false;
     } catch (error) {
       console.error("Error checking follow status:", error);
+
+      // Handle rate limit errors gracefully
+      if (
+        error.status === 429 ||
+        error.message?.includes("Too many requests")
+      ) {
+        console.warn("Rate limited on follow status check, using cached data");
+        // Return cached value or false
+        return this._cachedFollowStatus.get(userId) ?? false;
+      }
+
       return false; // Default to not following
     }
   }

@@ -31,7 +31,12 @@ router.post(
 );
 
 // Get follow status
-router.get("/:userId/status", validateUserId, getFollowStatus);
+router.get(
+  "/:userId/status",
+  rateLimiter("followStatus", 30, 60), // 30 status checks per minute
+  validateUserId,
+  getFollowStatus,
+);
 
 // Get user's followers
 router.get("/:userId/followers", validateUserId, getFollowers);

@@ -11,7 +11,7 @@ export const rateLimiter = (identifier, maxRequests, windowMs) => {
     message: {
       status: "error",
       message: `Too many ${identifier} requests from this IP, please try again later.`,
-      retryAfter: Math.ceil(windowMs / 60), // minutes
+      retryAfter: Math.ceil(windowMs / 1000), // seconds, not minutes
     },
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers

@@ -22,19 +22,39 @@ export const FollowButton = ({
   const { user } = useAuthContext();
   const { toast } = useToast();
 
-  // Check initial following status
+  // Check initial following status with debouncing
   useEffect(() => {
+    let timeoutId;
+
     const checkFollowStatus = async () => {
       try {
         const following = await followService.isFollowing(userId);
         setIsFollowing(following);
       } catch (error) {
         console.error("Error checking follow status:", error);
+        // Handle rate limit gracefully by not showing error to user
+        if (
+          error.status !== 429 &&
+          !error.message?.includes("Too many requests")
+        ) {
+          toast({
+            title: "Error",
+            description: "Unable to check follow status",
+            variant: "destructive",
+          });
+        }
       }
     };
 
-    checkFollowStatus();
-  }, [userId]);
+    // Debounce the follow status check
+    timeoutId = setTimeout(checkFollowStatus, 100);
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [userId, toast]);
 
   // Don't show follow button for current user - AFTER all hooks
   if (!user || user._id === userId) {
