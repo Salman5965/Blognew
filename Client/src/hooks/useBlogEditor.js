@@ -308,6 +308,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
     category, // Added category to return
     tags,
     isPublished,
+    visibility,
     isDirty,
     isSaving,
     lastSaved,
@@ -319,6 +320,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
     setCategory, // Added setCategory to return
     setTags,
     setIsPublished,
+    setVisibility,
 
     addTag,
     removeTag,
