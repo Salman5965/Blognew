@@ -140,18 +140,20 @@ const CommunityForum = () => {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          {selectedChannel ? (
-            <ForumChat
-              channel={selectedChannel}
-              onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
-            />
-          ) : (
-            <ForumWelcome
-              stats={forumStats}
-              onChannelSelect={setSelectedChannel}
-              onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
-            />
-          )}
+          <ErrorBoundary fallbackMessage="Something went wrong with the chat. Please try refreshing the page.">
+            {selectedChannel ? (
+              <ForumChat
+                channel={selectedChannel}
+                onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
+              />
+            ) : (
+              <ForumWelcome
+                stats={forumStats}
+                onChannelSelect={setSelectedChannel}
+                onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
+              />
+            )}
+          </ErrorBoundary>
         </div>
       </div>
     </div>
