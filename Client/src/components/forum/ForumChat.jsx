@@ -169,26 +169,57 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
+  const handleSendMessage = async () => {
+    if (!message.trim() || !socketConnected) return;
 
-    const newMessage = {
-      id: Date.now(),
-      user: {
-        id: user.id,
-        name: user.firstName + " " + user.lastName,
-        avatar: user.avatar,
-        role: "Member",
-        isOnline: true,
-      },
+    const messageData = {
       content: message,
-      timestamp: new Date(),
-      reactions: [],
+      type: "text",
+      channelId: channel.id || channel._id,
     };
 
-    setMessages((prev) => [...prev, newMessage]);
-    setMessage("");
-    setShowEmojiPicker(false);
+    try {
+      // Send via socket for real-time
+      socketService.sendMessage(channel.id || channel._id, messageData);
+
+      // Also send via API for persistence
+      await forumService.sendMessage(channel.id || channel._id, messageData);
+
+      // Clear message input
+      setMessage("");
+      setShowEmojiPicker(false);
+
+      // Stop typing indicator
+      socketService.stopTyping(channel.id || channel._id);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+
+      // Fallback: add message locally if socket/API fails
+      const fallbackMessage = {
+        id: Date.now(),
+        user: {
+          id: user.id || user._id,
+          name:
+            `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+            user.username ||
+            "User",
+          avatar: user.avatar,
+          role: "Member",
+          isOnline: true,
+        },
+        content: message,
+        timestamp: new Date(),
+        reactions: [],
+        isLocal: true, // Mark as local message
+      };
+
+      setMessages((prev) => [...prev, fallbackMessage]);
+      setMessage("");
+      setShowEmojiPicker(false);
+    }
   };
 
   const handleKeyPress = (e) => {
