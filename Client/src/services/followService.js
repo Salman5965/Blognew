@@ -116,7 +116,11 @@ class FollowService {
     }
 
     try {
-      const response = await apiService.get(`/follow/${userId}/status`);
+      const response = await apiService.get(`/follow/${userId}/status`, {
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
 
       if (response.status === "success") {
         const isFollowing = response.data.isFollowing;
