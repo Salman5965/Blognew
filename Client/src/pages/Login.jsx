@@ -126,7 +126,7 @@ export const Login = () => {
         lastLoginAttempt.current = now;
 
         console.log("Attempting login with:", { email: values.email }); // Debug log
-        const result = await login(values); // Make sure login throws error on failure!
+        await login(values); // Make sure login throws error on failure!
 
         // Clear rate limiting on successful login
         lastLoginAttempt.current = 0;
@@ -135,18 +135,11 @@ export const Login = () => {
           clearInterval(countdownInterval.current);
         }
 
-        // Show appropriate success message
-        const isDemoMode =
-          result?.isDemoMode ||
-          values.email.includes("demo") ||
-          values.email.includes("test");
         toast({
           title: "Login successful",
-          description: isDemoMode
-            ? "Demo mode activated - Welcome! Some features may be limited."
-            : "Welcome back!",
+          description: "Welcome back!",
           variant: "default",
-          duration: isDemoMode ? 5000 : 3000,
+          duration: 3000,
         });
       } catch (error) {
         console.error("Login error:", error); // Debug log
