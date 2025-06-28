@@ -481,18 +481,8 @@ class BlogService {
 
       throw new Error(response.message || "Failed to fetch tags");
     } catch (error) {
-      // If endpoint doesn't exist, return common tags
-      console.warn("Tags endpoint not available, returning default tags");
-      return [
-        "React",
-        "JavaScript",
-        "Node.js",
-        "CSS",
-        "TypeScript",
-        "API",
-        "Performance",
-        "Tutorial",
-      ];
+      console.error("Error fetching tags:", error);
+      return [];
     }
   }
 
