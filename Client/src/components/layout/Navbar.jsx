@@ -96,6 +96,12 @@ export const Navbar = () => {
                 Feed
               </Link>
               <Link
+                to={ROUTES.EXPLORE}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Explore
+              </Link>
+              <Link
                 to="/community"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
