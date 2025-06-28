@@ -3,7 +3,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import compression from "compression";
-import rateLimit from "express-rate-limit";
+import path from "path";
+import { fileURLToPath } from "url";
 import mongoose from "mongoose";
 
 // Import routes
@@ -11,37 +12,53 @@ import authRoutes from "./routes/auth.js";
 import blogRoutes from "./routes/blogs.js";
 import commentRoutes from "./routes/comments.js";
 import userRoutes from "./routes/users.js";
+import followRoutes from "./routes/follow.js";
+import chatRoutes from "./routes/chat.js";
+import likeRoutes from "./routes/likes.js";
+import bookmarkRoutes from "./routes/bookmarks.js";
+import uploadRoutes from "./routes/uploads.js";
+import notificationRoutes from "./routes/notifications.js";
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
+import {
+  publicRateLimiter,
+  loginRateLimiter,
+} from "./middlewares/rateLimiter.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Trust proxy for accurate client IP detection
+app.set("trust proxy", 1);
+
 // Security middleware
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 
 // CORS configuration
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: process.env.CLIENT_URL || [
+      "http://localhost:5173",
+      "http://localhost:3000",
+    ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   }),
 );
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: {
-    error: "Too many requests from this IP, please try again later.",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+// Apply general rate limiting
+app.use("/api/", publicRateLimiter);
 
-app.use("/api/", limiter);
+// Special rate limiting for auth routes
+app.use("/api/auth/login", loginRateLimiter);
 
 // Compression middleware
 app.use(compression());
@@ -49,6 +66,9 @@ app.use(compression());
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Static file serving for uploads
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Logging middleware
 if (process.env.NODE_ENV === "development") {
@@ -69,6 +89,7 @@ app.get("/health", (req, res) => {
     uptime: process.uptime(),
     database: dbStatus,
     environment: process.env.NODE_ENV || "development",
+    version: "2.0.0",
   });
 });
 
@@ -87,6 +108,18 @@ app.get("/api/health", (req, res) => {
       host: mongoose.connection.host || "not connected",
     },
     environment: process.env.NODE_ENV || "development",
+    features: [
+      "authentication",
+      "blogs",
+      "comments",
+      "users",
+      "follow_system",
+      "messaging",
+      "likes",
+      "bookmarks",
+      "file_uploads",
+      "notifications",
+    ],
   });
 });
 
@@ -95,18 +128,41 @@ app.use("/api/auth", authRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/follow", followRoutes);
+app.use("/api/chat", chatRoutes);
+app.use("/api/likes", likeRoutes);
+app.use("/api/bookmarks", bookmarkRoutes);
+app.use("/api/uploads", uploadRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Welcome route
 app.get("/", (req, res) => {
   res.json({
-    message: "Welcome to Blog API",
-    version: "1.0.0",
+    message: "Welcome to BlogHub API v2.0",
+    version: "2.0.0",
     documentation: "/api/docs",
+    features: [
+      "User Authentication & Authorization",
+      "Blog Management (CRUD)",
+      "Comment System",
+      "Social Follow System",
+      "Real-time Messaging",
+      "Like & Bookmark System",
+      "File Upload Service",
+      "Push Notifications",
+      "Rate Limiting & Security",
+    ],
     endpoints: {
       auth: "/api/auth",
       blogs: "/api/blogs",
       comments: "/api/comments",
       users: "/api/users",
+      follow: "/api/follow",
+      chat: "/api/chat",
+      likes: "/api/likes",
+      bookmarks: "/api/bookmarks",
+      uploads: "/api/uploads",
+      notifications: "/api/notifications",
     },
   });
 });
@@ -116,6 +172,7 @@ app.all("*", (req, res) => {
   res.status(404).json({
     status: "error",
     message: `Route ${req.originalUrl} not found`,
+    suggestion: "Check the API documentation for available endpoints",
   });
 });
 
