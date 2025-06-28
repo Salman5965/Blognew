@@ -11,13 +11,7 @@ class ForumService {
       throw new Error(response.message || "Failed to fetch forum stats");
     } catch (error) {
       console.error("Error fetching forum stats:", error);
-      // Return mock data as fallback
-      return {
-        totalMembers: 12453,
-        onlineMembers: 342,
-        totalMessages: 89234,
-        channelsCount: 28,
-      };
+      throw error;
     }
   }
 
