@@ -138,28 +138,6 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     };
   }, [channel, user]);
 
-  // Mock messages fallback
-  const getMockMessages = () => [
-    {
-      id: 1,
-      user: {
-        id: "user1",
-        name: "Community Bot",
-        avatar:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-        role: "Bot",
-        isOnline: true,
-      },
-      content: `Welcome to #${channel.name}! 🎉 This is where we discuss ${channel.description?.toLowerCase() || "various topics"}. Feel free to ask questions and share your knowledge!`,
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-      reactions: [
-        { emoji: "👋", count: 12, users: ["user2", "user3"] },
-        { emoji: "🎉", count: 8, users: ["user4"] },
-      ],
-      isPinned: true,
-    },
-  ];
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
