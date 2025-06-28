@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -437,7 +436,11 @@ const Help = () => {
                 <p className="text-sm text-muted-foreground mb-4">
                   Connect with other users and get community support
                 </p>
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/community")}
+                >
                   Join Forum
                 </Button>
               </CardContent>
