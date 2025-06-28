@@ -70,12 +70,7 @@ class ForumService {
       throw new Error(response.message || "Failed to fetch messages");
     } catch (error) {
       console.error("Error fetching channel messages:", error);
-
-      // Return mock messages
-      return {
-        messages: this.getMockMessages(),
-        hasMore: false,
-      };
+      throw error;
     }
   }
 
