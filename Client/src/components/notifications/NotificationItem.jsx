@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useNotificationStore from "@/features/notifications/notificationStore";
-import useNotificationStore from "../../features/notifications/notificationStore";
 
 const NotificationItem = ({ notification }) => {
   const [showActions, setShowActions] = useState(false);
