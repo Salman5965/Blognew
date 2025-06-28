@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 export const Home = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(false);
   const { isAuthenticated } = useAuthContext();
