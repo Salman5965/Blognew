@@ -334,6 +334,25 @@ class BlogService {
 
       throw new Error(response.message || "Failed to fetch blogs");
     } catch (error) {
+      // Handle rate limiting gracefully
+      if (
+        error.status === 429 ||
+        error.message?.includes("Too many requests")
+      ) {
+        console.warn("Rate limited, using mock data fallback");
+        return {
+          status: "success",
+          data: this.getMockBlogs(),
+          pagination: {
+            currentPage: 1,
+            totalPages: 1,
+            totalBlogs: 3,
+            hasNextPage: false,
+            hasPrevPage: false,
+          },
+        };
+      }
+
       // Log network errors but don't expose them to users
       if (
         error.message?.includes("fetch") ||
