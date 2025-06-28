@@ -133,15 +133,15 @@ class FollowService {
       console.error("Error checking follow status:", error);
 
       // Handle rate limit errors gracefully
-      if (error.status === 429 || error.message?.includes('Too many requests')) {
-        console.warn('Rate limited on follow status check, using cached data');
+      if (
+        error.status === 429 ||
+        error.message?.includes("Too many requests")
+      ) {
+        console.warn("Rate limited on follow status check, using cached data");
         // Return cached value or false
         return this._cachedFollowStatus.get(userId) ?? false;
       }
 
-      return false; // Default to not following
-    }
-  }
       return false; // Default to not following
     }
   }
