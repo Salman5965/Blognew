@@ -28,6 +28,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { useBlogStore } from "@/features/blogs/blogStore";
+import { ChatButton } from "@/components/chat/ChatButton";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -137,6 +138,9 @@ export const Navbar = () => {
                   Write
                 </Link>
               </Button>
+
+              {/* Chat Button */}
+              <ChatButton />
 
               {/* User Menu */}
               <DropdownMenu>
