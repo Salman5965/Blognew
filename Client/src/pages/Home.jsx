@@ -234,7 +234,7 @@ export const Home = () => {
                     </p>
                     <div className="space-y-2">
                       <Button
-                        onClick={() => (window.location.href = ROUTES.DISCOVER)}
+                        onClick={() => navigate(ROUTES.EXPLORE)}
                         className="w-full"
                         size="sm"
                       >
