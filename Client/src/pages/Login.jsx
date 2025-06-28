@@ -194,7 +194,7 @@ import { Loader2, BookOpen, Eye, EyeOff } from "lucide-react";
 // Import toast hook — adjust path if needed
 import { useToast } from "@/hooks/use-toast";
 
-const RATE_LIMIT_DELAY = 3000; // 3 seconds between login attempts
+const RATE_LIMIT_DELAY = 1000; // 1 second between login attempts
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -288,6 +288,14 @@ export const Login = () => {
 
         console.log("Attempting login with:", { email: values.email }); // Debug log
         await login(values); // Make sure login throws error on failure!
+
+        // Clear rate limiting on successful login
+        lastLoginAttempt.current = 0;
+        setRateLimitCountdown(0);
+        if (countdownInterval.current) {
+          clearInterval(countdownInterval.current);
+        }
+
         toast({
           title: "Login successful",
           description: "Welcome back!",
@@ -301,11 +309,19 @@ export const Login = () => {
         let title = "Login failed";
         let description =
           "Invalid credentials. Please check your email and password.";
+        let shouldStartCountdown = false;
 
-        if (error.response?.status === 429) {
+        if (
+          error.message?.includes("Too many login attempts") ||
+          error.response?.status === 429
+        ) {
           title = "Too many attempts";
           description =
-            "You've made too many login attempts. Please wait a few minutes before trying again.";
+            "You've made too many login attempts. Please wait a moment before trying again.";
+          shouldStartCountdown = true;
+
+          // Start a shorter countdown for server-side rate limiting
+          startRateLimitCountdown(30); // 30 seconds for server rate limiting
         } else if (error.response?.status === 401) {
           description =
             "Invalid email or password. Please check your credentials.";
@@ -325,7 +341,7 @@ export const Login = () => {
           title,
           description,
           variant: "destructive",
-          duration: 5000,
+          duration: shouldStartCountdown ? 8000 : 5000,
         });
       } finally {
         isLoginInProgress.current = false;
