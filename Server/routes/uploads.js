@@ -13,7 +13,7 @@ import {
   deleteUploadedFile,
   getFileInfo,
 } from "../controllers/uploadController.js";
-import { authenticateToken } from "../middlewares/auth.js";
+import { protect } from "../middlewares/auth.js";
 import { rateLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
