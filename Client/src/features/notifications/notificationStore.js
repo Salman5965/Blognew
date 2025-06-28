@@ -168,10 +168,18 @@ const useNotificationStore = create(
 
       try {
         const result = await notificationService.getPreferences();
-        set({
-          preferences: result.data,
-          isPreferencesLoading: false,
-        });
+        if (result.success) {
+          set({
+            preferences: result.data,
+            isPreferencesLoading: false,
+          });
+        } else {
+          // Use default preferences on failure
+          set({
+            preferences: notificationService.getDefaultPreferences(),
+            isPreferencesLoading: false,
+          });
+        }
       } catch (error) {
         set({
           preferences: notificationService.getDefaultPreferences(),
