@@ -18,6 +18,7 @@ import likeRoutes from "./routes/likes.js";
 import bookmarkRoutes from "./routes/bookmarks.js";
 import uploadRoutes from "./routes/uploads.js";
 import notificationRoutes from "./routes/notifications.js";
+import forumRoutes from "./routes/forum.js";
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
@@ -134,6 +135,7 @@ app.use("/api/likes", likeRoutes);
 app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/forum", forumRoutes);
 
 // Welcome route
 app.get("/", (req, res) => {
