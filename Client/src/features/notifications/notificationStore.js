@@ -54,7 +54,12 @@ const useNotificationStore = create(
           });
         }
       } catch (error) {
+        // Silently handle 404s and use defaults
+        if (error.response?.status !== 404) {
+          console.error("Error fetching preferences:", error);
+        }
         set({
+          preferences: notificationService.getDefaultPreferences(),
           error: "Failed to fetch notifications",
           isLoading: false,
         });
