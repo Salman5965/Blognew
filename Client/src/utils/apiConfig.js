@@ -126,19 +126,26 @@ export const debugApiConfig = () => {
   console.log("VITE_API_BASE_URL:", import.meta.env.VITE_API_BASE_URL);
   console.log("Computed API_BASE_URL:", API_BASE_URL);
 
-  // Test API connectivity
+  // Test API connectivity with proper error handling
   fetch(getApiUrl("/health"))
     .then((response) => {
       console.log("API Health Check:", response.status, response.statusText);
+
+      // Handle rate limiting gracefully
+      if (response.status === 429) {
+        console.warn("API Health Check: Rate limited, skipping body parsing");
+        return { status: response.status, message: "Rate limited" };
+      }
+
       // Clone response before reading body to avoid "body stream already read" error
-      const responseClone = response.clone();
       if (
         response.ok &&
         response.headers.get("content-type")?.includes("application/json")
       ) {
-        return responseClone.json();
+        return response.clone().json();
       } else {
-        return responseClone
+        return response
+          .clone()
           .text()
           .then((text) => ({ message: text || "OK", status: response.status }));
       }
@@ -147,7 +154,7 @@ export const debugApiConfig = () => {
       console.log("API Health Data:", data);
     })
     .catch((error) => {
-      console.error("API Health Check Failed:", error.message || error);
+      console.warn("API Health Check Failed:", error.message || error);
     });
 };
 

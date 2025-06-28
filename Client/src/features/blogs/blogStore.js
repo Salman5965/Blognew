@@ -111,11 +111,12 @@ export const useBlogStore = create(
           // Don't show network errors to users, just log them
           const errorMessage =
             error?.status === 429
-              ? "Too many requests. Please wait a moment."
+              ? null // Don't show rate limit errors
               : error?.message?.includes("fetch") ||
                   error?.message?.includes("network") ||
-                  error?.message?.includes("Failed to fetch")
-                ? null // Don't set error for network issues
+                  error?.message?.includes("Failed to fetch") ||
+                  error?.message?.includes("Too many requests")
+                ? null // Don't set error for network issues or rate limits
                 : error instanceof Error
                   ? error.message
                   : "Failed to fetch blogs";

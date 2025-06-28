@@ -128,7 +128,7 @@ export const uploadRateLimiter = rateLimiter("upload", 10, 60); // 10 uploads pe
 // IP-based rate limiter for public endpoints
 export const publicRateLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 300, // 300 requests per minute per IP - more generous for browsing
+  max: 1000, // 1000 requests per minute per IP - very generous for development
   message: {
     status: "error",
     message: "Too many requests from this IP, please try again later.",
