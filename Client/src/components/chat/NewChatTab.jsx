@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Search, UserPlus, AlertCircle } from "lucide-react";
 import { useChatStore } from "@/features/chat/chatStore";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useDebounceEffect } from "@/hooks/useDebounce";
 
 export const NewChatTab = () => {
   const {
@@ -24,14 +24,14 @@ export const NewChatTab = () => {
   const [localQuery, setLocalQuery] = useState(searchQuery);
 
   // Debounce search to avoid too many API calls
-  useDebounce(
+  useDebounceEffect(
     () => {
       if (localQuery.trim()) {
         searchUsers(localQuery);
       }
     },
-    300,
     [localQuery],
+    300,
   );
 
   const handleUserSelect = async (user) => {
