@@ -135,6 +135,22 @@ const ForumChannelList = ({
           unread: 3,
         },
         {
+          id: "development",
+          name: "Development",
+          description: "Programming and development discussions",
+          icon: Code,
+          messageCount: 892,
+          onlineCount: 45,
+          lastActivity: "5 minutes ago",
+          unread: 1,
+        },
+      ],
+    },
+  ];
+
+  // Use dynamic categories if available, otherwise fallback
+  const displayCategories = channelCategories.length > 0 ? channelCategories : fallbackCategories;
+        {
           id: "announcements",
           name: "announcements",
           description: "Important updates",
@@ -343,7 +359,7 @@ const ForumChannelList = ({
     setExpandedCategories(newExpanded);
   };
 
-  const filteredCategories = channelCategories
+  const filteredCategories = displayCategories
     .map((category) => ({
       ...category,
       channels: category.channels.filter(
