@@ -25,11 +25,27 @@ export const useBlogStore = create(
       error: null,
       filters: initialFilters,
       pagination: initialPagination,
+      // Cache management
+      lastFetchTime: null,
+      cacheTimeout: 2 * 60 * 1000, // 2 minutes cache
 
-      getBlogs: async (query) => {
+      getBlogs: async (query, forceRefresh = false) => {
         try {
+          const { filters, pagination, lastFetchTime, cacheTimeout, blogs } = get();
+
+          // Check if we have recent cached data
+          const now = Date.now();
+          const isCacheValid = lastFetchTime &&
+            (now - lastFetchTime) < cacheTimeout &&
+            !forceRefresh &&
+            blogs.length > 0;
+
+          if (isCacheValid) {
+            console.log('Using cached blog data');
+            return;
+          }
+
           set({ isLoading: true, error: null });
-          const { filters, pagination } = get();
 
           const mergedQuery = {
             ...query,
@@ -253,13 +269,14 @@ export const useBlogStore = create(
                 ? updatedBlog
                 : blog,
             );
-            set({
-              blogs: updatedBlogs,
-              currentBlog:
-                currentBlog?.id === updatedBlog.id ? updatedBlog : currentBlog,
-              isLoading: false,
-            });
-          }
+          set({
+            blogs,
+            pagination: paginationData,
+            filters: mergedQuery,
+            isLoading: false,
+            error: null,
+            lastFetchTime: Date.now(),
+          });
 
           return updatedBlog;
         } catch (error) {
