@@ -85,7 +85,9 @@ class ApiService {
 
         if (error.response?.status === 401) {
           // Only clear auth data and redirect if this is not a login/register attempt
-          const isAuthEndpoint = error.config?.url?.includes("/auth/");
+          const isAuthEndpoint =
+            error.config?.url?.includes("/auth/login") ||
+            error.config?.url?.includes("/auth/register");
           if (!isAuthEndpoint) {
             localStorage.removeItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
             localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_DATA);
