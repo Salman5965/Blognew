@@ -193,6 +193,7 @@ const Analytics = React.lazy(() =>
 const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 const Discover = React.lazy(() => import("./pages/Discover"));
+const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 
 // Loading component for suspense
 const PageLoader = () => (
@@ -324,7 +325,15 @@ const App = () => (
                       }
                     />
 
-                    {/* Follow pages */}
+                    {/* User profile pages */}
+                    <Route
+                      path="/users/:userId"
+                      element={
+                        <PrivateRoute>
+                          <UserProfile />
+                        </PrivateRoute>
+                      }
+                    />
                     <Route
                       path="/users/:userId/followers"
                       element={
