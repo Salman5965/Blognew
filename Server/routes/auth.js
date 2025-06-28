@@ -9,6 +9,7 @@ import {
   logoutUser,
 } from "../controllers/authController.js";
 import { protect } from "../middlewares/auth.js";
+import { loginRateLimiter, rateLimiter } from "../middlewares/rateLimiter.js";
 import {
   validateRegister,
   validateLogin,
@@ -26,9 +27,10 @@ const router = express.Router();
  */
 router.post(
   "/register",
+  rateLimiter("register", 10, 300), // 10 registrations per 5 minutes
   validateRegister,
   handleValidationErrors,
-  registerUser
+  registerUser,
 );
 
 /**
@@ -36,7 +38,13 @@ router.post(
  * @desc    Login user and return JWT token
  * @access  Public
  */
-router.post("/login", validateLogin, handleValidationErrors, loginUser);
+router.post(
+  "/login",
+  loginRateLimiter, // Apply login rate limiting
+  validateLogin,
+  handleValidationErrors,
+  loginUser,
+);
 
 /**
  * @route   POST /api/auth/logout
@@ -62,7 +70,7 @@ router.put(
   protect,
   validateUpdateProfile,
   handleValidationErrors,
-  updateProfile
+  updateProfile,
 );
 
 /**
@@ -75,7 +83,7 @@ router.put(
   protect,
   validateChangePassword,
   handleValidationErrors,
-  changePassword
+  changePassword,
 );
 
 /**
