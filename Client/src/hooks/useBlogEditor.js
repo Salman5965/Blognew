@@ -122,6 +122,11 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
     setIsDirty(true);
   }, []);
 
+  const setVisibility = useCallback((newVisibility) => {
+    setVisibilityState(newVisibility);
+    setIsDirty(true);
+  }, []);
+
   const addTag = useCallback(
     (tag) => {
       const trimmedTag = tag.trim().toLowerCase();
@@ -163,6 +168,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
       category, // Added category to draft data
       tags,
       isPublished: false,
+      visibility,
       timestamp: new Date().toISOString(),
     };
 
@@ -185,6 +191,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
         setCategoryState(draft.category || ""); // Added category loading
         setTagsState(draft.tags || []);
         setIsPublishedState(false);
+        setVisibilityState(draft.visibility || "public");
         setIsDirty(false);
       } catch (error) {
         console.error("Failed to load draft:", error);
