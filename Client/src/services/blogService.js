@@ -338,7 +338,10 @@ class BlogService {
       if (
         error.message?.includes("fetch") ||
         error.message?.includes("network") ||
-        error.name === "TypeError"
+        error.message?.includes("Failed to fetch data") ||
+        error.isNetworkError ||
+        error.name === "TypeError" ||
+        !error.response
       ) {
         console.error("Network error fetching blogs:", error);
 
