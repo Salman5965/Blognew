@@ -220,9 +220,14 @@ import {
 import { LikeButton } from "@/components/shared/LikeButton";
 import { useToast } from "@/hooks/use-toast";
 import { bookmarkService } from "@/services/bookmarkService";
+import { useChatStore } from "@/features/chat/chatStore";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { FollowButton } from "@/components/shared/FollowButton";
 
 export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
   const { toast } = useToast();
+  const { user: currentUser } = useAuthContext();
+  const { startConversation, openChat } = useChatStore();
   // Safety checks for blog data
   if (!blog || !blog.author) {
     return <div>Loading...</div>;
@@ -230,6 +235,57 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
 
   const authorUrl = `${ROUTES.HOME}?author=${blog.author.id || blog.author._id}`;
   const readingTime = Math.ceil((blog.content?.length || 0) / 200);
+
+  // Check if current user is the author
+  const isAuthor = currentUser?._id === (blog.author._id || blog.author.id);
+
+  const handleMessageAuthor = async () => {
+    if (!currentUser) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to send messages",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isAuthor) {
+      toast({
+        title: "Cannot message yourself",
+        description: "You cannot send a message to yourself",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Create user object for chat service
+      const chatUser = {
+        id: blog.author._id || blog.author.id,
+        name: blog.author.name || blog.author.username,
+        username: blog.author.username,
+        avatar: blog.author.avatar,
+      };
+
+      // Start conversation with this user
+      await startConversation(chatUser);
+
+      // Open chat panel
+      openChat();
+
+      toast({
+        title: "Chat opened",
+        description: `You can now send messages to ${blog.author.username}`,
+      });
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to start conversation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleShare = async () => {
     // Try native sharing first
@@ -288,7 +344,7 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
   if (variant === "compact") {
     return (
       <div className="flex items-center justify-between border-b pb-4 mb-6">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between flex-1">
           <Link
             to={authorUrl}
             className="flex items-center space-x-3 hover:opacity-80"
@@ -306,6 +362,21 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
               </p>
             </div>
           </Link>
+
+          {/* Author action buttons for compact variant */}
+          {currentUser && !isAuthor && (
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" onClick={handleMessageAuthor}>
+                <MessageCircle className="h-4 w-4 mr-1" />
+                Message
+              </Button>
+              <FollowButton
+                userId={blog.author._id || blog.author.id}
+                size="sm"
+                showIcon={false}
+              />
+            </div>
+          )}
         </div>
 
         {showActions && (
@@ -332,7 +403,7 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
     <div className="space-y-6">
       {/* Author and Date */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center justify-between flex-1">
           <Link
             to={authorUrl}
             className="flex items-center space-x-3 hover:opacity-80"
@@ -352,6 +423,21 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
               )}
             </div>
           </Link>
+
+          {/* Author action buttons */}
+          {currentUser && !isAuthor && (
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" onClick={handleMessageAuthor}>
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Message
+              </Button>
+              <FollowButton
+                userId={blog.author._id || blog.author.id}
+                size="sm"
+                showIcon={false}
+              />
+            </div>
+          )}
         </div>
 
         {showActions && (
