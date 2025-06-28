@@ -35,16 +35,16 @@ class BlogService {
         error.status === 429 ||
         error.message?.includes("Too many requests")
       ) {
-        console.warn("Rate limited, using mock data fallback");
+        console.warn("Rate limited, returning empty data");
         return {
-          status: "success",
-          data: this.getMockBlogs(),
+          blogs: [],
           pagination: {
-            currentPage: 1,
-            totalPages: 1,
-            totalBlogs: 3,
+            currentPage: query.page || 1,
+            totalPages: 0,
+            totalBlogs: 0,
             hasNextPage: false,
             hasPrevPage: false,
+            limit: query.limit || PAGINATION.BLOG_LIMIT,
           },
         };
       }
