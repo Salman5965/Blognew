@@ -61,12 +61,6 @@
 // export const DEFAULT_AVATAR = "/placeholder.svg";
 // export const DEFAULT_COVER_IMAGE = "/placeholder.svg";
 
-
-
-
-
-
-
 import { API_BASE_URL as API_URL } from "./apiConfig";
 
 export const API_BASE_URL = API_URL;
@@ -81,6 +75,10 @@ export const ROUTES = {
   DASHBOARD: "/dashboard",
   MY_BLOGS: "/dashboard/blogs",
   PROFILE: "/dashboard/profile",
+  USER_PROFILE: "/users",
+  FOLLOWERS: "/users/:userId/followers",
+  FOLLOWING: "/users/:userId/following",
+  DISCOVER: "/discover",
   ABOUT: "/about",
   CONTACT: "/contact",
   PRIVACY: "/privacy",
