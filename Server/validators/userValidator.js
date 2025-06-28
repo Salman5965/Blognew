@@ -1,4 +1,4 @@
-const { body, param, query } = require("express-validator");
+import { body, param, query } from "express-validator";
 
 // User registration validation
 const validateUserRegistration = [
