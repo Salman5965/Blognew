@@ -17,9 +17,6 @@ export const useAuthStore = create(
           set({ isLoading: true, error: null });
           const { user, token } = await authService.login(credentials);
 
-          // Check if this is demo authentication
-          const isDemoMode = token?.includes("demo-jwt-token");
-
           set({
             user,
             isAuthenticated: true,
@@ -27,8 +24,7 @@ export const useAuthStore = create(
             error: null,
           });
 
-          // Return demo mode indicator for UI feedback
-          return { user, token, isDemoMode };
+          return { user, token };
         } catch (error) {
           // Enhanced error handling
           let errorMessage = "Login failed";
@@ -39,13 +35,12 @@ export const useAuthStore = create(
             errorMessage =
               "Too many login attempts. Please wait before trying again.";
           } else if (error.response?.status === 401) {
-            errorMessage =
-              "Invalid email or password. Try demo credentials: demo@example.com";
+            errorMessage = "Invalid email or password.";
           } else if (error.response?.status >= 500) {
-            errorMessage = "Server error. Try demo credentials for testing.";
+            errorMessage = "Server error. Please try again later.";
           } else if (error.isNetworkError || !error.response) {
             errorMessage =
-              "Network connection failed. Try demo credentials for offline testing.";
+              "Network connection failed. Please check your internet connection.";
           }
 
           set({
