@@ -15,6 +15,7 @@ import {
   getCategories,
 } from "../controllers/blogController.js";
 import { protect, optionalAuth, authorize } from "../middlewares/auth.js";
+import { rateLimiter } from "../middlewares/rateLimiter.js";
 import {
   validateCreateBlog,
   validateUpdateBlog,
@@ -28,7 +29,12 @@ const router = express.Router();
  * @access  Public
  * @query   page, limit, category, tag, author, search, sort
  */
-router.get("/", optionalAuth, getBlogs);
+router.get(
+  "/",
+  rateLimiter("getBlogs", 120, 60), // 120 requests per minute - generous for browsing
+  optionalAuth,
+  getBlogs,
+);
 
 /**
  * @route   GET /api/blogs/no-tags
