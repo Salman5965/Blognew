@@ -79,6 +79,19 @@ const CommunityForum = () => {
               </div>
               <div className="hidden md:flex items-center space-x-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
+                  {isConnected ? (
+                    <Wifi className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <WifiOff className="h-3 w-3 text-red-500" />
+                  )}
+                  <span
+                    className={isConnected ? "text-green-600" : "text-red-600"}
+                  >
+                    {connectionStatus}
+                  </span>
+                </div>
+                <span>•</span>
+                <div className="flex items-center space-x-1">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>
                     {forumStats.onlineMembers.toLocaleString()} online
