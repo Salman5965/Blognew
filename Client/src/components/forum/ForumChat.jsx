@@ -38,7 +38,10 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [typingUsers, setTypingUsers] = useState([]);
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
   const { user } = useAuthContext();
 
   // Mock messages for the channel
