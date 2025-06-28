@@ -15,6 +15,8 @@ import { followService } from "@/services/followService";
 import { FollowSuggestions } from "@/components/users/FollowSuggestions";
 import {
   User,
+  Users,
+  UserCheck,
   Mail,
   Calendar,
   MapPin,
