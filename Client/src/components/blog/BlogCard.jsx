@@ -200,6 +200,7 @@ import {
   Share2,
 } from "lucide-react";
 import { LikeButton } from "@/components/shared/LikeButton";
+import { FollowButton } from "@/components/shared/FollowButton";
 import { useToast } from "@/hooks/use-toast";
 import { bookmarkService } from "@/services/bookmarkService";
 import LazyImage, {
@@ -359,25 +360,33 @@ export const BlogCard = memo(
           </CardHeader>
 
           <CardContent className="p-6">
-            <div className="flex items-center space-x-2 mb-3">
-              <Link
-                to={authorUrl}
-                className="flex items-center space-x-2 hover:opacity-80"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={blog.author.avatar} />
-                  <AvatarFallback>
-                    {blog.author.username.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium">
-                  {blog.author.username}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <Link
+                  to={authorUrl}
+                  className="flex items-center space-x-2 hover:opacity-80"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={blog.author.avatar} />
+                    <AvatarFallback>
+                      {blog.author.username.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium">
+                    {blog.author.username}
+                  </span>
+                </Link>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-sm text-muted-foreground">
+                  {formatBlogDate(blog.createdAt)}
                 </span>
-              </Link>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-sm text-muted-foreground">
-                {formatBlogDate(blog.createdAt)}
-              </span>
+              </div>
+              <FollowButton
+                userId={blog.author._id || blog.author.id}
+                size="sm"
+                showIcon={false}
+                className="h-7 px-3 text-xs"
+              />
             </div>
 
             <Link to={blogUrl}>
