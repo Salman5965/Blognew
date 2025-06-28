@@ -3,9 +3,9 @@ import { body, param, query } from "express-validator";
 import {
   getAllUsers,
   getUserById,
-  updateUser,
   deleteUser,
   getUserStats,
+  updateUserRole,
 } from "../controllers/userController.js";
 import { protect, authorize } from "../middlewares/auth.js";
 import { validateUpdateUser } from "../validators/userValidator.js";
@@ -88,8 +88,14 @@ router.get("/", protect, authorize("admin"), getAllUsers);
 // Get user by ID
 router.get("/:id", protect, validateUserId, getUserById);
 
-// Update user
-router.put("/:id", protect, validateUserId, validateUpdateUser, updateUser);
+// Update user role (admin only)
+router.put(
+  "/:id/role",
+  protect,
+  authorize("admin"),
+  validateUserId,
+  updateUserRole,
+);
 
 // Delete user (admin only)
 router.delete("/:id", protect, authorize("admin"), validateUserId, deleteUser);
