@@ -47,10 +47,7 @@ class ForumService {
       throw new Error(response.message || "Failed to fetch channel");
     } catch (error) {
       console.error("Error fetching channel:", error);
-
-      // Return mock channel
-      const mockChannels = this.getMockChannels();
-      return mockChannels.find((c) => c.id === channelId) || mockChannels[0];
+      throw error;
     }
   }
 
