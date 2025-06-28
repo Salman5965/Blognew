@@ -23,6 +23,7 @@ export const useBlogStore = create(
       currentBlog: null,
       isLoading: false,
       error: null,
+      isOffline: false,
       filters: initialFilters,
       pagination: initialPagination,
 
