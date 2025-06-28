@@ -15,7 +15,7 @@ export const UserCard = ({
   variant = "default",
   onFollowChange,
 }) => {
-  const userProfileUrl = `${ROUTES.HOME}?author=${user._id}`;
+  const userProfileUrl = `/users/${user._id}`;
 
   const getInitials = () => {
     if (user.firstName && user.lastName) {
