@@ -188,10 +188,6 @@
 //   );
 // };
 
-
-
-
-
 import React, { useEffect } from "react";
 import { BlogCard } from "./BlogCard";
 import { Pagination } from "@/components/shared/Pagination";
@@ -199,7 +195,7 @@ import { useBlogStore } from "@/features/blogs/blogStore";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, BookOpen } from "lucide-react";
+import { RefreshCw, BookOpen, WifiOff, AlertTriangle } from "lucide-react";
 
 export const BlogList = ({
   variant = "grid",
@@ -210,6 +206,7 @@ export const BlogList = ({
     blogs,
     isLoading,
     error,
+    isOffline,
     pagination,
     filters,
     getBlogs,
