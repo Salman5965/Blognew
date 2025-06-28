@@ -35,12 +35,14 @@ import {
   Globe,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useChatStore } from "@/features/chat/chatStore";
 
 export const UserProfile = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
   const { user: currentUser } = useAuthContext();
   const { toast } = useToast();
+  const { startConversation, openChat } = useChatStore();
 
   const [user, setUser] = useState(null);
   const [userStats, setUserStats] = useState(null);
@@ -115,6 +117,36 @@ export const UserProfile = () => {
     }));
   };
 
+  const handleSendMessage = async () => {
+    try {
+      // Create user object for chat service
+      const chatUser = {
+        id: user._id,
+        name: getDisplayName(),
+        username: user.username,
+        avatar: user.avatar,
+      };
+
+      // Start conversation with this user
+      await startConversation(chatUser);
+
+      // Open chat panel
+      openChat();
+
+      toast({
+        title: "Chat opened",
+        description: `You can now send messages to ${getDisplayName()}`,
+      });
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to start conversation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <PageWrapper>
@@ -185,10 +217,21 @@ export const UserProfile = () => {
                   </div>
 
                   {!isOwnProfile && (
-                    <FollowButton
-                      userId={user._id}
-                      onFollowChange={handleFollowChange}
-                    />
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleSendMessage}
+                        className="flex items-center space-x-2"
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        <span>Message</span>
+                      </Button>
+                      <FollowButton
+                        userId={user._id}
+                        onFollowChange={handleFollowChange}
+                      />
+                    </div>
                   )}
                 </div>
 
