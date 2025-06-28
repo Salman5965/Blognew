@@ -36,88 +36,35 @@ import { Link } from "react-router-dom";
 
 const Explore = () => {
   const { user } = useAuthContext();
-  const [trendingAuthors, setTrendingAuthors] = useState([]);
-  const [featuredContent, setFeaturedContent] = useState([]);
-  const [popularTags, setPopularTags] = useState([]);
-  const [recommendedUsers, setRecommendedUsers] = useState([]);
-  const [trendingTopics, setTrendingTopics] = useState([]);
-  const [exploreStats, setExploreStats] = useState({});
-
-  const [isLoadingAuthors, setIsLoadingAuthors] = useState(true);
-  const [isLoadingContent, setIsLoadingContent] = useState(true);
-  const [isLoadingTags, setIsLoadingTags] = useState(true);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [timeframe, setTimeframe] = useState("week");
 
-  useEffect(() => {
-    loadExploreData();
-  }, [timeframe, activeFilter]);
+  const { data, loading, error, searchUsers } = useExplore({
+    timeframe,
+    contentType: activeFilter,
+    limit: 12,
+  });
 
-  const loadExploreData = async () => {
-    try {
-      // Load all explore data in parallel
-      const [
-        authorsData,
-        contentData,
-        tagsData,
-        usersData,
-        topicsData,
-        statsData,
-      ] = await Promise.allSettled([
-        exploreService.getTrendingAuthors({ timeframe, limit: 12 }),
-        exploreService.getFeaturedContent({
-          type: activeFilter === "all" ? null : activeFilter,
-        }),
-        exploreService.getPopularTags(20),
-        exploreService.getRecommendedUsers({ limit: 8 }),
-        exploreService.getTrendingTopics(10),
-        exploreService.getExploreStats(),
-      ]);
+  const {
+    trendingAuthors,
+    featuredContent,
+    popularTags,
+    recommendedUsers,
+    trendingTopics,
+    exploreStats,
+  } = data;
 
-      // Set data from successful requests
-      if (authorsData.status === "fulfilled") {
-        setTrendingAuthors(authorsData.value.authors || []);
-      }
-      if (contentData.status === "fulfilled") {
-        setFeaturedContent(contentData.value.content || []);
-      }
-      if (tagsData.status === "fulfilled") {
-        setPopularTags(tagsData.value || []);
-      }
-      if (usersData.status === "fulfilled") {
-        setRecommendedUsers(usersData.value.users || []);
-      }
-      if (topicsData.status === "fulfilled") {
-        setTrendingTopics(topicsData.value || []);
-      }
-      if (statsData.status === "fulfilled") {
-        setExploreStats(statsData.value || {});
-      }
-    } catch (error) {
-      console.error("Error loading explore data:", error);
-    } finally {
-      setIsLoadingAuthors(false);
-      setIsLoadingContent(false);
-      setIsLoadingTags(false);
-      setIsLoadingUsers(false);
-    }
-  };
+  const {
+    authors: isLoadingAuthors,
+    content: isLoadingContent,
+    tags: isLoadingTags,
+    users: isLoadingUsers,
+  } = loading;
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
-
-    try {
-      setIsLoadingAuthors(true);
-      const results = await exploreService.searchUsers(searchQuery);
-      setTrendingAuthors(results.users || []);
-    } catch (error) {
-      console.error("Search error:", error);
-    } finally {
-      setIsLoadingAuthors(false);
-    }
+    await searchUsers(searchQuery);
   };
 
   const getAuthorRankIcon = (rank) => {
