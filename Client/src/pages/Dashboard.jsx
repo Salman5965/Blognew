@@ -551,6 +551,7 @@ import {
   Heart,
   MessageCircle,
   Users,
+  UserCheck,
   TrendingUp,
   Calendar,
   Settings,
