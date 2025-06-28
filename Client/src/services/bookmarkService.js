@@ -43,9 +43,8 @@ class BookmarkService {
 
       throw new Error(response.message || "Failed to bookmark blog");
     } catch (error) {
-      // If endpoint doesn't exist, simulate success for better UX
-      console.warn("Bookmark add endpoint not available yet");
-      return { bookmarked: true };
+      console.error("Error adding bookmark:", error);
+      throw error;
     }
   }
 
@@ -60,9 +59,8 @@ class BookmarkService {
 
       throw new Error(response.message || "Failed to remove bookmark");
     } catch (error) {
-      // If endpoint doesn't exist, simulate success for better UX
-      console.warn("Bookmark remove endpoint not available yet");
-      return { bookmarked: false };
+      console.error("Error removing bookmark:", error);
+      throw error;
     }
   }
 
@@ -77,8 +75,7 @@ class BookmarkService {
 
       return false;
     } catch (error) {
-      // If endpoint doesn't exist, return false
-      console.warn("Bookmark check endpoint not available yet");
+      console.error("Error checking bookmark status:", error);
       return false;
     }
   }
