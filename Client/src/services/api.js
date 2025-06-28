@@ -116,6 +116,11 @@
 import axios from "axios";
 import { API_BASE_URL, LOCAL_STORAGE_KEYS } from "@/utils/constant";
 import { ApiCache } from "@/utils/cache";
+import {
+  debugApiRequest,
+  debugApiResponse,
+  isDebugMode,
+} from "@/utils/debugMode";
 
 class ApiService {
   constructor() {
@@ -183,6 +188,9 @@ class ApiService {
 
   async get(url, config = {}) {
     try {
+      // Debug logging
+      debugApiRequest(url, "GET", config.params);
+
       // Check if caching is enabled for this request
       const enableCache = config.cache !== false;
       const cacheKey = enableCache
@@ -193,11 +201,17 @@ class ApiService {
       if (enableCache && cacheKey) {
         const cachedData = ApiCache.get(cacheKey);
         if (cachedData) {
+          if (isDebugMode()) {
+            console.log(`📦 Cache hit for ${url}`);
+          }
           return cachedData;
         }
       }
 
       const response = await this.instance.get(url, config);
+
+      // Debug response
+      debugApiResponse(url, response.data);
 
       // Cache successful responses
       if (enableCache && cacheKey && response.data) {
@@ -207,6 +221,9 @@ class ApiService {
 
       return response.data;
     } catch (error) {
+      // Debug error response
+      debugApiResponse(url, null, error);
+
       // Log the error for debugging
       console.error(`API Error for ${url}:`, {
         message: error.message,
@@ -214,6 +231,7 @@ class ApiService {
         statusText: error.response?.statusText,
         isNetworkError: error.isNetworkError,
         code: error.code,
+        baseURL: this.instance.defaults.baseURL,
       });
 
       // Handle network errors gracefully
