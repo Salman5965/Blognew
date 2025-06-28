@@ -10,7 +10,7 @@ import {
   deleteBookmark,
   getBlogsBookmarkStatus,
 } from "../controllers/bookmarkController.js";
-import { authenticateToken } from "../middlewares/auth.js";
+import { protect } from "../middlewares/auth.js";
 import { rateLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();

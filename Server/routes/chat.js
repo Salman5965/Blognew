@@ -10,7 +10,7 @@ import {
   deleteMessage,
   editMessage,
 } from "../controllers/chatController.js";
-import { authenticateToken } from "../middlewares/auth.js";
+import { protect } from "../middlewares/auth.js";
 import { rateLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
