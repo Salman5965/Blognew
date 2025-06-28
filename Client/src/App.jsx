@@ -196,6 +196,7 @@ const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
+const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
 
 // Loading component for suspense
 const PageLoader = () => (
@@ -349,6 +350,16 @@ const App = () => (
                       element={
                         <PrivateRoute>
                           <Notifications />
+                        </PrivateRoute>
+                      }
+                    />
+
+                    {/* Community Forum */}
+                    <Route
+                      path="/community"
+                      element={
+                        <PrivateRoute>
+                          <CommunityForum />
                         </PrivateRoute>
                       }
                     />
