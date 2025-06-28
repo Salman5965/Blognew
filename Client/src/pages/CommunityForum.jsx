@@ -115,6 +115,11 @@ const CommunityForum = () => {
               <Button variant="outline" size="sm">
                 <Filter className="h-4 w-4" />
               </Button>
+              {!isConnected && connectionStatus === "error" && (
+                <Button variant="outline" size="sm" onClick={retry}>
+                  Retry Connection
+                </Button>
+              )}
             </div>
           </div>
         </div>
