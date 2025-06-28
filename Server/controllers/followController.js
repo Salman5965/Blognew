@@ -82,7 +82,17 @@ export const toggleFollow = async (req, res) => {
       ]);
 
       // Create notification
-      await Notification.createFollowNotification(currentUserId, targetUserId);
+      try {
+        await Notification.createFollowNotification(
+          currentUserId,
+          targetUserId,
+        );
+      } catch (notifError) {
+        console.warn(
+          "Failed to create follow notification:",
+          notifError.message,
+        );
+      }
 
       res.status(201).json({
         status: "success",
@@ -109,12 +119,15 @@ export const getFollowStatus = async (req, res) => {
     const { userId: targetUserId } = req.params;
     const currentUserId = req.user.id;
 
-    const isFollowing = await Follow.isFollowing(currentUserId, targetUserId);
+    const existingFollow = await Follow.findOne({
+      follower: currentUserId,
+      following: targetUserId,
+    });
 
     res.status(200).json({
       status: "success",
       data: {
-        isFollowing: !!isFollowing,
+        isFollowing: !!existingFollow,
       },
     });
   } catch (error) {
@@ -143,7 +156,16 @@ export const getFollowers = async (req, res) => {
       });
     }
 
-    const followers = await Follow.getFollowers(userId, { page, limit });
+    const skip = (page - 1) * limit;
+    const followers = await Follow.find({ following: userId })
+      .populate(
+        "follower",
+        "username firstName lastName avatar bio stats.followersCount",
+      )
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
     const totalFollowers = await Follow.countDocuments({ following: userId });
 
     res.status(200).json({
@@ -186,7 +208,16 @@ export const getFollowing = async (req, res) => {
       });
     }
 
-    const following = await Follow.getFollowing(userId, { page, limit });
+    const skip = (page - 1) * limit;
+    const following = await Follow.find({ follower: userId })
+      .populate(
+        "following",
+        "username firstName lastName avatar bio stats.followersCount",
+      )
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
     const totalFollowing = await Follow.countDocuments({ follower: userId });
 
     res.status(200).json({
@@ -227,11 +258,18 @@ export const getFollowStats = async (req, res) => {
       });
     }
 
-    const stats = await Follow.getFollowStats(userId);
+    const [followersCount, followingCount] = await Promise.all([
+      Follow.countDocuments({ following: userId }),
+      Follow.countDocuments({ follower: userId }),
+    ]);
 
     res.status(200).json({
       status: "success",
-      data: stats,
+      data: {
+        followersCount,
+        followingCount,
+        mutualFollowsCount: 0, // Simplified for now
+      },
     });
   } catch (error) {
     console.error("Get follow stats error:", error);
@@ -256,61 +294,16 @@ export const getFollowSuggestions = async (req, res) => {
     const followingIds = currentlyFollowing.map((f) => f.following);
     followingIds.push(currentUserId); // Exclude self
 
-    // Find suggested users based on followers of people you follow
-    const suggestions = await User.aggregate([
-      // Match active users not already followed
-      {
-        $match: {
-          _id: { $nin: followingIds },
-          isActive: true,
-        },
-      },
-      // Add a score based on mutual connections and activity
-      {
-        $lookup: {
-          from: "follows",
-          localField: "_id",
-          foreignField: "following",
-          as: "followers",
-        },
-      },
-      {
-        $addFields: {
-          mutualConnections: {
-            $size: {
-              $setIntersection: [
-                "$followers.follower",
-                followingIds.slice(0, -1), // Remove self from comparison
-              ],
-            },
-          },
-          score: {
-            $add: [
-              { $multiply: ["$stats.followersCount", 0.3] },
-              { $multiply: ["$mutualConnections", 10] },
-              { $multiply: ["$stats.blogsCount", 0.5] },
-            ],
-          },
-        },
-      },
-      // Sort by score and follower count
-      { $sort: { score: -1, "stats.followersCount": -1 } },
-      { $limit: limit },
-      // Clean up response
-      {
-        $project: {
-          username: 1,
-          firstName: 1,
-          lastName: 1,
-          avatar: 1,
-          bio: 1,
-          "stats.followersCount": 1,
-          "stats.blogsCount": 1,
-          mutualConnections: 1,
-          isOnline: 1,
-        },
-      },
-    ]);
+    // Find suggested users - simplified logic
+    const suggestions = await User.find({
+      _id: { $nin: followingIds },
+      isActive: true,
+    })
+      .select(
+        "username firstName lastName avatar bio stats.followersCount stats.blogsCount",
+      )
+      .sort({ "stats.followersCount": -1 })
+      .limit(limit);
 
     res.status(200).json({
       status: "success",
@@ -336,12 +329,10 @@ export const getMutualFollows = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
 
     // Get users that both current user and target user follow
-    const currentUserFollowing = await Follow.find({
-      follower: currentUserId,
-    }).select("following");
-    const targetUserFollowing = await Follow.find({
-      follower: targetUserId,
-    }).select("following");
+    const [currentUserFollowing, targetUserFollowing] = await Promise.all([
+      Follow.find({ follower: currentUserId }).select("following"),
+      Follow.find({ follower: targetUserId }).select("following"),
+    ]);
 
     const currentFollowingIds = currentUserFollowing.map((f) =>
       f.following.toString(),
