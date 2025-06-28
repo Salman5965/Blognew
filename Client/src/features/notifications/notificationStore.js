@@ -70,8 +70,16 @@ const useNotificationStore = create(
     fetchUnreadCount: async () => {
       try {
         const result = await notificationService.getUnreadCount();
-        set({ unreadCount: result.count });
+        if (result.success) {
+          set({ unreadCount: result.count });
+        } else {
+          set({ unreadCount: 0 });
+        }
       } catch (error) {
+        // Silently handle 404s
+        if (error.response?.status !== 404) {
+          console.error("Error fetching unread count:", error);
+        }
         console.error("Failed to fetch unread count:", error);
       }
     },
