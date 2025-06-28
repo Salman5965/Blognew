@@ -131,12 +131,6 @@
 // export const authService = new AuthService();
 // export default authService;
 
-
-
-
-
-
-
 import { LOCAL_STORAGE_KEYS } from "@/utils/constant";
 import apiService from "./api";
 
@@ -153,6 +147,8 @@ class AuthService {
 
       throw new Error(response.message || "Login failed");
     } catch (error) {
+      // Let the frontend handle specific error messaging
+      // Just pass through the original error for better flexibility
       throw error;
     }
   }

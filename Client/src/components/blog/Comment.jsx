@@ -40,8 +40,12 @@ export const Comment = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const isOwner = user && comment.author.id === user.id;
-  const isLiked = comment.likes?.some((like) => like.user === user?.id);
+  const commentId = comment._id || comment.id;
+  const authorId = comment.author._id || comment.author.id;
+  const userId = user?._id || user?.id;
+
+  const isOwner = user && authorId === userId;
+  const isLiked = comment.likes?.some((like) => like.user === userId);
   const likeCount = comment.likes?.length || 0;
 
   const handleReply = async () => {
@@ -50,7 +54,7 @@ export const Comment = ({
     try {
       setIsSubmitting(true);
       setError(null);
-      await onReply(comment.id, replyContent);
+      await onReply(commentId, replyContent);
       setReplyContent("");
       setIsReplying(false);
     } catch (err) {
@@ -66,7 +70,7 @@ export const Comment = ({
     try {
       setIsSubmitting(true);
       setError(null);
-      await onEdit(comment.id, editContent);
+      await onEdit(commentId, editContent);
       setIsEditing(false);
     } catch (err) {
       setError(err.message || "Failed to update comment");
@@ -79,7 +83,7 @@ export const Comment = ({
     if (!isAuthenticated) return;
 
     try {
-      await onLike(comment.id);
+      await onLike(commentId);
     } catch (err) {
       console.error("Failed to like comment:", err);
     }
@@ -88,7 +92,7 @@ export const Comment = ({
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this comment?")) {
       try {
-        await onDelete(comment.id);
+        await onDelete(commentId);
       } catch (err) {
         console.error("Failed to delete comment:", err);
       }
@@ -275,7 +279,7 @@ export const Comment = ({
         <div className="space-y-3">
           {comment.replies.map((reply) => (
             <Comment
-              key={reply.id}
+              key={reply._id || reply.id}
               comment={reply}
               onEdit={onEdit}
               onDelete={onDelete}

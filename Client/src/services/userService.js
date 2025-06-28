@@ -109,9 +109,6 @@
 // export const userService = new UserService();
 // export default userService;
 
-
-
-
 import apiService from "./api";
 
 class UserService {
@@ -140,6 +137,22 @@ class UserService {
       return response.data.stats;
     }
     throw new Error(response.message || "Failed to fetch user stats");
+  }
+
+  // Get activity on current user's blogs (likes, comments from other users)
+  async getUserActivity(userId, limit = 10) {
+    try {
+      const response = await apiService.get(
+        `/users/${userId}/activity?limit=${limit}`,
+      );
+      if (response.status === "success") {
+        return response.data.activities;
+      }
+      throw new Error(response.message || "Failed to fetch user activity");
+    } catch (error) {
+      console.error("Error fetching user activity:", error);
+      return [];
+    }
   }
 
   // Search users

@@ -1,4 +1,3 @@
-
 // import React from "react";
 // import { Toaster } from "@/components/ui/toaster";
 // import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -137,16 +136,6 @@
 
 // export default App;
 
-
-
-
-
-
-
-
-
-
-
 import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -160,6 +149,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PrivateRoute } from "@/components/shared/PrivateRoute";
 import { ROUTES } from "@/utils/constant";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ChatPanel } from "@/components/chat/ChatPanel";
 
 // Lazy import pages for code splitting
 const Home = React.lazy(() =>
@@ -198,6 +188,13 @@ const Cookies = React.lazy(() => import("./pages/Cookies"));
 const Gdpr = React.lazy(() => import("./pages/Gdpr"));
 const Help = React.lazy(() => import("./pages/Help"));
 const Feed = React.lazy(() => import("./pages/Feed"));
+const Analytics = React.lazy(() =>
+  import("./pages/Analytics").then((module) => ({ default: module.Analytics })),
+);
+const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
+const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
+
+const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 
 // Loading component for suspense
 const PageLoader = () => (
@@ -310,6 +307,40 @@ const App = () => (
                         </PrivateRoute>
                       }
                     />
+                    <Route
+                      path="/dashboard/analytics"
+                      element={
+                        <PrivateRoute>
+                          <Analytics />
+                        </PrivateRoute>
+                      }
+                    />
+
+                    {/* User profile pages */}
+                    <Route
+                      path="/users/:userId"
+                      element={
+                        <PrivateRoute>
+                          <UserProfile />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/users/:userId/followers"
+                      element={
+                        <PrivateRoute>
+                          <FollowersPage />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/users/:userId/following"
+                      element={
+                        <PrivateRoute>
+                          <FollowingPage />
+                        </PrivateRoute>
+                      }
+                    />
 
                     {/* Catch-all route */}
                     <Route path="*" element={<NotFound />} />
@@ -318,6 +349,10 @@ const App = () => (
               </main>
               <Footer />
             </div>
+
+            {/* Chat Panel - Available globally for authenticated users */}
+            <ChatPanel />
+
             <Toaster />
             <Sonner />
           </BrowserRouter>

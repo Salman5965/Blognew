@@ -1,4 +1,3 @@
-
 // import React, { useState } from "react";
 // import { PageWrapper } from "@/components/layout/PageWrapper";
 // import { BlogList } from "@/components/blog/BlogList";
@@ -199,24 +198,33 @@
 //   );
 // };
 
-
-
-
-
 import React, { useState } from "react";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { BlogList } from "@/components/blog/BlogList";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBlogStore } from "@/features/blogs/blogStore";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
-import { DEBOUNCE_DELAY } from "@/utils/constant";
-import { Search, Filter, Grid, List, X } from "lucide-react";
+import { useAuthContext } from "@/contexts/AuthContext";
+import { DEBOUNCE_DELAY, ROUTES } from "@/utils/constant";
+
+import {
+  Search,
+  Filter,
+  Grid,
+  List,
+  X,
+  Users,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 
 export const Home = () => {
   const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(false);
+  const { isAuthenticated } = useAuthContext();
 
   const { filters, updateFilters, resetFilters } = useBlogStore();
 
@@ -396,8 +404,83 @@ export const Home = () => {
           </div>
         )}
 
-        {/* Blog List */}
-        <BlogList variant={viewMode} />
+        {/* Main Content Layout */}
+        <div
+          className={`grid gap-8 ${isAuthenticated ? "grid-cols-1 lg:grid-cols-4" : "grid-cols-1"}`}
+        >
+          {/* Main Content - Blog List */}
+          <div className={isAuthenticated ? "lg:col-span-3" : "col-span-1"}>
+            <BlogList variant={viewMode} />
+          </div>
+
+          {/* Sidebar - Only for authenticated users */}
+          {isAuthenticated && (
+            <div className="lg:col-span-1 space-y-6">
+              <div className="sticky top-6 space-y-6">
+                {/* Discover CTA */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center space-x-2 text-lg">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      <span>Discover</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground">
+                      Find amazing writers and discover your next favorite
+                      content creator.
+                    </p>
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => (window.location.href = ROUTES.DISCOVER)}
+                        className="w-full"
+                        size="sm"
+                      >
+                        <Users className="h-4 w-4 mr-2" />
+                        Explore People
+                      </Button>
+                      <div className="flex items-center justify-center space-x-4 text-xs text-muted-foreground">
+                        <div className="flex items-center space-x-1">
+                          <TrendingUp className="h-3 w-3" />
+                          <span>Popular Authors</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Search className="h-3 w-3" />
+                          <span>User Search</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Stats or Tips for new users */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">
+                      Welcome to BlogHub
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <span>Discover amazing content</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <span>Follow your favorite writers</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <span>Share your own stories</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+        </div>
       </PageWrapper>
     </div>
   );

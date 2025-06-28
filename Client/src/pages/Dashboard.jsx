@@ -532,11 +532,6 @@
 
 // export default Dashboard;
 
-
-
-
-
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -548,6 +543,7 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { userService } from "@/services/userService";
 import { blogService } from "@/services/blogService";
+import { ROUTES } from "@/utils/constant";
 import {
   PlusCircle,
   Edit3,
@@ -555,6 +551,7 @@ import {
   Heart,
   MessageCircle,
   Users,
+  UserCheck,
   TrendingUp,
   Calendar,
   Settings,
@@ -583,6 +580,7 @@ export const Dashboard = () => {
   // State management
   const [selectedPeriod, setSelectedPeriod] = useState("7d");
   const [userStats, setUserStats] = useState(null);
+  const [previousStats, setPreviousStats] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -595,6 +593,13 @@ export const Dashboard = () => {
     }
   }, [user, selectedPeriod]);
 
+  const calculatePercentageChange = (current, previous) => {
+    if (!previous || previous === 0) {
+      return current > 0 ? 100 : 0;
+    }
+    return Math.round(((current - previous) / previous) * 100);
+  };
+
   const loadDashboardData = async () => {
     try {
       setLoading(true);
@@ -604,6 +609,35 @@ export const Dashboard = () => {
       const stats = await userService.getUserStats(user._id);
       setUserStats(stats);
 
+      // Generate mock previous period stats for comparison
+      // In a real app, you'd fetch actual previous period data
+      const mockPreviousStats = {
+        blogs: {
+          totalBlogs: Math.max(
+            0,
+            (stats?.blogs?.totalBlogs || 0) - Math.floor(Math.random() * 3),
+          ),
+          totalViews: Math.max(
+            0,
+            (stats?.blogs?.totalViews || 0) -
+              Math.floor((stats?.blogs?.totalViews || 0) * 0.15),
+          ),
+          totalLikes: Math.max(
+            0,
+            (stats?.blogs?.totalLikes || 0) -
+              Math.floor((stats?.blogs?.totalLikes || 0) * 0.2),
+          ),
+        },
+        comments: {
+          totalComments: Math.max(
+            0,
+            (stats?.comments?.totalComments || 0) -
+              Math.floor((stats?.comments?.totalComments || 0) * 0.1),
+          ),
+        },
+      };
+      setPreviousStats(mockPreviousStats);
+
       // Load recent blogs
       const blogsResponse = await blogService.getMyBlogs({
         limit: 5,
@@ -612,8 +646,8 @@ export const Dashboard = () => {
       });
       setRecentBlogs(blogsResponse.blogs || blogsResponse.data || []);
 
-      // Mock recent activity (you can implement this endpoint in the backend)
-      const activities = generateMockActivity(stats || {});
+      // Load activity from other users on current user's blogs
+      const activities = await userService.getUserActivity(user._id, 5);
       setRecentActivity(activities);
     } catch (error) {
       console.error("Error loading dashboard data:", error);
@@ -626,53 +660,6 @@ export const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const generateMockActivity = (stats = {}) => {
-    const activities = [];
-
-    if (stats?.blogs?.totalBlogs > 0) {
-      activities.push({
-        id: 1,
-        type: "blog_published",
-        message: "Blog published successfully",
-        time: "2 hours ago",
-        color: "bg-green-500",
-      });
-    }
-
-    if (stats?.blogs?.totalViews > 0) {
-      activities.push({
-        id: 2,
-        type: "views",
-        message: `${Math.round(stats.blogs.totalViews * 0.1)} new views today`,
-        time: "4 hours ago",
-        color: "bg-blue-500",
-      });
-    }
-
-    if (stats?.blogs?.totalLikes > 0) {
-      activities.push({
-        id: 3,
-        type: "likes",
-        message: `${Math.round(stats.blogs.totalLikes * 0.05)} new likes`,
-        time: "6 hours ago",
-        color: "bg-red-500",
-      });
-    }
-
-    // Add default activity if no stats available
-    if (activities.length === 0) {
-      activities.push({
-        id: 1,
-        type: "welcome",
-        message: "Welcome to your dashboard!",
-        time: "Just now",
-        color: "bg-blue-500",
-      });
-    }
-
-    return activities;
   };
 
   const formatDate = (date) => {
@@ -746,20 +733,27 @@ export const Dashboard = () => {
       <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
         <div className="flex items-center space-x-1">
           <Eye className="h-4 w-4" />
-          <span>{blog.views || 0}</span>
+          <span>{blog.views || blog.viewCount || 0}</span>
         </div>
         <div className="flex items-center space-x-1">
           <Heart className="h-4 w-4" />
-          <span>{blog.likeCount || blog.likes?.length || 0}</span>
+          <span>
+            {blog.likesCount || blog.likeCount || blog.likes?.length || 0}
+          </span>
         </div>
         <div className="flex items-center space-x-1">
           <MessageCircle className="h-4 w-4" />
-          <span>{blog.commentsCount || 0}</span>
+          <span>
+            {blog.commentsCount ||
+              blog.commentCount ||
+              blog.comments?.length ||
+              0}
+          </span>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => navigate(`/edit/${blog._id}`)}
+          onClick={() => navigate(`${ROUTES.EDIT_BLOG}/${blog._id}`)}
         >
           <Edit3 className="h-4 w-4" />
         </Button>
@@ -841,7 +835,10 @@ export const Dashboard = () => {
             icon={BookOpen}
             title="Total Blogs"
             value={userStats?.blogs?.totalBlogs}
-            change={12}
+            change={calculatePercentageChange(
+              userStats?.blogs?.totalBlogs || 0,
+              previousStats?.blogs?.totalBlogs || 0,
+            )}
             color="blue"
             loading={loading}
           />
@@ -849,7 +846,10 @@ export const Dashboard = () => {
             icon={Eye}
             title="Total Views"
             value={userStats?.blogs?.totalViews}
-            change={8}
+            change={calculatePercentageChange(
+              userStats?.blogs?.totalViews || 0,
+              previousStats?.blogs?.totalViews || 0,
+            )}
             color="green"
             loading={loading}
           />
@@ -857,7 +857,10 @@ export const Dashboard = () => {
             icon={Heart}
             title="Total Likes"
             value={userStats?.blogs?.totalLikes}
-            change={15}
+            change={calculatePercentageChange(
+              userStats?.blogs?.totalLikes || 0,
+              previousStats?.blogs?.totalLikes || 0,
+            )}
             color="red"
             loading={loading}
           />
@@ -865,7 +868,10 @@ export const Dashboard = () => {
             icon={MessageCircle}
             title="Comments"
             value={userStats?.comments?.totalComments}
-            change={-3}
+            change={calculatePercentageChange(
+              userStats?.comments?.totalComments || 0,
+              previousStats?.comments?.totalComments || 0,
+            )}
             color="purple"
             loading={loading}
           />
@@ -881,7 +887,7 @@ export const Dashboard = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => navigate("/dashboard/blogs")}
+                    onClick={() => navigate(ROUTES.MY_BLOGS)}
                   >
                     View all
                   </Button>
@@ -899,7 +905,7 @@ export const Dashboard = () => {
                     <p className="text-muted-foreground mb-4">
                       Start creating your first blog post
                     </p>
-                    <Button onClick={() => navigate("/create")}>
+                    <Button onClick={() => navigate(ROUTES.CREATE_BLOG)}>
                       <PlusCircle className="h-4 w-4 mr-2" />
                       Create Blog
                     </Button>
@@ -926,7 +932,7 @@ export const Dashboard = () => {
                 <QuickActionButton
                   icon={PlusCircle}
                   label="Create New Post"
-                  onClick={() => navigate("/create")}
+                  onClick={() => navigate(ROUTES.CREATE_BLOG)}
                   color="blue"
                 />
                 <QuickActionButton
@@ -938,13 +944,19 @@ export const Dashboard = () => {
                 <QuickActionButton
                   icon={BookOpen}
                   label="My Blogs"
-                  onClick={() => navigate("/dashboard/blogs")}
+                  onClick={() => navigate(ROUTES.MY_BLOGS)}
                   color="purple"
+                />
+                <QuickActionButton
+                  icon={Users}
+                  label="Discover People"
+                  onClick={() => navigate(ROUTES.DISCOVER)}
+                  color="indigo"
                 />
                 <QuickActionButton
                   icon={Settings}
                   label="Profile Settings"
-                  onClick={() => navigate("/dashboard/profile")}
+                  onClick={() => navigate(ROUTES.PROFILE)}
                   color="gray"
                 />
               </CardContent>
@@ -962,63 +974,112 @@ export const Dashboard = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">
-                          Views
-                        </span>
-                        <span className="font-semibold">
-                          {Math.round(
-                            (userStats?.blogs?.totalViews || 0) * 0.15,
-                          ).toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full"
-                          style={{ width: "72%" }}
-                        ></div>
-                      </div>
-                    </div>
+                    {(() => {
+                      const weeklyViews = Math.max(
+                        0,
+                        Math.round((userStats?.blogs?.totalViews || 0) * 0.2),
+                      );
+                      const totalViews = userStats?.blogs?.totalViews || 0;
+                      const viewsProgress =
+                        totalViews > 0
+                          ? Math.min(
+                              100,
+                              (weeklyViews / Math.max(totalViews * 0.3, 1)) *
+                                100,
+                            )
+                          : 0;
 
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">
-                          Engagement
-                        </span>
-                        <span className="font-semibold">
-                          {userStats?.blogs?.totalLikes > 0 ? "8.4%" : "0%"}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
-                        <div
-                          className="bg-green-600 h-2 rounded-full"
-                          style={{
-                            width:
-                              userStats?.blogs?.totalLikes > 0 ? "84%" : "0%",
-                          }}
-                        ></div>
-                      </div>
-                    </div>
+                      const totalInteractions =
+                        (userStats?.blogs?.totalLikes || 0) +
+                        (userStats?.comments?.totalComments || 0);
+                      const engagementRate =
+                        totalViews > 0
+                          ? ((totalInteractions / totalViews) * 100).toFixed(1)
+                          : "0.0";
+                      const engagementProgress = Math.min(
+                        100,
+                        parseFloat(engagementRate) * 10,
+                      );
 
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">
-                          New Comments
-                        </span>
-                        <span className="font-semibold">
-                          {Math.round(
-                            (userStats?.comments?.totalComments || 0) * 0.2,
-                          )}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
-                        <div
-                          className="bg-purple-600 h-2 rounded-full"
-                          style={{ width: "46%" }}
-                        ></div>
-                      </div>
-                    </div>
+                      const weeklyComments = Math.max(
+                        0,
+                        Math.round(
+                          (userStats?.comments?.totalComments || 0) * 0.3,
+                        ),
+                      );
+                      const totalComments =
+                        userStats?.comments?.totalComments || 0;
+                      const commentsProgress =
+                        totalComments > 0
+                          ? Math.min(
+                              100,
+                              (weeklyComments /
+                                Math.max(totalComments * 0.4, 1)) *
+                                100,
+                            )
+                          : 0;
+
+                      return (
+                        <>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">
+                                Views
+                              </span>
+                              <span className="font-semibold">
+                                {weeklyViews.toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                              <div
+                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${Math.max(5, viewsProgress)}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">
+                                Engagement
+                              </span>
+                              <span className="font-semibold">
+                                {engagementRate}%
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                              <div
+                                className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${Math.max(2, engagementProgress)}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm text-muted-foreground">
+                                New Comments
+                              </span>
+                              <span className="font-semibold">
+                                {weeklyComments}
+                              </span>
+                            </div>
+                            <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-2">
+                              <div
+                                className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${Math.max(3, commentsProgress)}%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </>
                 )}
               </CardContent>
@@ -1051,6 +1112,12 @@ export const Dashboard = () => {
                         <div className="flex-1">
                           <p className="text-sm text-gray-900 dark:text-white">
                             {activity.message}
+                            {activity.username &&
+                              activity.username !== "System" && (
+                                <span className="text-primary font-medium ml-1">
+                                  by {activity.username}
+                                </span>
+                              )}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
                             {activity.time}

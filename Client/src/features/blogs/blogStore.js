@@ -111,6 +111,32 @@ export const useBlogStore = create(
           set({ isLoading: true, error: null });
           const response = await blogService.getBlogBySlug(slug);
 
+          // Handle error responses gracefully
+          if (response?.status === "error") {
+            let errorMessage = response.message;
+
+            // Customize error messages based on error type
+            if (response.errorType === "rate_limit") {
+              errorMessage = response.retryAfter
+                ? `Too many requests. Please try again in ${response.retryAfter} seconds.`
+                : "Too many requests. Please wait before trying again.";
+            } else if (response.errorType === "network") {
+              errorMessage =
+                "Unable to connect to server. Please check your internet connection.";
+            } else if (response.errorType === "not_found") {
+              errorMessage = `Blog not found`;
+            } else if (response.errorType === "api") {
+              errorMessage = response.message || "Server error occurred";
+            }
+
+            set({
+              error: errorMessage,
+              isLoading: false,
+              currentBlog: null,
+            });
+            return null;
+          }
+
           let blog = null;
           if (response?.data) {
             blog = response.data;
@@ -278,25 +304,33 @@ export const useBlogStore = create(
         try {
           const result = await blogService.likeBlog(id);
           const { blogs, currentBlog } = get();
+
+          // Update based on server response
+          const isLiked = result.isLiked;
+          const likeCount = result.likeCount;
+
           const updatedBlogs = blogs.map((blog) =>
             (blog._id || blog.id) === id
-              ? { ...blog, likeCount: result.likeCount, isLiked: !blog.isLiked }
+              ? { ...blog, likeCount, isLiked }
               : blog,
           );
+
           set({
             blogs: updatedBlogs,
             currentBlog:
               currentBlog && (currentBlog._id || currentBlog.id) === id
                 ? {
                     ...currentBlog,
-                    likeCount: result.likeCount,
-                    isLiked: !currentBlog.isLiked,
+                    likeCount,
+                    isLiked,
                   }
                 : currentBlog,
           });
+
+          return result;
         } catch (error) {
           console.error("Error liking blog:", error);
-          // Don't show like errors to users
+          throw error;
         }
       },
 
@@ -304,25 +338,33 @@ export const useBlogStore = create(
         try {
           const result = await blogService.unlikeBlog(id);
           const { blogs, currentBlog } = get();
+
+          // Update based on server response
+          const isLiked = result.isLiked;
+          const likeCount = result.likeCount;
+
           const updatedBlogs = blogs.map((blog) =>
             (blog._id || blog.id) === id
-              ? { ...blog, likeCount: result.likeCount, isLiked: false }
+              ? { ...blog, likeCount, isLiked }
               : blog,
           );
+
           set({
             blogs: updatedBlogs,
             currentBlog:
               currentBlog && (currentBlog._id || currentBlog.id) === id
                 ? {
                     ...currentBlog,
-                    likeCount: result.likeCount,
-                    isLiked: false,
+                    likeCount,
+                    isLiked,
                   }
                 : currentBlog,
           });
+
+          return result;
         } catch (error) {
           console.error("Error unliking blog:", error);
-          // Don't show unlike errors to users
+          throw error;
         }
       },
 
@@ -406,6 +448,16 @@ export const useBlogStore = create(
 
       setLoading: (loading) => {
         set({ isLoading: loading });
+      },
+
+      refreshBlogs: async () => {
+        // Refresh the current blogs list to ensure all like states are up to date
+        const { pagination, filters } = get();
+        await get().getBlogs({
+          page: pagination.page,
+          limit: pagination.limit,
+          ...filters,
+        });
       },
     }),
     {

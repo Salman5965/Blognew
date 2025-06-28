@@ -1,4 +1,3 @@
-
 // import { PAGINATION } from "@/utils/constant";
 // import apiService from "./api";
 
@@ -303,10 +302,6 @@
 // export const blogService = new BlogService();
 // export default blogService;
 
-
-
-
-
 import { PAGINATION } from "@/utils/constant";
 import apiService from "./api";
 
@@ -343,11 +338,14 @@ class BlogService {
       if (
         error.message?.includes("fetch") ||
         error.message?.includes("network") ||
-        error.name === "TypeError"
+        error.message?.includes("Failed to fetch data") ||
+        error.isNetworkError ||
+        error.name === "TypeError" ||
+        !error.response
       ) {
         console.error("Network error fetching blogs:", error);
 
-        // Return empty data structure instead of throwing
+        // Return empty data structure when API is unavailable
         return {
           blogs: [],
           pagination: {
@@ -367,13 +365,76 @@ class BlogService {
   }
 
   async getBlogBySlug(slug) {
-    const response = await apiService.get(`/blogs/${slug}`);
+    try {
+      const response = await apiService.get(`/blogs/${slug}`);
 
-    if (response.status === "success") {
-      return response.data;
+      if (response && response.status === "success") {
+        return response.data;
+      }
+
+      // Handle response that exists but indicates failure
+      throw new Error(response?.message || "Blog not found");
+    } catch (error) {
+      console.warn(`Error fetching blog by slug "${slug}":`, {
+        message: error.message,
+        status: error.response?.status,
+        isNetworkError: error.isNetworkError,
+        isRateLimitError: error.isRateLimitError,
+        retryAfter: error.retryAfter,
+      });
+
+      // Handle rate limit errors
+      if (error.isRateLimitError || error.status === 429) {
+        return {
+          data: null,
+          status: "error",
+          message:
+            error.message ||
+            "Too many requests. Please wait before trying again.",
+          errorType: "rate_limit",
+          retryAfter: error.retryAfter,
+        };
+      }
+
+      // Handle network errors more gracefully
+      if (error.isNetworkError || error.message?.includes("Failed to fetch")) {
+        // Return a fallback response structure instead of throwing
+        return {
+          data: null,
+          status: "error",
+          message:
+            "Unable to connect to server. Please check your internet connection and try again.",
+          isNetworkError: true,
+          errorType: "network",
+        };
+      }
+
+      // Handle 404 or other API errors
+      if (error.response?.status === 404) {
+        return {
+          data: null,
+          status: "error",
+          message: `Blog with slug "${slug}" not found`,
+          errorType: "not_found",
+        };
+      }
+
+      // Handle other API errors gracefully
+      if (error.response) {
+        return {
+          data: null,
+          status: "error",
+          message:
+            error.response.data?.message ||
+            `Server error (${error.response.status})`,
+          errorType: "api",
+          statusCode: error.response.status,
+        };
+      }
+
+      // Re-throw unexpected errors
+      throw error;
     }
-
-    throw new Error(response.message || "Blog not found");
   }
 
   async getBlogById(id) {
@@ -422,17 +483,18 @@ class BlogService {
       return response.data;
     }
 
-    throw new Error(response.message || "Failed to like blog");
+    throw new Error(response.message || "Failed to toggle like");
   }
 
   async unlikeBlog(id) {
-    const response = await apiService.delete(`/blogs/${id}/like`);
+    // Both like and unlike use the same endpoint (toggle)
+    const response = await apiService.post(`/blogs/${id}/like`);
 
     if (response.status === "success") {
       return response.data;
     }
 
-    throw new Error(response.message || "Failed to unlike blog");
+    throw new Error(response.message || "Failed to toggle like");
   }
 
   async incrementViewCount(id) {
@@ -482,18 +544,8 @@ class BlogService {
 
       throw new Error(response.message || "Failed to fetch tags");
     } catch (error) {
-      // If endpoint doesn't exist, return common tags
-      console.warn("Tags endpoint not available, returning default tags");
-      return [
-        "React",
-        "JavaScript",
-        "Node.js",
-        "CSS",
-        "TypeScript",
-        "API",
-        "Performance",
-        "Tutorial",
-      ];
+      console.error("Error fetching tags:", error);
+      return [];
     }
   }
 

@@ -1,4 +1,3 @@
-
 // import axios from "axios";
 // import { API_BASE_URL, LOCAL_STORAGE_KEYS } from "@/utils/constant";
 
@@ -114,12 +113,14 @@
 // export const apiService = new ApiService();
 // export default apiService;
 
-
-
-
 import axios from "axios";
 import { API_BASE_URL, LOCAL_STORAGE_KEYS } from "@/utils/constant";
 import { ApiCache } from "@/utils/cache";
+import {
+  debugApiRequest,
+  debugApiResponse,
+  isDebugMode,
+} from "@/utils/debugMode";
 
 class ApiService {
   constructor() {
@@ -160,6 +161,41 @@ class ApiService {
           return Promise.reject(networkError);
         }
 
+        // Handle rate limiting
+        if (error.response?.status === 429) {
+          const retryAfter = error.response.headers["retry-after"];
+          const responseData = error.response.data;
+
+          // Extract retry time from response data if available
+          let retryTime = retryAfter;
+          if (
+            responseData &&
+            typeof responseData === "object" &&
+            responseData.retryAfter
+          ) {
+            retryTime = responseData.retryAfter;
+          }
+
+          const rateLimitError = new Error(
+            retryTime
+              ? `Too many requests. Please try again in ${retryTime} seconds.`
+              : "Too many requests. Please wait before trying again.",
+          );
+          rateLimitError.isRateLimitError = true;
+          rateLimitError.retryAfter = retryTime;
+          rateLimitError.status = 429;
+          rateLimitError.response = error.response;
+
+          // Log rate limiting for debugging
+          console.warn("Rate limit hit:", {
+            url: error.config?.url,
+            retryAfter: retryTime,
+            message: responseData?.error || responseData?.message,
+          });
+
+          return Promise.reject(rateLimitError);
+        }
+
         if (error.response?.status === 401) {
           // Clear auth data on unauthorized
           localStorage.removeItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
@@ -174,6 +210,24 @@ class ApiService {
 
   async get(url, config = {}) {
     try {
+      // Debug logging
+      debugApiRequest(url, "GET", config.params);
+
+      // Check rate limiting (unless disabled)
+      if (config.skipRateLimit !== true) {
+        const rateCheck = rateLimiter.canMakeRequest(url, 5, 60000); // 5 requests per minute
+        if (!rateCheck.allowed) {
+          const error = new Error(
+            `Rate limit exceeded. Try again in ${rateCheck.retryAfter} seconds.`,
+          );
+          error.isRateLimitError = true;
+          error.retryAfter = rateCheck.retryAfter;
+          error.status = 429;
+          throw error;
+        }
+        rateLimiter.recordRequest(url);
+      }
+
       // Check if caching is enabled for this request
       const enableCache = config.cache !== false;
       const cacheKey = enableCache
@@ -184,11 +238,17 @@ class ApiService {
       if (enableCache && cacheKey) {
         const cachedData = ApiCache.get(cacheKey);
         if (cachedData) {
+          if (isDebugMode()) {
+            console.log(`📦 Cache hit for ${url}`);
+          }
           return cachedData;
         }
       }
 
       const response = await this.instance.get(url, config);
+
+      // Debug response
+      debugApiResponse(url, response.data);
 
       // Cache successful responses
       if (enableCache && cacheKey && response.data) {
@@ -198,9 +258,38 @@ class ApiService {
 
       return response.data;
     } catch (error) {
+      // Debug error response
+      debugApiResponse(url, null, error);
+
+      // Log the error for debugging with proper serialization
+      const errorDetails = {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        isNetworkError: error.isNetworkError,
+        code: error.code,
+        baseURL: this.instance.defaults.baseURL,
+        url: url,
+        timestamp: new Date().toISOString(),
+      };
+      console.error(`API Error for ${url}:`, errorDetails);
+
+      // Also log response data if available
+      if (error.response?.data) {
+        console.error("Error response data:", error.response.data);
+      }
+
       // Handle network errors gracefully
       if (error.isNetworkError || !error.response) {
-        throw new Error("Failed to fetch data");
+        const networkError = new Error("Failed to fetch data");
+        networkError.isNetworkError = true;
+        networkError.originalError = error;
+        networkError.details = {
+          url: url,
+          baseURL: this.instance.defaults.baseURL,
+          timeout: this.instance.defaults.timeout,
+        };
+        throw networkError;
       }
       throw error;
     }

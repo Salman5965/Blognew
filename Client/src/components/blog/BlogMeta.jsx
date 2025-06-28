@@ -195,10 +195,6 @@
 //   );
 // };
 
-
-
-
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -222,8 +218,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LikeButton } from "@/components/shared/LikeButton";
+import { useToast } from "@/hooks/use-toast";
+import { bookmarkService } from "@/services/bookmarkService";
 
 export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
+  const { toast } = useToast();
   // Safety checks for blog data
   if (!blog || !blog.author) {
     return <div>Loading...</div>;
@@ -233,6 +232,7 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
   const readingTime = Math.ceil((blog.content?.length || 0) / 200);
 
   const handleShare = async () => {
+    // Try native sharing first
     if (navigator.share) {
       try {
         await navigator.share({
@@ -240,20 +240,49 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
           text: blog.excerpt,
           url: window.location.href,
         });
+        return;
       } catch (error) {
-        copyToClipboard();
+        // User cancelled or share failed, fall back to clipboard
       }
-    } else {
-      copyToClipboard();
+    }
+
+    // Fallback to clipboard
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied!",
+        description: "Blog link copied to clipboard",
+        duration: 2000,
+      });
+    } catch (error) {
+      toast({
+        title: "Share failed",
+        description: "Unable to share the blog",
+        variant: "destructive",
+        duration: 3000,
+      });
     }
   };
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(window.location.href);
-  };
+  const handleBookmark = async () => {
+    try {
+      const result = await bookmarkService.toggleBookmark(blog._id || blog.id);
 
-  const handleBookmark = () => {
-    console.log("Bookmark blog:", blog.id);
+      toast({
+        title: result.bookmarked ? "Bookmarked!" : "Bookmark removed",
+        description: result.bookmarked
+          ? "Blog saved to your bookmarks"
+          : "Blog removed from bookmarks",
+        duration: 2000,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to bookmark blog",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
   };
 
   if (variant === "compact") {
@@ -284,6 +313,7 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
             <LikeButton
               blogId={blog.id || blog._id}
               likeCount={blog.likeCount || 0}
+              isLiked={blog.isLiked}
               blogLikes={blog.likes || []}
             />
             <Button variant="ghost" size="sm" onClick={handleShare}>
@@ -382,6 +412,7 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
           <LikeButton
             blogId={blog.id || blog._id}
             likeCount={blog.likeCount || 0}
+            isLiked={blog.isLiked}
             blogLikes={blog.likes || []}
           />
           <Button variant="outline" size="sm" onClick={handleShare}>

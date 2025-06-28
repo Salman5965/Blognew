@@ -172,12 +172,7 @@
 //   );
 // };
 
-
-
-
-
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Card,
@@ -199,11 +194,17 @@ import { Loader2, BookOpen, Eye, EyeOff } from "lucide-react";
 // Import toast hook — adjust path if needed
 import { useToast } from "@/hooks/use-toast";
 
+const RATE_LIMIT_DELAY = 1000; // 1 second between login attempts
+
 export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, login } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
+  const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
+  const lastLoginAttempt = useRef(0);
+  const isLoginInProgress = useRef(false);
+  const countdownInterval = useRef(null);
 
   // Toast trigger
   const { toast } = useToast();
@@ -218,6 +219,41 @@ export const Login = () => {
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]);
+
+  // Cleanup countdown interval on unmount
+  useEffect(() => {
+    return () => {
+      if (countdownInterval.current) {
+        clearInterval(countdownInterval.current);
+      }
+    };
+  }, []);
+
+  const startRateLimitCountdown = (seconds) => {
+    setRateLimitCountdown(seconds);
+    countdownInterval.current = setInterval(() => {
+      setRateLimitCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const resetRateLimit = () => {
+    lastLoginAttempt.current = 0;
+    setRateLimitCountdown(0);
+    if (countdownInterval.current) {
+      clearInterval(countdownInterval.current);
+    }
+    toast({
+      title: "Rate limit reset",
+      description: "You can now try logging in again",
+      duration: 2000,
+    });
+  };
 
   const { values, errors, isSubmitting, setValue, handleSubmit } = useForm({
     initialValues: {
@@ -236,15 +272,92 @@ export const Login = () => {
       return errors;
     },
     onSubmit: async (values) => {
-      try {
-        await login(values); // Make sure login throws error on failure!
-      } catch (error) {
+      // Rate limiting check
+      const now = Date.now();
+      const timeSinceLastAttempt = now - lastLoginAttempt.current;
+
+      if (timeSinceLastAttempt < RATE_LIMIT_DELAY) {
+        const waitTime = Math.ceil(
+          (RATE_LIMIT_DELAY - timeSinceLastAttempt) / 1000,
+        );
+        startRateLimitCountdown(waitTime);
         toast({
-          title: "Login failed",
-          description: error.message || "Invalid credentials",
+          title: "Please wait",
+          description: `Too many login attempts. Please wait ${waitTime} second${waitTime !== 1 ? "s" : ""} before trying again.`,
           variant: "destructive",
-          duration: 5000,
+          duration: 3000,
         });
+        return;
+      }
+
+      // Prevent concurrent requests
+      if (isLoginInProgress.current) {
+        return;
+      }
+
+      try {
+        isLoginInProgress.current = true;
+        lastLoginAttempt.current = now;
+
+        console.log("Attempting login with:", { email: values.email }); // Debug log
+        await login(values); // Make sure login throws error on failure!
+
+        // Clear rate limiting on successful login
+        lastLoginAttempt.current = 0;
+        setRateLimitCountdown(0);
+        if (countdownInterval.current) {
+          clearInterval(countdownInterval.current);
+        }
+
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+          variant: "default",
+          duration: 3000,
+        });
+      } catch (error) {
+        console.error("Login error:", error); // Debug log
+
+        // Handle specific error types
+        let title = "Login failed";
+        let description =
+          "Invalid credentials. Please check your email and password.";
+        let shouldStartCountdown = false;
+
+        if (
+          error.message?.includes("Too many login attempts") ||
+          error.response?.status === 429
+        ) {
+          title = "Too many attempts";
+          description =
+            "You've made too many login attempts. Please wait a moment before trying again.";
+          shouldStartCountdown = true;
+
+          // Start a shorter countdown for server-side rate limiting
+          startRateLimitCountdown(30); // 30 seconds for server rate limiting
+        } else if (error.response?.status === 401) {
+          description =
+            "Invalid email or password. Please check your credentials.";
+        } else if (error.response?.status >= 500) {
+          title = "Server error";
+          description =
+            "Our servers are experiencing issues. Please try again later.";
+        } else if (error.isNetworkError || !error.response) {
+          title = "Connection error";
+          description =
+            "Unable to connect to our servers. Please check your internet connection.";
+        } else if (error.message) {
+          description = error.message;
+        }
+
+        toast({
+          title,
+          description,
+          variant: "destructive",
+          duration: shouldStartCountdown ? 8000 : 5000,
+        });
+      } finally {
+        isLoginInProgress.current = false;
       }
     },
   });
@@ -328,12 +441,37 @@ export const Login = () => {
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting || rateLimitCountdown > 0}
+            >
               {isSubmitting && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}
-              Sign In
+              {rateLimitCountdown > 0
+                ? `Wait ${rateLimitCountdown}s`
+                : isSubmitting
+                  ? "Signing In..."
+                  : "Sign In"}
             </Button>
+
+            {/* Rate limit info and reset */}
+            {rateLimitCountdown > 0 && (
+              <div className="text-center space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Too many attempts. Please wait {rateLimitCountdown} seconds.
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetRateLimit}
+                  className="text-xs h-8"
+                >
+                  Reset and try again
+                </Button>
+              </div>
+            )}
 
             <div className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}

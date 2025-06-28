@@ -179,7 +179,7 @@
 // };
 
 import React, { memo, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -191,8 +191,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatBlogDate } from "@/utils/formatDate";
 import { ROUTES, DEFAULT_COVER_IMAGE } from "@/utils/constant";
-import { Heart, MessageCircle, Eye, Clock } from "lucide-react";
+import {
+  Heart,
+  MessageCircle,
+  Eye,
+  Clock,
+  Bookmark,
+  Share2,
+} from "lucide-react";
 import { LikeButton } from "@/components/shared/LikeButton";
+import { FollowButton } from "@/components/shared/FollowButton";
+import { useToast } from "@/hooks/use-toast";
+import { bookmarkService } from "@/services/bookmarkService";
 import LazyImage, {
   LazyCoverImage,
   LazyAvatar,
@@ -200,14 +210,21 @@ import LazyImage, {
 
 export const BlogCard = memo(
   ({ blog, showActions = true, variant = "default" }) => {
+    const navigate = useNavigate();
+    const { toast } = useToast();
+
     // Memoize computed values
     const blogUrl = useMemo(
       () => `${ROUTES.BLOG_DETAILS}/${blog.slug}`,
       [blog.slug],
     );
+    const fullBlogUrl = useMemo(
+      () => `${window.location.origin}${ROUTES.BLOG_DETAILS}/${blog.slug}`,
+      [blog.slug],
+    );
     const authorUrl = useMemo(
-      () => `${ROUTES.HOME}?author=${blog.author.id}`,
-      [blog.author.id],
+      () => `/users/${blog.author._id || blog.author.id}`,
+      [blog.author._id, blog.author.id],
     );
     const readTime = useMemo(
       () => Math.ceil((blog.content?.length || 0) / 200),
@@ -217,6 +234,71 @@ export const BlogCard = memo(
       () => blog.author.username.charAt(0).toUpperCase(),
       [blog.author.username],
     );
+
+    const handleCommentClick = (e) => {
+      e.stopPropagation();
+      navigate(`${ROUTES.BLOG_DETAILS}/${blog.slug}#comments`);
+    };
+
+    const handleBookmark = async (e) => {
+      e.stopPropagation();
+
+      try {
+        const result = await bookmarkService.toggleBookmark(
+          blog._id || blog.id,
+        );
+
+        toast({
+          title: result.bookmarked ? "Bookmarked!" : "Bookmark removed",
+          description: result.bookmarked
+            ? "Blog saved to your bookmarks"
+            : "Blog removed from bookmarks",
+          duration: 2000,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to bookmark blog",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    };
+
+    const handleShare = async (e) => {
+      e.stopPropagation();
+
+      // Try native sharing first
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: blog.title,
+            text: blog.excerpt,
+            url: fullBlogUrl,
+          });
+          return;
+        } catch (error) {
+          // User cancelled or share failed, fall back to clipboard
+        }
+      }
+
+      // Fallback to clipboard
+      try {
+        await navigator.clipboard.writeText(fullBlogUrl);
+        toast({
+          title: "Link copied!",
+          description: "Blog link copied to clipboard",
+          duration: 2000,
+        });
+      } catch (error) {
+        toast({
+          title: "Share failed",
+          description: "Unable to share the blog",
+          variant: "destructive",
+          duration: 3000,
+        });
+      }
+    };
 
     const renderContent = () => {
       if (variant === "compact") {
@@ -278,25 +360,33 @@ export const BlogCard = memo(
           </CardHeader>
 
           <CardContent className="p-6">
-            <div className="flex items-center space-x-2 mb-3">
-              <Link
-                to={authorUrl}
-                className="flex items-center space-x-2 hover:opacity-80"
-              >
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={blog.author.avatar} />
-                  <AvatarFallback>
-                    {blog.author.username.charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium">
-                  {blog.author.username}
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center space-x-2">
+                <Link
+                  to={authorUrl}
+                  className="flex items-center space-x-2 hover:opacity-80"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={blog.author.avatar} />
+                    <AvatarFallback>
+                      {blog.author.username.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm font-medium">
+                    {blog.author.username}
+                  </span>
+                </Link>
+                <span className="text-muted-foreground">•</span>
+                <span className="text-sm text-muted-foreground">
+                  {formatBlogDate(blog.createdAt)}
                 </span>
-              </Link>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-sm text-muted-foreground">
-                {formatBlogDate(blog.createdAt)}
-              </span>
+              </div>
+              <FollowButton
+                userId={blog.author._id || blog.author.id}
+                size="sm"
+                showIcon={false}
+                className="h-7 px-3 text-xs"
+              />
             </div>
 
             <Link to={blogUrl}>
@@ -335,23 +425,55 @@ export const BlogCard = memo(
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <div className="flex items-center space-x-1">
                     <Eye className="h-4 w-4" />
-                    <span>{blog.viewCount}</span>
+                    <span>{blog.views || blog.viewCount || 0}</span>
                   </div>
-                  <div className="flex items-center space-x-1">
+                  <button
+                    onClick={handleCommentClick}
+                    className="flex items-center space-x-1 hover:text-foreground transition-colors"
+                  >
                     <MessageCircle className="h-4 w-4" />
-                    <span>{blog.commentCount}</span>
-                  </div>
+                    <span>
+                      {blog.commentsCount ||
+                        blog.commentCount ||
+                        blog.comments?.length ||
+                        0}
+                    </span>
+                  </button>
                   <div className="flex items-center space-x-1">
                     <Clock className="h-4 w-4" />
-                    <span>{Math.ceil(blog.content.length / 200)} min read</span>
+                    <span>{readTime} min read</span>
                   </div>
                 </div>
 
-                <LikeButton
-                  blogId={blog.id}
-                  likeCount={blog.likeCount}
-                  size="sm"
-                />
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleBookmark}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Bookmark className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleShare}
+                    className="h-8 w-8 p-0"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                  <LikeButton
+                    blogId={blog._id || blog.id}
+                    likeCount={
+                      blog.likesCount ||
+                      blog.likeCount ||
+                      blog.likes?.length ||
+                      0
+                    }
+                    isLiked={blog.isLiked}
+                    size="sm"
+                  />
+                </div>
               </div>
             </CardFooter>
           )}

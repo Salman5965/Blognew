@@ -1,4 +1,3 @@
-
 // import React, { useState, useRef, useEffect } from "react";
 // import { useNavigate } from "react-router-dom";
 // import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -63,7 +62,7 @@
 
 //   const handleSelect = (optionValue) => {
 //     setIsOpen(false);
-    
+
 //     if (onValueChange) {
 //       onValueChange(optionValue);
 //     }
@@ -209,7 +208,7 @@
 
 //   // Helper function to get category label from slug
 //   const getCategoryLabel = (categorySlug) => {
-//     return BLOG_CATEGORIES.find(cat => 
+//     return BLOG_CATEGORIES.find(cat =>
 //       cat.toLowerCase().replace(/\s+/g, '-') === categorySlug
 //     ) || categorySlug;
 //   };
@@ -298,7 +297,7 @@
 //             {/* Cover Image */}
 //             <div className="space-y-2">
 //               <Label>Cover Image</Label>
-              
+
 //               {/* Image Upload Mode Toggle */}
 //               <div className="flex items-center space-x-2 mb-3">
 //                 <Button
@@ -532,11 +531,6 @@
 //   );
 // };
 
-
-
-
-
-
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -679,6 +673,7 @@ export const CreateBlog = () => {
     category,
     tags,
     isPublished,
+    visibility,
     isDirty,
     setTitle,
     setContent,
@@ -686,6 +681,7 @@ export const CreateBlog = () => {
     setCoverImage,
     setCategory,
     setIsPublished,
+    setVisibility,
     addTag,
     removeTag,
     generateExcerpt,
@@ -707,21 +703,22 @@ export const CreateBlog = () => {
       setError(null);
       setIsSaving(true);
 
-      const blogData = {
-        ...getBlogData(),
-        isPublished: publish,
-        status: publish ? "published" : "draft",
-      };
-
-      // Validate before publishing
-      if (publish) {
-        const validation = validateBlogForPublishing(blogData);
-        if (!validation.isValid) {
-          setError(`Cannot publish: ${validation.errors.join(", ")}`);
-          setIsSaving(false);
-          return;
-        }
+      if (publish && !validation.isValid) {
+        setError(`Cannot publish: ${validation.errors.join(", ")}`);
+        setIsSaving(false);
+        return;
       }
+
+      const blogData = {
+        title,
+        content,
+        excerpt,
+        tags,
+        category,
+        coverImage,
+        status: isPublished ? "published" : "draft",
+        visibility,
+      };
 
       const createdBlog = await createBlog(blogData);
 
@@ -1148,6 +1145,61 @@ export const CreateBlog = () => {
                   checked={isPublished}
                   onCheckedChange={setIsPublished}
                 />
+              </div>
+
+              {/* Post Visibility */}
+              <div className="space-y-3">
+                <Label className="text-sm font-medium">Post Visibility</Label>
+                <div className="space-y-2">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="postVisibility"
+                      value="public"
+                      checked={visibility === "public"}
+                      onChange={(e) => setVisibility(e.target.value)}
+                      className="text-primary"
+                    />
+                    <div>
+                      <div className="text-sm font-medium">Public</div>
+                      <div className="text-xs text-muted-foreground">
+                        Anyone can see this post
+                      </div>
+                    </div>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="postVisibility"
+                      value="followers"
+                      checked={visibility === "followers"}
+                      onChange={(e) => setVisibility(e.target.value)}
+                      className="text-primary"
+                    />
+                    <div>
+                      <div className="text-sm font-medium">Followers Only</div>
+                      <div className="text-xs text-muted-foreground">
+                        Only your followers can see this post
+                      </div>
+                    </div>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="postVisibility"
+                      value="private"
+                      checked={visibility === "private"}
+                      onChange={(e) => setVisibility(e.target.value)}
+                      className="text-primary"
+                    />
+                    <div>
+                      <div className="text-sm font-medium">Private</div>
+                      <div className="text-xs text-muted-foreground">
+                        Only you can see this post
+                      </div>
+                    </div>
+                  </label>
+                </div>
               </div>
 
               {/* Category Display */}

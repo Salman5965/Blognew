@@ -62,6 +62,17 @@ export const getBlogs = async (req, res, next) => {
       .limit(limit)
       .lean();
 
+    // Add user-specific like status if user is authenticated
+    const blogsWithLikeStatus = blogs.map((blog) => ({
+      ...blog,
+      isLiked: req.user
+        ? blog.likes.some(
+            (like) => like.user.toString() === req.user.id.toString(),
+          )
+        : false,
+      likeCount: blog.likes ? blog.likes.length : 0,
+    }));
+
     // Get total count for pagination
     const total = await Blog.countDocuments(filter);
 
@@ -73,7 +84,7 @@ export const getBlogs = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       data: {
-        blogs,
+        blogs: blogsWithLikeStatus,
         pagination: {
           currentPage: page,
           totalPages,
@@ -112,10 +123,21 @@ export const getBlogBySlug = async (req, res, next) => {
     blog.views += 1;
     await blog.save();
 
+    // Add user-specific like status
+    const blogWithLikeStatus = {
+      ...blog.toObject(),
+      isLiked: req.user
+        ? blog.likes.some(
+            (like) => like.user.toString() === req.user.id.toString(),
+          )
+        : false,
+      likeCount: blog.likes ? blog.likes.length : 0,
+    };
+
     res.status(200).json({
       status: "success",
       data: {
-        blog,
+        blog: blogWithLikeStatus,
       },
     });
   } catch (error) {
@@ -299,14 +321,26 @@ export const getBlogsByUser = async (req, res, next) => {
       .populate("commentCount")
       .sort({ publishedAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    // Add user-specific like status if user is authenticated
+    const blogsWithLikeStatus = blogs.map((blog) => ({
+      ...blog,
+      isLiked: req.user
+        ? blog.likes.some(
+            (like) => like.user.toString() === req.user.id.toString(),
+          )
+        : false,
+      likeCount: blog.likes ? blog.likes.length : 0,
+    }));
 
     const total = await Blog.countDocuments(filter);
 
     res.status(200).json({
       status: "success",
       data: {
-        blogs,
+        blogs: blogsWithLikeStatus,
         pagination: {
           currentPage: page,
           totalPages: Math.ceil(total / limit),
@@ -342,14 +376,24 @@ export const getMyBlogs = async (req, res, next) => {
       .populate("commentCount")
       .sort({ updatedAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
+
+    // Add user-specific like status
+    const blogsWithLikeStatus = blogs.map((blog) => ({
+      ...blog,
+      isLiked: blog.likes.some(
+        (like) => like.user.toString() === req.user.id.toString(),
+      ),
+      likeCount: blog.likes ? blog.likes.length : 0,
+    }));
 
     const total = await Blog.countDocuments(filter);
 
     res.status(200).json({
       status: "success",
       data: {
-        blogs,
+        blogs: blogsWithLikeStatus,
         pagination: {
           currentPage: page,
           totalPages: Math.ceil(total / limit),
@@ -374,10 +418,21 @@ export const getPopularBlogs = async (req, res, next) => {
 
     const blogs = await Blog.getPopularBlogs(limit);
 
+    // Add user-specific like status if user is authenticated
+    const blogsWithLikeStatus = blogs.map((blog) => ({
+      ...blog,
+      isLiked: req.user
+        ? blog.likes.some(
+            (like) => like.user.toString() === req.user.id.toString(),
+          )
+        : false,
+      likeCount: blog.likes ? blog.likes.length : 0,
+    }));
+
     res.status(200).json({
       status: "success",
       data: {
-        blogs,
+        blogs: blogsWithLikeStatus,
       },
     });
   } catch (error) {
@@ -503,9 +558,9 @@ export const getBlogsByCategory = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     // Build filter object
-    const filter = { 
+    const filter = {
       status: "published",
-      category: req.params.category.toLowerCase()
+      category: req.params.category.toLowerCase(),
     };
 
     // Filter by author
@@ -591,13 +646,13 @@ export const getCategories = async (req, res, next) => {
           category: category,
           status: "published",
         });
-        
+
         return {
           name: category,
           slug: category,
           blogCount,
         };
-      })
+      }),
     );
 
     // Sort categories by name

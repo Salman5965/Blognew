@@ -188,10 +188,6 @@
 //   );
 // };
 
-
-
-
-
 import React, { useEffect } from "react";
 import { BlogCard } from "./BlogCard";
 import { Pagination } from "@/components/shared/Pagination";
@@ -199,7 +195,7 @@ import { useBlogStore } from "@/features/blogs/blogStore";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, BookOpen } from "lucide-react";
+import { RefreshCw, BookOpen, WifiOff, AlertTriangle } from "lucide-react";
 
 export const BlogList = ({
   variant = "grid",
@@ -297,6 +293,7 @@ export const BlogList = ({
       {/* Error banner that can be dismissed */}
       {error && blogs && blogs.length > 0 && (
         <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="flex items-center justify-between">
             <span>Failed to refresh blogs. Showing cached results.</span>
             <Button variant="outline" size="sm" onClick={handleRetry}>

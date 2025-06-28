@@ -1,4 +1,3 @@
-
 // import React, { useEffect, useState } from "react";
 // import { useParams, useNavigate } from "react-router-dom";
 // import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -226,16 +225,11 @@
 //   );
 // };
 
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { BlogMeta } from "@/components/blog/BlogMeta";
+import { CommentSection } from "@/components/blog/CommentSection";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useBlogStore } from "@/features/blogs/blogStore";
@@ -280,6 +274,18 @@ export const BlogDetails = () => {
     };
   }, [slug, getBlogBySlug]);
 
+  useEffect(() => {
+    // Scroll to comments section if hash is present
+    if (window.location.hash === "#comments" && !isLoading && currentBlog) {
+      setTimeout(() => {
+        const commentsSection = document.getElementById("comments");
+        if (commentsSection) {
+          commentsSection.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  }, [isLoading, currentBlog]);
+
   const handleDelete = async () => {
     if (!currentBlog) return;
 
@@ -321,17 +327,63 @@ export const BlogDetails = () => {
   }
 
   if (error) {
+    // Check if it's a rate limit error
+    const isRateLimit =
+      error.includes("Too many requests") || error.includes("try again in");
+    const retryMatch = error.match(/try again in (\d+) seconds/);
+    const retryAfter = retryMatch ? retryMatch[1] : null;
+
     return (
       <PageWrapper className="py-8">
-        <Alert variant="destructive">
-          <AlertDescription className="flex items-center justify-between">
-            <span>{error}</span>
-            <Button variant="outline" size="sm" onClick={handleRetry}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Retry
-            </Button>
-          </AlertDescription>
-        </Alert>
+        <div className="space-y-4">
+          {isRateLimit && retryAfter ? (
+            <div className="space-y-4">
+              <Alert variant="destructive">
+                <AlertDescription className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium">Rate limit exceeded</div>
+                    <div className="text-sm">{error}</div>
+                  </div>
+                </AlertDescription>
+              </Alert>
+              <div className="bg-amber-50 dark:bg-amber-950 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                <h3 className="font-medium mb-2 text-amber-800 dark:text-amber-200">
+                  Too Many Requests
+                </h3>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
+                  The server is receiving too many requests. This is a temporary
+                  protection measure.
+                </p>
+                <Button variant="outline" size="sm" onClick={handleRetry}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Alert variant="destructive">
+                <AlertDescription className="flex items-center justify-between">
+                  <span>{error}</span>
+                  <Button variant="outline" size="sm" onClick={handleRetry}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Retry
+                  </Button>
+                </AlertDescription>
+              </Alert>
+
+              {/* Network diagnostic information */}
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h3 className="font-medium mb-2">Troubleshooting</h3>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Check your internet connection</li>
+                  <li>• Try refreshing the page</li>
+                  <li>• The server might be temporarily unavailable</li>
+                </ul>
+              </div>
+            </>
+          )}
+        </div>
       </PageWrapper>
     );
   }
@@ -442,7 +494,7 @@ export const BlogDetails = () => {
         </article>
 
         {/* Comments Section */}
-        <section className="mt-12">
+        <section id="comments" className="mt-12">
           <div className="border-t pt-8">
             <CommentSection
               blogId={currentBlog._id || currentBlog.id}

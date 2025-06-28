@@ -23,8 +23,24 @@ export const useAuthStore = create(
             error: null,
           });
         } catch (error) {
+          // Enhanced error handling
+          let errorMessage = "Login failed";
+
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          } else if (error.response?.status === 429) {
+            errorMessage =
+              "Too many login attempts. Please wait before trying again.";
+          } else if (error.response?.status === 401) {
+            errorMessage = "Invalid email or password.";
+          } else if (error.response?.status >= 500) {
+            errorMessage = "Server error. Please try again later.";
+          } else if (error.isNetworkError || !error.response) {
+            errorMessage = "Network connection failed.";
+          }
+
           set({
-            error: error instanceof Error ? error.message : "Login failed",
+            error: errorMessage,
             isLoading: false,
             isAuthenticated: false,
             user: null,

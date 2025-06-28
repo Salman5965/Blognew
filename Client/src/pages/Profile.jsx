@@ -11,8 +11,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { userService } from "@/services/userService";
 import { blogService } from "@/services/blogService";
+import { followService } from "@/services/followService";
+import { FollowSuggestions } from "@/components/users/FollowSuggestions";
 import {
   User,
+  Users,
+  UserCheck,
   Mail,
   Calendar,
   MapPin,
@@ -59,6 +63,7 @@ const Profile = () => {
   const [userStats, setUserStats] = useState(null);
   const [recentBlogs, setRecentBlogs] = useState([]);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [followStats, setFollowStats] = useState(null);
 
   // Form states
   const [profileForm, setProfileForm] = useState({
@@ -80,6 +85,15 @@ const Profile = () => {
     confirmPassword: "",
   });
 
+  const [privacySettings, setPrivacySettings] = useState({
+    profileVisibility: "public", // public, private
+    showEmail: false,
+    showFollowers: true,
+    showFollowing: true,
+    allowMessages: true,
+    allowFollow: true,
+  });
+
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
@@ -97,6 +111,16 @@ const Profile = () => {
           linkedin: user.socialLinks?.linkedin || "",
           website: user.socialLinks?.website || "",
         },
+      });
+
+      // Load privacy settings
+      setPrivacySettings({
+        profileVisibility: user.profileVisibility || "public",
+        showEmail: user.privacySettings?.showEmail || false,
+        showFollowers: user.privacySettings?.showFollowers !== false,
+        showFollowing: user.privacySettings?.showFollowing !== false,
+        allowMessages: user.privacySettings?.allowMessages !== false,
+        allowFollow: user.privacySettings?.allowFollow !== false,
       });
     }
   }, [user]);
@@ -216,7 +240,7 @@ const Profile = () => {
 
       toast({
         title: "Success",
-        description: "Password changed successfully!",
+        description: "Password changed successfully",
       });
     } catch (error) {
       toast({
@@ -226,6 +250,38 @@ const Profile = () => {
       });
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+  const handleSavePrivacySettings = async () => {
+    try {
+      setIsLoading(true);
+
+      // Update profile with privacy settings
+      await updateProfile({
+        ...profileForm,
+        profileVisibility: privacySettings.profileVisibility,
+        privacySettings: {
+          showEmail: privacySettings.showEmail,
+          showFollowers: privacySettings.showFollowers,
+          showFollowing: privacySettings.showFollowing,
+          allowMessages: privacySettings.allowMessages,
+          allowFollow: privacySettings.allowFollow,
+        },
+      });
+
+      toast({
+        title: "Success",
+        description: "Privacy settings updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update privacy settings",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -531,60 +587,121 @@ const Profile = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Blogs
-                  </CardTitle>
-                  <BookOpen className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {statsLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                    ) : (
-                      userStats?.blogs?.totalBlogs || 0
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="space-y-6">
+              {/* Blog Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Total Blogs
+                    </CardTitle>
+                    <BookOpen className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        userStats?.blogs?.totalBlogs || 0
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Views
-                  </CardTitle>
-                  <Eye className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {statsLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                    ) : (
-                      (userStats?.blogs?.totalViews || 0).toLocaleString()
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Total Views
+                    </CardTitle>
+                    <Eye className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        (userStats?.blogs?.totalViews || 0).toLocaleString()
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Likes
-                  </CardTitle>
-                  <Heart className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {statsLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                    ) : (
-                      (userStats?.blogs?.totalLikes || 0).toLocaleString()
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Total Likes
+                    </CardTitle>
+                    <Heart className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        (userStats?.blogs?.totalLikes || 0).toLocaleString()
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Follow Stats */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() =>
+                    (window.location.href = `/users/${user._id}/followers`)
+                  }
+                >
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Followers
+                    </CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        (followStats?.followersCount || 0).toLocaleString()
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Click to view followers
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card
+                  className="cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() =>
+                    (window.location.href = `/users/${user._id}/following`)
+                  }
+                >
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      Following
+                    </CardTitle>
+                    <UserCheck className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">
+                      {statsLoading ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        (followStats?.followingCount || 0).toLocaleString()
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Click to view following
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Follow Suggestions */}
+              <FollowSuggestions limit={4} />
             </div>
           </TabsContent>
 
@@ -706,6 +823,209 @@ const Profile = () => {
           {/* Settings Tab */}
           <TabsContent value="settings">
             <div className="space-y-6">
+              {/* Privacy Settings */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Shield className="h-5 w-5" />
+                    <span>Privacy Settings</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Profile Visibility */}
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium">Profile Visibility</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Control who can see your profile and posts
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="profileVisibility"
+                          value="public"
+                          checked={
+                            privacySettings.profileVisibility === "public"
+                          }
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              profileVisibility: e.target.value,
+                            }))
+                          }
+                          className="text-primary"
+                        />
+                        <div>
+                          <div className="font-medium">Public</div>
+                          <div className="text-sm text-muted-foreground">
+                            Anyone can see your profile and posts
+                          </div>
+                        </div>
+                      </label>
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="profileVisibility"
+                          value="private"
+                          checked={
+                            privacySettings.profileVisibility === "private"
+                          }
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              profileVisibility: e.target.value,
+                            }))
+                          }
+                          className="text-primary"
+                        />
+                        <div>
+                          <div className="font-medium">Private</div>
+                          <div className="text-sm text-muted-foreground">
+                            Only your followers can see your posts
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Profile Information */}
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium">Profile Information</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Choose what information to display on your profile
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">Show Email</div>
+                          <div className="text-sm text-muted-foreground">
+                            Display your email address on your profile
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.showEmail}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              showEmail: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">Show Followers</div>
+                          <div className="text-sm text-muted-foreground">
+                            Display your followers list publicly
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.showFollowers}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              showFollowers: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">Show Following</div>
+                          <div className="text-sm text-muted-foreground">
+                            Display who you follow publicly
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.showFollowing}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              showFollowing: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Interaction Settings */}
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-medium">Interaction Settings</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Control how others can interact with you
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">Allow Messages</div>
+                          <div className="text-sm text-muted-foreground">
+                            Let others send you direct messages
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.allowMessages}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              allowMessages: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <div>
+                          <div className="font-medium">
+                            Allow Follow Requests
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Allow others to follow you
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={privacySettings.allowFollow}
+                          onChange={(e) =>
+                            setPrivacySettings((prev) => ({
+                              ...prev,
+                              allowFollow: e.target.checked,
+                            }))
+                          }
+                          className="scale-125"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <Button
+                      onClick={handleSavePrivacySettings}
+                      disabled={isLoading}
+                    >
+                      {isLoading && (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      )}
+                      Save Privacy Settings
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Account Settings */}
               <Card>
                 <CardHeader>
                   <CardTitle>Account Settings</CardTitle>

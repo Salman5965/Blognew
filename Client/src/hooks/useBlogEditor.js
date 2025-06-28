@@ -11,6 +11,7 @@ const INITIAL_STATE = {
   category: "", // Added category field
   tags: [],
   isPublished: false,
+  visibility: "public", // Added visibility field
 };
 
 export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
@@ -35,6 +36,9 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
   const [isPublished, setIsPublishedState] = useState(
     initialBlog?.isPublished || INITIAL_STATE.isPublished,
   );
+  const [visibility, setVisibilityState] = useState(
+    initialBlog?.visibility || INITIAL_STATE.visibility,
+  );
 
   const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -47,6 +51,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
     coverImage: initialBlog?.coverImage || "",
     category: initialBlog?.category || "", // Added to initial state ref
     tags: initialBlog?.tags || [],
+    visibility: initialBlog?.visibility || "public",
     isPublished: initialBlog?.isPublished || false,
   });
 
@@ -117,6 +122,11 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
     setIsDirty(true);
   }, []);
 
+  const setVisibility = useCallback((newVisibility) => {
+    setVisibilityState(newVisibility);
+    setIsDirty(true);
+  }, []);
+
   const addTag = useCallback(
     (tag) => {
       const trimmedTag = tag.trim().toLowerCase();
@@ -158,6 +168,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
       category, // Added category to draft data
       tags,
       isPublished: false,
+      visibility,
       timestamp: new Date().toISOString(),
     };
 
@@ -180,6 +191,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
         setCategoryState(draft.category || ""); // Added category loading
         setTagsState(draft.tags || []);
         setIsPublishedState(false);
+        setVisibilityState(draft.visibility || "public");
         setIsDirty(false);
       } catch (error) {
         console.error("Failed to load draft:", error);
@@ -296,6 +308,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
     category, // Added category to return
     tags,
     isPublished,
+    visibility,
     isDirty,
     isSaving,
     lastSaved,
@@ -307,6 +320,7 @@ export function useBlogEditor({ initialBlog, autoSave = true, onSave } = {}) {
     setCategory, // Added setCategory to return
     setTags,
     setIsPublished,
+    setVisibility,
 
     addTag,
     removeTag,

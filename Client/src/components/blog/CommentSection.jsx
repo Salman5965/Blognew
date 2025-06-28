@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Comment } from "./Comment";
 import { useAuthContext } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/utils/constant";
+import apiService from "@/services/api";
 import {
   MessageCircle,
   Loader2,
@@ -44,15 +45,14 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch(
-        `/api/comments/blog/${blogId}?sort=${sortOrder}`,
+      const response = await apiService.get(
+        `/comments/blog/${blogId}?sort=${sortOrder}`,
       );
-      const data = await response.json();
 
-      if (data.status === "success") {
-        setComments(data.data.comments || []);
+      if (response.status === "success") {
+        setComments(response.data.comments || []);
       } else {
-        throw new Error(data.message || "Failed to fetch comments");
+        throw new Error(response.message || "Failed to fetch comments");
       }
     } catch (err) {
       console.error("Error fetching comments:", err);
@@ -74,26 +74,17 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       setIsSubmitting(true);
       setError(null);
 
-      const response = await fetch("/api/comments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-        },
-        body: JSON.stringify({
-          content: newComment.trim(),
-          blog: blogId,
-        }),
+      const response = await apiService.post("/comments", {
+        content: newComment.trim(),
+        blog: blogId,
       });
 
-      const data = await response.json();
-
-      if (data.status === "success") {
+      if (response.status === "success") {
         setNewComment("");
         // Add new comment to the beginning of the list
-        setComments((prev) => [data.data.comment, ...prev]);
+        setComments((prev) => [response.data.comment, ...prev]);
       } else {
-        throw new Error(data.message || "Failed to post comment");
+        throw new Error(response.message || "Failed to post comment");
       }
     } catch (err) {
       setError(err.message || "Failed to post comment");
@@ -105,98 +96,67 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
   const handleReply = async (parentCommentId, content) => {
     if (!content.trim()) return;
 
-    const response = await fetch("/api/comments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-      body: JSON.stringify({
-        content: content.trim(),
-        blog: blogId,
-        parentComment: parentCommentId,
-      }),
+    const response = await apiService.post("/comments", {
+      content: content.trim(),
+      blog: blogId,
+      parentComment: parentCommentId,
     });
 
-    const data = await response.json();
-
-    if (data.status === "success") {
+    if (response.status === "success") {
       // Refresh comments to show the new reply
       fetchComments();
     } else {
-      throw new Error(data.message || "Failed to post reply");
+      throw new Error(response.message || "Failed to post reply");
     }
   };
 
   const handleEditComment = async (commentId, content) => {
     if (!content.trim()) return;
 
-    const response = await fetch(`/api/comments/${commentId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-      body: JSON.stringify({
-        content: content.trim(),
-      }),
+    const response = await apiService.put(`/comments/${commentId}`, {
+      content: content.trim(),
     });
 
-    const data = await response.json();
-
-    if (data.status === "success") {
+    if (response.status === "success") {
       // Update the comment in the list
       setComments((prev) =>
         prev.map((comment) =>
-          comment.id === commentId
+          (comment._id || comment.id) === commentId
             ? { ...comment, content: content.trim(), isEdited: true }
             : comment,
         ),
       );
     } else {
-      throw new Error(data.message || "Failed to update comment");
+      throw new Error(response.message || "Failed to update comment");
     }
   };
 
   const handleDeleteComment = async (commentId) => {
-    const response = await fetch(`/api/comments/${commentId}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-    });
+    const response = await apiService.delete(`/comments/${commentId}`);
 
-    const data = await response.json();
-
-    if (data.status === "success") {
+    if (response.status === "success") {
       // Remove the comment from the list
-      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+      setComments((prev) =>
+        prev.filter((comment) => (comment._id || comment.id) !== commentId),
+      );
     } else {
-      throw new Error(data.message || "Failed to delete comment");
+      throw new Error(response.message || "Failed to delete comment");
     }
   };
-
   const handleLikeComment = async (commentId) => {
-    const response = await fetch(`/api/comments/${commentId}/like`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-      },
-    });
+    const response = await apiService.post(`/comments/${commentId}/like`);
 
-    const data = await response.json();
-
-    if (data.status === "success") {
+    if (response.status === "success") {
       // Update the comment like status
       setComments((prev) =>
         prev.map((comment) =>
-          comment.id === commentId
+          (comment._id || comment.id) === commentId
             ? {
                 ...comment,
-                likes: data.data.isLiked
-                  ? [...(comment.likes || []), { user: user.id }]
+                likes: response.data.isLiked
+                  ? [...(comment.likes || []), { user: user._id || user.id }]
                   : (comment.likes || []).filter(
-                      (like) => like.user !== user.id,
+                      (like) => like.user !== (user._id || user.id),
                     ),
               }
             : comment,
@@ -204,7 +164,6 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       );
     }
   };
-
   if (!allowComments) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -308,7 +267,7 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
         <div className="space-y-6">
           {comments.map((comment) => (
             <Comment
-              key={comment.id}
+              key={comment._id || comment.id}
               comment={comment}
               onReply={handleReply}
               onEdit={handleEditComment}
