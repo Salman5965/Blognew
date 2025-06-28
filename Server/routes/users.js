@@ -8,7 +8,7 @@ import {
   updateUserRole,
 } from "../controllers/userController.js";
 import { protect, authorize } from "../middlewares/auth.js";
-import { validateUpdateUser } from "../validators/userValidator.js";
+import { validateUserUpdate } from "../validators/userValidator.js";
 import { rateLimiter } from "../middlewares/rateLimiter.js";
 import User from "../models/User.js";
 
@@ -94,6 +94,7 @@ router.put(
   protect,
   authorize("admin"),
   validateUserId,
+  validateUserUpdate,
   updateUserRole,
 );
 
