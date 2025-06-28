@@ -27,6 +27,7 @@ import {
 import HelpChatbot from "@/components/help/HelpChatbot";
 
 const Help = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [expandedFaq, setExpandedFaq] = useState(null);
