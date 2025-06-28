@@ -313,6 +313,24 @@ const App = () => (
                       }
                     />
 
+                    {/* Follow pages */}
+                    <Route
+                      path="/users/:userId/followers"
+                      element={
+                        <PrivateRoute>
+                          <FollowersPage />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/users/:userId/following"
+                      element={
+                        <PrivateRoute>
+                          <FollowingPage />
+                        </PrivateRoute>
+                      }
+                    />
+
                     {/* Catch-all route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
