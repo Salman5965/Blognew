@@ -209,7 +209,10 @@ class ApiService {
     } catch (error) {
       // Handle network errors gracefully
       if (error.isNetworkError || !error.response) {
-        throw new Error("Failed to fetch data");
+        const networkError = new Error("Failed to fetch data");
+        networkError.isNetworkError = true;
+        networkError.originalError = error;
+        throw networkError;
       }
       throw error;
     }
