@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -208,7 +207,30 @@ export const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {/* Removed old error alert to rely on toast */}
+            {/* Demo credentials notice */}
+            <div className="bg-muted/50 border border-border rounded-lg p-3">
+              <p className="text-sm text-muted-foreground mb-2">
+                <strong>Demo Mode:</strong> Backend may be unavailable. Use demo
+                credentials:
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setValue("email", "demo@example.com");
+                    setValue("password", "demo123");
+                  }}
+                  className="text-xs"
+                >
+                  Fill Demo Credentials
+                </Button>
+                <div className="text-xs text-muted-foreground">
+                  Email: demo@example.com | Password: demo123
+                </div>
+              </div>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
