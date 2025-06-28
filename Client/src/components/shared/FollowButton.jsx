@@ -146,7 +146,6 @@
 
 // export default FollowButton;
 
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -176,21 +175,23 @@ export const FollowButton = ({
     let timeoutId;
 
     const checkFollowStatus = async () => {
+      // Skip check if user is not authenticated
+      if (!user) return;
+
       try {
         const following = await followService.isFollowing(userId);
         setIsFollowing(following);
       } catch (error) {
         console.error("Error checking follow status:", error);
-        // Handle rate limit gracefully by not showing error to user
+        // Handle auth errors and rate limits gracefully by not showing error to user
         if (
+          error.status !== 401 &&
           error.status !== 429 &&
-          !error.message?.includes("Too many requests")
+          !error.message?.includes("Too many requests") &&
+          !error.message?.includes("Access denied")
         ) {
-          toast({
-            title: "Error",
-            description: "Unable to check follow status",
-            variant: "destructive",
-          });
+          // Only show errors for unexpected issues
+          console.warn("Follow status check failed:", error.message);
         }
       }
     };
@@ -203,7 +204,7 @@ export const FollowButton = ({
         clearTimeout(timeoutId);
       }
     };
-  }, [userId, toast]);
+  }, [userId, user]);
 
   // Don't show follow button for current user - AFTER all hooks
   if (!user || user._id === userId) {
