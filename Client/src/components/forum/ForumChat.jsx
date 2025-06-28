@@ -229,6 +229,38 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     }
   };
 
+  const handleTyping = (e) => {
+    setMessage(e.target.value);
+
+    if (!socketConnected) return;
+
+    // Start typing indicator
+    if (e.target.value.length > 0 && !isTyping) {
+      setIsTyping(true);
+      socketService.startTyping(channel.id || channel._id);
+    }
+
+    // Reset typing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Stop typing after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+      socketService.stopTyping(channel.id || channel._id);
+    }, 2000);
+
+    // Stop typing immediately if message is empty
+    if (e.target.value.length === 0 && isTyping) {
+      setIsTyping(false);
+      socketService.stopTyping(channel.id || channel._id);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    }
+  };
+
   const addReaction = (messageId, emoji) => {
     setMessages((prev) =>
       prev.map((msg) => {
