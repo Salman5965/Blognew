@@ -15,16 +15,12 @@ export const FollowButton = ({
   showIcon = true,
   showText = true,
 }) => {
+  // All hooks must be called before any conditional returns
   const [isFollowing, setIsFollowing] = useState(initialFollowingStatus);
   const [isLoading, setIsLoading] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const { user } = useAuthContext();
   const { toast } = useToast();
-
-  // Don't show follow button for current user
-  if (!user || user._id === userId) {
-    return null;
-  }
 
   // Check initial following status
   useEffect(() => {
@@ -39,6 +35,11 @@ export const FollowButton = ({
 
     checkFollowStatus();
   }, [userId]);
+
+  // Don't show follow button for current user - AFTER all hooks
+  if (!user || user._id === userId) {
+    return null;
+  }
 
   const handleFollowToggle = async () => {
     if (isLoading) return;
