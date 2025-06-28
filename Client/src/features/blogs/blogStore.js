@@ -86,6 +86,7 @@ export const useBlogStore = create(
             },
             isLoading: false,
             error: null,
+            isOffline: response?.isOffline || false,
           });
         } catch (error) {
           console.error("Error fetching blogs:", error);
