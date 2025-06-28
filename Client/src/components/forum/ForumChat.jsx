@@ -367,7 +367,17 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
           </Button>
           <Icon className="h-5 w-5 text-muted-foreground" />
           <div>
-            <h2 className="font-semibold">{channel.name}</h2>
+            <div className="flex items-center space-x-2">
+              <h2 className="font-semibold">{channel.name}</h2>
+              {socketConnected ? (
+                <Wifi className="h-4 w-4 text-green-500" title="Connected" />
+              ) : (
+                <WifiOff
+                  className="h-4 w-4 text-red-500"
+                  title="Disconnected"
+                />
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {channel.description}
             </p>
