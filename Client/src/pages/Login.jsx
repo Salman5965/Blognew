@@ -242,6 +242,19 @@ export const Login = () => {
     }, 1000);
   };
 
+  const resetRateLimit = () => {
+    lastLoginAttempt.current = 0;
+    setRateLimitCountdown(0);
+    if (countdownInterval.current) {
+      clearInterval(countdownInterval.current);
+    }
+    toast({
+      title: "Rate limit reset",
+      description: "You can now try logging in again",
+      duration: 2000,
+    });
+  };
+
   const { values, errors, isSubmitting, setValue, handleSubmit } = useForm({
     initialValues: {
       email: "",
@@ -442,6 +455,23 @@ export const Login = () => {
                   ? "Signing In..."
                   : "Sign In"}
             </Button>
+
+            {/* Rate limit info and reset */}
+            {rateLimitCountdown > 0 && (
+              <div className="text-center space-y-2">
+                <p className="text-xs text-muted-foreground">
+                  Too many attempts. Please wait {rateLimitCountdown} seconds.
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={resetRateLimit}
+                  className="text-xs h-8"
+                >
+                  Reset and try again
+                </Button>
+              </div>
+            )}
 
             <div className="text-center text-sm text-muted-foreground">
               Don't have an account?{" "}
