@@ -272,8 +272,6 @@ export const useBlogStore = create(
             );
           set({
             blogs,
-            pagination: paginationData,
-            filters: mergedQuery,
             isLoading: false,
             error: null,
             lastFetchTime: Date.now(),
