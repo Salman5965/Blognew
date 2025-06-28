@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { useBlogStore } from "@/features/blogs/blogStore";
 import { ChatButton } from "@/components/chat/ChatButton";
+import { NotificationButton } from "@/components/notifications";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -138,6 +139,9 @@ export const Navbar = () => {
                   Write
                 </Link>
               </Button>
+
+              {/* Notification Button */}
+              <NotificationButton />
 
               {/* Chat Button */}
               <ChatButton />

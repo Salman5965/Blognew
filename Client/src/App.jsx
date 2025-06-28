@@ -195,6 +195,7 @@ const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
+const Notifications = React.lazy(() => import("./pages/Notifications"));
 
 // Loading component for suspense
 const PageLoader = () => (
@@ -338,6 +339,16 @@ const App = () => (
                       element={
                         <PrivateRoute>
                           <FollowingPage />
+                        </PrivateRoute>
+                      }
+                    />
+
+                    {/* Notifications */}
+                    <Route
+                      path="/notifications"
+                      element={
+                        <PrivateRoute>
+                          <Notifications />
                         </PrivateRoute>
                       }
                     />
