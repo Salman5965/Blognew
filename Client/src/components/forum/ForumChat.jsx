@@ -58,10 +58,12 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     // Load initial messages
     const loadMessages = async () => {
       try {
-        const data = await forumService.getChannelMessages(channel.id || channel._id);
+        const data = await forumService.getChannelMessages(
+          channel.id || channel._id,
+        );
         setMessages(data.messages || []);
       } catch (error) {
-        console.error('Failed to load messages:', error);
+        console.error("Failed to load messages:", error);
         // Fall back to mock messages on error
         setMessages(getMockMessages());
       } finally {
@@ -76,52 +78,59 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
 
     // Socket event listeners
     const handleNewMessage = (newMessage) => {
-      setMessages(prev => [...prev, newMessage]);
+      setMessages((prev) => [...prev, newMessage]);
     };
 
     const handleMessageReaction = (data) => {
-      setMessages(prev => prev.map(msg =>
-        msg.id === data.messageId || msg._id === data.messageId
-          ? { ...msg, reactions: data.reactions }
-          : msg
-      ));
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === data.messageId || msg._id === data.messageId
+            ? { ...msg, reactions: data.reactions }
+            : msg,
+        ),
+      );
     };
 
     const handleUserTyping = (data) => {
-      if (data.userId !== user.id && data.channelId === (channel.id || channel._id)) {
-        setTypingUsers(prev =>
-          prev.includes(data.username) ? prev : [...prev, data.username]
+      if (
+        data.userId !== user.id &&
+        data.channelId === (channel.id || channel._id)
+      ) {
+        setTypingUsers((prev) =>
+          prev.includes(data.username) ? prev : [...prev, data.username],
         );
       }
     };
 
     const handleUserStoppedTyping = (data) => {
       if (data.channelId === (channel.id || channel._id)) {
-        setTypingUsers(prev => prev.filter(username => username !== data.username));
+        setTypingUsers((prev) =>
+          prev.filter((username) => username !== data.username),
+        );
       }
     };
 
     const handleConnectionStatus = (status) => {
-      setSocketConnected(status === 'connected');
+      setSocketConnected(status === "connected");
     };
 
     // Register socket listeners
-    socketService.on('new_message', handleNewMessage);
-    socketService.on('message_reaction', handleMessageReaction);
-    socketService.on('user_typing', handleUserTyping);
-    socketService.on('user_stopped_typing', handleUserStoppedTyping);
-    socketService.on('connectionStatusChanged', handleConnectionStatus);
+    socketService.on("new_message", handleNewMessage);
+    socketService.on("message_reaction", handleMessageReaction);
+    socketService.on("user_typing", handleUserTyping);
+    socketService.on("user_stopped_typing", handleUserStoppedTyping);
+    socketService.on("connectionStatusChanged", handleConnectionStatus);
 
     // Check initial connection status
     setSocketConnected(socketService.connected);
 
     // Cleanup
     return () => {
-      socketService.off('new_message', handleNewMessage);
-      socketService.off('message_reaction', handleMessageReaction);
-      socketService.off('user_typing', handleUserTyping);
-      socketService.off('user_stopped_typing', handleUserStoppedTyping);
-      socketService.off('connectionStatusChanged', handleConnectionStatus);
+      socketService.off("new_message", handleNewMessage);
+      socketService.off("message_reaction", handleMessageReaction);
+      socketService.off("user_typing", handleUserTyping);
+      socketService.off("user_stopped_typing", handleUserStoppedTyping);
+      socketService.off("connectionStatusChanged", handleConnectionStatus);
       socketService.leaveChannel(channel.id || channel._id);
 
       if (typingTimeoutRef.current) {
@@ -137,18 +146,19 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
       user: {
         id: "user1",
         name: "Community Bot",
-        avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
         role: "Bot",
         isOnline: true,
       },
-      content: `Welcome to #${channel.name}! 🎉 This is where we discuss ${channel.description?.toLowerCase() || 'various topics'}. Feel free to ask questions and share your knowledge!`,
+      content: `Welcome to #${channel.name}! 🎉 This is where we discuss ${channel.description?.toLowerCase() || "various topics"}. Feel free to ask questions and share your knowledge!`,
       timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
       reactions: [
         { emoji: "👋", count: 12, users: ["user2", "user3"] },
         { emoji: "🎉", count: 8, users: ["user4"] },
       ],
       isPinned: true,
-    }
+    },
   ];
 
   const scrollToBottom = () => {
@@ -164,8 +174,8 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
 
     const messageData = {
       content: message,
-      type: 'text',
-      channelId: channel.id || channel._id
+      type: "text",
+      channelId: channel.id || channel._id,
     };
 
     try {
@@ -185,14 +195,17 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
         clearTimeout(typingTimeoutRef.current);
       }
     } catch (error) {
-      console.error('Failed to send message:', error);
+      console.error("Failed to send message:", error);
 
       // Fallback: add message locally if socket/API fails
       const fallbackMessage = {
         id: Date.now(),
         user: {
           id: user.id || user._id,
-          name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'User',
+          name:
+            `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+            user.username ||
+            "User",
           avatar: user.avatar,
           role: "Member",
           isOnline: true,
@@ -255,16 +268,17 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
 
       // Also send via API for persistence
       await forumService.addReaction(messageId, emoji);
-
     } catch (error) {
-      console.error('Failed to add reaction:', error);
+      console.error("Failed to add reaction:", error);
 
       // Fallback: update locally
       setMessages((prev) =>
         prev.map((msg) => {
           if (msg.id === messageId || msg._id === messageId) {
             const userId = user.id || user._id;
-            const existingReaction = msg.reactions?.find((r) => r.emoji === emoji);
+            const existingReaction = msg.reactions?.find(
+              (r) => r.emoji === emoji,
+            );
 
             if (existingReaction) {
               if (existingReaction.users.includes(userId)) {
@@ -289,7 +303,11 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
                   ...msg,
                   reactions: msg.reactions.map((r) =>
                     r.emoji === emoji
-                      ? { ...r, count: r.count + 1, users: [...r.users, userId] }
+                      ? {
+                          ...r,
+                          count: r.count + 1,
+                          users: [...r.users, userId],
+                        }
                       : r,
                   ),
                 };
@@ -354,7 +372,10 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
               {socketConnected ? (
                 <Wifi className="h-4 w-4 text-green-500" title="Connected" />
               ) : (
-                <WifiOff className="h-4 w-4 text-red-500" title="Disconnected" />
+                <WifiOff
+                  className="h-4 w-4 text-red-500"
+                  title="Disconnected"
+                />
               )}
             </div>
             <p className="text-sm text-muted-foreground">
@@ -383,127 +404,131 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
           <div className="flex items-center justify-center h-32">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-              <p className="text-sm text-muted-foreground">Loading messages...</p>
+              <p className="text-sm text-muted-foreground">
+                Loading messages...
+              </p>
             </div>
           </div>
-        ) : (
-        {messages.map((msg, index) => {
-          const showAvatar =
-            index === 0 || messages[index - 1].user.id !== msg.user.id;
-          const timeDiff =
-            index > 0 ? msg.timestamp - messages[index - 1].timestamp : 0;
-          const showTimestamp = timeDiff > 5 * 60 * 1000; // 5 minutes
+        ) : null}
 
-          return (
-            <div key={msg.id} className="group">
-              {showTimestamp && (
-                <div className="text-center text-xs text-muted-foreground my-4">
-                  {formatDistanceToNow(msg.timestamp, { addSuffix: true })}
-                </div>
-              )}
+        {!isLoading &&
+          messages.map((msg, index) => {
+            const showAvatar =
+              index === 0 || messages[index - 1].user.id !== msg.user.id;
+            const timeDiff =
+              index > 0 ? msg.timestamp - messages[index - 1].timestamp : 0;
+            const showTimestamp = timeDiff > 5 * 60 * 1000; // 5 minutes
 
-              <div className={`flex space-x-3 ${!showAvatar ? "ml-12" : ""}`}>
-                {showAvatar && (
-                  <div className="relative">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={msg.user.avatar} />
-                      <AvatarFallback>
-                        {msg.user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    {msg.user.isOnline && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
-                    )}
+            return (
+              <div key={msg.id} className="group">
+                {showTimestamp && (
+                  <div className="text-center text-xs text-muted-foreground my-4">
+                    {formatDistanceToNow(msg.timestamp, { addSuffix: true })}
                   </div>
                 )}
 
-                <div className="flex-1 min-w-0">
+                <div className={`flex space-x-3 ${!showAvatar ? "ml-12" : ""}`}>
                   {showAvatar && (
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="font-medium text-sm">
-                        {msg.user.name}
-                      </span>
-                      <Badge variant="outline" className="text-xs">
-                        {msg.user.role}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(msg.timestamp, {
-                          addSuffix: true,
-                        })}
-                      </span>
-                      {msg.isPinned && (
-                        <Pin className="h-3 w-3 text-yellow-500" />
+                    <div className="relative">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={msg.user.avatar} />
+                        <AvatarFallback>
+                          {msg.user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      {msg.user.isOnline && (
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
                       )}
                     </div>
                   )}
 
-                  <div className="text-sm leading-relaxed">
-                    {formatMessageContent(msg.content)}
-                  </div>
-
-                  {/* Reactions */}
-                  {msg.reactions.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {msg.reactions.map((reaction, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => addReaction(msg.id, reaction.emoji)}
-                          className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-colors ${
-                            reaction.users.includes(user.id)
-                              ? "bg-primary/20 text-primary"
-                              : "bg-muted hover:bg-muted/80"
-                          }`}
-                        >
-                          <span>{reaction.emoji}</span>
-                          <span>{reaction.count}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Message Actions */}
-                  <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => addReaction(msg.id, "👍")}
-                      className="h-6 w-6 p-0"
-                    >
-                      <Heart className="h-3 w-3" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                      <Reply className="h-3 w-3" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                      <Share className="h-3 w-3" />
-                    </Button>
-                    {msg.user.id === user.id && (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </>
+                  <div className="flex-1 min-w-0">
+                    {showAvatar && (
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-medium text-sm">
+                          {msg.user.name}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {msg.user.role}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(msg.timestamp, {
+                            addSuffix: true,
+                          })}
+                        </span>
+                        {msg.isPinned && (
+                          <Pin className="h-3 w-3 text-yellow-500" />
+                        )}
+                      </div>
                     )}
+
+                    <div className="text-sm leading-relaxed">
+                      {formatMessageContent(msg.content)}
+                    </div>
+
+                    {/* Reactions */}
+                    {msg.reactions.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {msg.reactions.map((reaction, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => addReaction(msg.id, reaction.emoji)}
+                            className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-colors ${
+                              reaction.users.includes(user.id)
+                                ? "bg-primary/20 text-primary"
+                                : "bg-muted hover:bg-muted/80"
+                            }`}
+                          >
+                            <span>{reaction.emoji}</span>
+                            <span>{reaction.count}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Message Actions */}
+                    <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => addReaction(msg.id, "👍")}
+                        className="h-6 w-6 p-0"
+                      >
+                        <Heart className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Reply className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Share className="h-3 w-3" />
+                      </Button>
+                      {msg.user.id === user.id && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
         {/* Typing Indicator */}
         {typingUsers.length > 0 && (
@@ -574,7 +599,11 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
           <Button
             onClick={handleSendMessage}
             disabled={!message.trim() || !socketConnected}
-            title={!socketConnected ? "Disconnected - cannot send messages" : "Send message"}
+            title={
+              !socketConnected
+                ? "Disconnected - cannot send messages"
+                : "Send message"
+            }
           >
             <Send className="h-4 w-4" />
           </Button>
