@@ -327,28 +327,62 @@ export const BlogDetails = () => {
   }
 
   if (error) {
+    // Check if it's a rate limit error
+    const isRateLimit =
+      error.includes("Too many requests") || error.includes("try again in");
+    const retryMatch = error.match(/try again in (\d+) seconds/);
+    const retryAfter = retryMatch ? retryMatch[1] : null;
+
     return (
       <PageWrapper className="py-8">
         <div className="space-y-4">
-          <Alert variant="destructive">
-            <AlertDescription className="flex items-center justify-between">
-              <span>{error}</span>
-              <Button variant="outline" size="sm" onClick={handleRetry}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Retry
-              </Button>
-            </AlertDescription>
-          </Alert>
+          {isRateLimit && retryAfter ? (
+            <div className="space-y-4">
+              <Alert variant="destructive">
+                <AlertDescription className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium">Rate limit exceeded</div>
+                    <div className="text-sm">{error}</div>
+                  </div>
+                </AlertDescription>
+              </Alert>
+              <div className="bg-amber-50 dark:bg-amber-950 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                <h3 className="font-medium mb-2 text-amber-800 dark:text-amber-200">
+                  Too Many Requests
+                </h3>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
+                  The server is receiving too many requests. This is a temporary
+                  protection measure.
+                </p>
+                <Button variant="outline" size="sm" onClick={handleRetry}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <Alert variant="destructive">
+                <AlertDescription className="flex items-center justify-between">
+                  <span>{error}</span>
+                  <Button variant="outline" size="sm" onClick={handleRetry}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Retry
+                  </Button>
+                </AlertDescription>
+              </Alert>
 
-          {/* Network diagnostic information */}
-          <div className="bg-muted/50 p-4 rounded-lg">
-            <h3 className="font-medium mb-2">Troubleshooting</h3>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>• Check your internet connection</li>
-              <li>• Try refreshing the page</li>
-              <li>• The server might be temporarily unavailable</li>
-            </ul>
-          </div>
+              {/* Network diagnostic information */}
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h3 className="font-medium mb-2">Troubleshooting</h3>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• Check your internet connection</li>
+                  <li>• Try refreshing the page</li>
+                  <li>• The server might be temporarily unavailable</li>
+                </ul>
+              </div>
+            </>
+          )}
         </div>
       </PageWrapper>
     );
