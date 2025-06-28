@@ -584,7 +584,15 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
             )}
           </div>
 
-          <Button onClick={handleSendMessage} disabled={!message.trim()}>
+          <Button
+            onClick={handleSendMessage}
+            disabled={!message.trim() || !socketConnected}
+            title={
+              !socketConnected
+                ? "Disconnected - cannot send messages"
+                : "Send message"
+            }
+          >
             <Send className="h-4 w-4" />
           </Button>
         </div>
