@@ -947,6 +947,12 @@ export const Dashboard = () => {
                   color="purple"
                 />
                 <QuickActionButton
+                  icon={Users}
+                  label="Discover People"
+                  onClick={() => navigate(ROUTES.DISCOVER)}
+                  color="indigo"
+                />
+                <QuickActionButton
                   icon={Settings}
                   label="Profile Settings"
                   onClick={() => navigate(ROUTES.PROFILE)}
