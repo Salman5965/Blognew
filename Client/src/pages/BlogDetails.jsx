@@ -329,15 +329,27 @@ export const BlogDetails = () => {
   if (error) {
     return (
       <PageWrapper className="py-8">
-        <Alert variant="destructive">
-          <AlertDescription className="flex items-center justify-between">
-            <span>{error}</span>
-            <Button variant="outline" size="sm" onClick={handleRetry}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Retry
-            </Button>
-          </AlertDescription>
-        </Alert>
+        <div className="space-y-4">
+          <Alert variant="destructive">
+            <AlertDescription className="flex items-center justify-between">
+              <span>{error}</span>
+              <Button variant="outline" size="sm" onClick={handleRetry}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Retry
+              </Button>
+            </AlertDescription>
+          </Alert>
+
+          {/* Network diagnostic information */}
+          <div className="bg-muted/50 p-4 rounded-lg">
+            <h3 className="font-medium mb-2">Troubleshooting</h3>
+            <ul className="text-sm text-muted-foreground space-y-1">
+              <li>• Check your internet connection</li>
+              <li>• Try refreshing the page</li>
+              <li>• The server might be temporarily unavailable</li>
+            </ul>
+          </div>
+        </div>
       </PageWrapper>
     );
   }
