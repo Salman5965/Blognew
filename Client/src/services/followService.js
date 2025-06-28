@@ -1,6 +1,11 @@
 import apiService from "./api";
 
 class FollowService {
+  constructor() {
+    this._cachedFollowStatus = new Map();
+    this._cacheTimeout = 60000; // 1 minute cache
+  }
+
   // Follow a user
   async followUser(userId) {
     try {
