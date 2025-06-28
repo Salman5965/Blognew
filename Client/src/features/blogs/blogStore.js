@@ -111,10 +111,22 @@ export const useBlogStore = create(
           set({ isLoading: true, error: null });
           const response = await blogService.getBlogBySlug(slug);
 
-          // Handle network errors gracefully
-          if (response?.isNetworkError) {
+          // Handle error responses gracefully
+          if (response?.status === "error") {
+            let errorMessage = response.message;
+
+            // Customize error messages based on error type
+            if (response.errorType === "network") {
+              errorMessage =
+                "Unable to connect to server. Please check your internet connection.";
+            } else if (response.errorType === "not_found") {
+              errorMessage = `Blog not found`;
+            } else if (response.errorType === "api") {
+              errorMessage = response.message || "Server error occurred";
+            }
+
             set({
-              error: response.message || "Network connection failed",
+              error: errorMessage,
               isLoading: false,
               currentBlog: null,
             });
