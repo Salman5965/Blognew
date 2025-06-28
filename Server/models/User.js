@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema(
         /^[a-zA-Z0-9_]+$/,
         "Username can only contain letters, numbers, and underscores",
       ],
+      index: true,
     },
     email: {
       type: String,
@@ -25,6 +26,7 @@ const userSchema = new mongoose.Schema(
         /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
         "Please enter a valid email",
       ],
+      index: true,
     },
     password: {
       type: String,
@@ -54,6 +56,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    coverImage: {
+      type: String,
+      default: "",
+    },
     role: {
       type: String,
       enum: ["user", "admin", "moderator"],
@@ -62,6 +68,7 @@ const userSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
     isEmailVerified: {
       type: Boolean,
@@ -75,33 +82,87 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    // Social links
     socialLinks: {
-      twitter: String,
-      linkedin: String,
-      github: String,
-      website: String,
+      twitter: { type: String, trim: true },
+      linkedin: { type: String, trim: true },
+      github: { type: String, trim: true },
+      website: { type: String, trim: true },
+      instagram: { type: String, trim: true },
     },
+    // Privacy settings
+    profileVisibility: {
+      type: String,
+      enum: ["public", "private"],
+      default: "public",
+    },
+    privacySettings: {
+      showEmail: { type: Boolean, default: false },
+      showFollowers: { type: Boolean, default: true },
+      showFollowing: { type: Boolean, default: true },
+      allowMessages: { type: Boolean, default: true },
+      allowFollow: { type: Boolean, default: true },
+    },
+    // Online status
+    isOnline: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    lastSeen: {
+      type: Date,
+      default: Date.now,
+      index: true,
+    },
+    // Statistics (denormalized for performance)
+    stats: {
+      blogsCount: { type: Number, default: 0 },
+      followersCount: { type: Number, default: 0 },
+      followingCount: { type: Number, default: 0 },
+      totalViews: { type: Number, default: 0 },
+      totalLikes: { type: Number, default: 0 },
+    },
+    // Account preferences
     preferences: {
       emailNotifications: {
         type: Boolean,
         default: true,
       },
+      pushNotifications: { type: Boolean, default: true },
       newsletter: {
         type: Boolean,
         default: false,
       },
+      marketingEmails: { type: Boolean, default: false },
+      theme: {
+        type: String,
+        enum: ["light", "dark", "system"],
+        default: "system",
+      },
+      language: { type: String, default: "en" },
+    },
+    // Moderation
+    isSuspended: {
+      type: Boolean,
+      default: false,
+    },
+    suspendedUntil: Date,
+    suspensionReason: String,
+    warningsCount: {
+      type: Number,
+      default: 0,
     },
   },
   {
     timestamps: true,
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 // Virtual for full name
 userSchema.virtual("fullName").get(function () {
-  return `${this.firstName} ${this.lastName}`;
+  return `${this.firstName} ${this.lastName}`.trim() || this.username;
 });
 
 // Virtual for blog count
@@ -112,9 +173,11 @@ userSchema.virtual("blogCount", {
   count: true,
 });
 
-// Indexes for better query performance
-// Note: email and username indexes are created automatically by unique: true
+// Indexes for better query performance and search
 userSchema.index({ createdAt: -1 });
+userSchema.index({ username: "text", firstName: "text", lastName: "text" });
+userSchema.index({ "stats.followersCount": -1 });
+userSchema.index({ lastSeen: -1 });
 
 // Pre-save middleware to hash password
 userSchema.pre("save", async function (next) {
@@ -136,6 +199,37 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
+// Update lastSeen when user is active
+userSchema.methods.updateLastSeen = function () {
+  this.lastSeen = new Date();
+  this.isOnline = true;
+  return this.save();
+};
+
+// Set user offline
+userSchema.methods.setOffline = function () {
+  this.isOnline = false;
+  return this.save();
+};
+
+// Update user statistics
+userSchema.methods.updateStats = async function (field, increment = 1) {
+  if (this.stats[field] !== undefined) {
+    this.stats[field] += increment;
+    await this.save();
+  }
+};
+
+// Check if user can be messaged
+userSchema.methods.canBeMessaged = function (byUser) {
+  if (!this.privacySettings.allowMessages) return false;
+  if (this.profileVisibility === "private") {
+    // This would need additional logic to check if users follow each other
+    return false; // Simplified for now
+  }
+  return true;
+};
+
 // Instance method to get safe user data (without sensitive info)
 userSchema.methods.getSafeUserData = function () {
   return {
@@ -147,10 +241,16 @@ userSchema.methods.getSafeUserData = function () {
     fullName: this.fullName,
     bio: this.bio,
     avatar: this.avatar,
+    coverImage: this.coverImage,
     role: this.role,
     isActive: this.isActive,
     isEmailVerified: this.isEmailVerified,
     socialLinks: this.socialLinks,
+    profileVisibility: this.profileVisibility,
+    privacySettings: this.privacySettings,
+    isOnline: this.isOnline,
+    lastSeen: this.lastSeen,
+    stats: this.stats,
     preferences: this.preferences,
     createdAt: this.createdAt,
     updatedAt: this.updatedAt,
@@ -162,6 +262,44 @@ userSchema.statics.findByEmailOrUsername = function (identifier) {
   return this.findOne({
     $or: [{ email: identifier.toLowerCase() }, { username: identifier }],
   });
+};
+
+// Static method to find by email
+userSchema.statics.findByEmail = function (email) {
+  return this.findOne({ email: email.toLowerCase() });
+};
+
+// Static method to find by username
+userSchema.statics.findByUsername = function (username) {
+  return this.findOne({ username });
+};
+
+// Static method to search users
+userSchema.statics.searchUsers = function (query, options = {}) {
+  const { page = 1, limit = 20, excludeIds = [] } = options;
+  const skip = (page - 1) * limit;
+
+  let searchQuery = {
+    isActive: true,
+    _id: { $nin: excludeIds },
+  };
+
+  if (query) {
+    searchQuery.$or = [
+      { username: { $regex: query, $options: "i" } },
+      { firstName: { $regex: query, $options: "i" } },
+      { lastName: { $regex: query, $options: "i" } },
+      { $text: { $search: query } },
+    ];
+  }
+
+  return this.find(searchQuery)
+    .select(
+      "username firstName lastName avatar bio stats.followersCount isOnline lastSeen",
+    )
+    .sort({ "stats.followersCount": -1, createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
 };
 
 const User = mongoose.model("User", userSchema);
