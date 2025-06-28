@@ -291,9 +291,24 @@ export const BlogList = ({
         </div>
       )}
 
+      {/* Offline indicator */}
+      {isOffline && blogs && blogs.length > 0 && (
+        <Alert>
+          <WifiOff className="h-4 w-4" />
+          <AlertDescription className="flex items-center justify-between">
+            <span>You're offline. Showing sample content.</span>
+            <Button variant="outline" size="sm" onClick={handleRetry}>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Retry
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Error banner that can be dismissed */}
       {error && blogs && blogs.length > 0 && (
         <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="flex items-center justify-between">
             <span>Failed to refresh blogs. Showing cached results.</span>
             <Button variant="outline" size="sm" onClick={handleRetry}>
