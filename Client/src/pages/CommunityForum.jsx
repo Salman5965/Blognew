@@ -48,10 +48,15 @@ const CommunityForum = () => {
     const loadStats = async () => {
       try {
         const stats = await forumService.getStats();
-        setForumStats(stats);
+        setForumStats({
+          totalMembers: stats?.totalMembers || 0,
+          onlineMembers: stats?.onlineMembers || 0,
+          totalMessages: stats?.totalMessages || 0,
+          channelsCount: stats?.channelsCount || 0,
+        });
       } catch (error) {
         console.error("Failed to load forum stats:", error);
-        // Keep default empty stats on error
+        // Keep default initialized stats on error
       } finally {
         setIsLoadingStats(false);
       }
@@ -113,11 +118,13 @@ const CommunityForum = () => {
                 <div className="flex items-center space-x-1">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>
-                    {forumStats.onlineMembers.toLocaleString()} online
+                    {(forumStats?.onlineMembers || 0).toLocaleString()} online
                   </span>
                 </div>
                 <span>•</span>
-                <span>{forumStats.totalMembers.toLocaleString()} members</span>
+                <span>
+                  {(forumStats?.totalMembers || 0).toLocaleString()} members
+                </span>
               </div>
             </div>
 
