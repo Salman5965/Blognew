@@ -345,19 +345,17 @@ class BlogService {
       ) {
         console.error("Network error fetching blogs:", error);
 
-        // Return mock data structure with sample blogs for better UX
-        const mockBlogs = this.generateMockBlogs();
+        // Return empty data structure when API is unavailable
         return {
-          blogs: mockBlogs,
+          blogs: [],
           pagination: {
             currentPage: query.page || 1,
-            totalPages: 1,
-            totalBlogs: mockBlogs.length,
+            totalPages: 0,
+            totalBlogs: 0,
             hasNextPage: false,
             hasPrevPage: false,
             limit: query.limit || PAGINATION.BLOG_LIMIT,
           },
-          isOffline: true, // Flag to indicate this is offline data
         };
       }
 
@@ -606,110 +604,6 @@ class BlogService {
 
       throw error;
     }
-  }
-
-  // Generate mock blogs for offline/error scenarios
-  generateMockBlogs() {
-    const mockBlogs = [
-      {
-        _id: "mock-1",
-        id: "mock-1",
-        title: "Welcome to BlogHub",
-        excerpt:
-          "Discover amazing stories and connect with passionate writers from around the world.",
-        content:
-          "Welcome to our blogging platform! Here you can read, write, and share stories that matter...",
-        slug: "welcome-to-bloghub",
-        coverImage: "/placeholder.svg",
-        tags: ["welcome", "blogging"],
-        status: "published",
-        publishedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        views: 125,
-        viewCount: 125,
-        likesCount: 24,
-        likeCount: 24,
-        likes: [],
-        commentsCount: 8,
-        commentCount: 8,
-        comments: [],
-        isLiked: false,
-        author: {
-          _id: "mock-author-1",
-          id: "mock-author-1",
-          username: "bloghub_team",
-          firstName: "BlogHub",
-          lastName: "Team",
-          avatar: "/placeholder.svg",
-        },
-      },
-      {
-        _id: "mock-2",
-        id: "mock-2",
-        title: "Getting Started with Writing",
-        excerpt:
-          "Tips and tricks for new writers to create engaging content and build an audience.",
-        content:
-          "Writing is a journey of discovery. Every great writer started with a single word...",
-        slug: "getting-started-with-writing",
-        coverImage: "/placeholder.svg",
-        tags: ["writing", "tips", "beginners"],
-        status: "published",
-        publishedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-        views: 89,
-        viewCount: 89,
-        likesCount: 15,
-        likeCount: 15,
-        likes: [],
-        commentsCount: 5,
-        commentCount: 5,
-        comments: [],
-        isLiked: false,
-        author: {
-          _id: "mock-author-2",
-          id: "mock-author-2",
-          username: "writing_guru",
-          firstName: "Sarah",
-          lastName: "Johnson",
-          avatar: "/placeholder.svg",
-        },
-      },
-      {
-        _id: "mock-3",
-        id: "mock-3",
-        title: "The Future of Digital Storytelling",
-        excerpt:
-          "Exploring how technology is changing the way we tell and consume stories.",
-        content:
-          "Digital storytelling has evolved beyond traditional formats...",
-        slug: "future-of-digital-storytelling",
-        coverImage: "/placeholder.svg",
-        tags: ["technology", "storytelling", "future"],
-        status: "published",
-        publishedAt: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-        createdAt: new Date(Date.now() - 172800000).toISOString(),
-        views: 156,
-        viewCount: 156,
-        likesCount: 32,
-        likeCount: 32,
-        likes: [],
-        commentsCount: 12,
-        commentCount: 12,
-        comments: [],
-        isLiked: false,
-        author: {
-          _id: "mock-author-3",
-          id: "mock-author-3",
-          username: "tech_storyteller",
-          firstName: "Alex",
-          lastName: "Chen",
-          avatar: "/placeholder.svg",
-        },
-      },
-    ];
-
-    return mockBlogs;
   }
 }
 
