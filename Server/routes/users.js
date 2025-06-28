@@ -30,7 +30,7 @@ const validateUserSearch = [
 // Search users
 router.get(
   "/search",
-  authenticateToken,
+  protect,
   rateLimiter("userSearch", 30, 60), // 30 searches per minute
   validateUserSearch,
   async (req, res) => {
