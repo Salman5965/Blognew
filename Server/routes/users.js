@@ -104,4 +104,41 @@ router.delete("/:id", protect, authorize("admin"), validateUserId, deleteUser);
 // Get user statistics
 router.get("/:id/stats", protect, validateUserId, getUserStats);
 
+// Get user activity
+router.get("/:id/activity", protect, validateUserId, async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Mock activity data for now
+    const activities = [
+      {
+        id: 1,
+        type: "blog_created",
+        message: "Created a new blog post",
+        timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
+        data: { title: "New Blog Post" },
+      },
+      {
+        id: 2,
+        type: "blog_liked",
+        message: "Liked a blog post",
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+        data: { title: "Interesting Article" },
+      },
+    ].slice(0, limit);
+
+    res.status(200).json({
+      status: "success",
+      data: activities,
+    });
+  } catch (error) {
+    console.error("Error fetching user activity:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to fetch user activity",
+    });
+  }
+});
+
 export default router;
