@@ -673,6 +673,7 @@ export const CreateBlog = () => {
     category,
     tags,
     isPublished,
+    visibility,
     isDirty,
     setTitle,
     setContent,
@@ -680,6 +681,7 @@ export const CreateBlog = () => {
     setCoverImage,
     setCategory,
     setIsPublished,
+    setVisibility,
     addTag,
     removeTag,
     generateExcerpt,
@@ -715,7 +717,7 @@ export const CreateBlog = () => {
         category,
         coverImage,
         status: isPublished ? "published" : "draft",
-        visibility: postVisibility,
+        visibility,
       };
 
       const createdBlog = await createBlog(blogData);
@@ -1154,8 +1156,8 @@ export const CreateBlog = () => {
                       type="radio"
                       name="postVisibility"
                       value="public"
-                      checked={postVisibility === "public"}
-                      onChange={(e) => setPostVisibility(e.target.value)}
+                      checked={visibility === "public"}
+                      onChange={(e) => setVisibility(e.target.value)}
                       className="text-primary"
                     />
                     <div>
@@ -1170,8 +1172,8 @@ export const CreateBlog = () => {
                       type="radio"
                       name="postVisibility"
                       value="followers"
-                      checked={postVisibility === "followers"}
-                      onChange={(e) => setPostVisibility(e.target.value)}
+                      checked={visibility === "followers"}
+                      onChange={(e) => setVisibility(e.target.value)}
                       className="text-primary"
                     />
                     <div>
@@ -1186,8 +1188,8 @@ export const CreateBlog = () => {
                       type="radio"
                       name="postVisibility"
                       value="private"
-                      checked={postVisibility === "private"}
-                      onChange={(e) => setPostVisibility(e.target.value)}
+                      checked={visibility === "private"}
+                      onChange={(e) => setVisibility(e.target.value)}
                       className="text-primary"
                     />
                     <div>
