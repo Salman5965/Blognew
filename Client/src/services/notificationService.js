@@ -19,7 +19,7 @@ class NotificationService {
     } catch (error) {
       console.error("Error fetching notifications:", error);
 
-      // Return mock data as fallback
+      // Return mock data as fallback for any error (including 404)
       const mockNotifications = this.getMockNotifications(
         page,
         limit,
@@ -29,7 +29,10 @@ class NotificationService {
         success: false,
         data: mockNotifications.data,
         pagination: mockNotifications.pagination,
-        error: error.response?.data?.message || "Failed to fetch notifications",
+        error:
+          error.response?.status === 404
+            ? null
+            : error.response?.data?.message || "Failed to fetch notifications",
       };
     }
   }
@@ -100,8 +103,11 @@ class NotificationService {
       console.error("Error fetching unread count:", error);
       return {
         success: false,
-        count: Math.floor(Math.random() * 10), // Mock fallback
-        error: error.response?.data?.message || "Failed to fetch unread count",
+        count: Math.floor(Math.random() * 5), // Mock fallback
+        error:
+          error.response?.status === 404
+            ? null
+            : error.response?.data?.message || "Failed to fetch unread count",
       };
     }
   }
