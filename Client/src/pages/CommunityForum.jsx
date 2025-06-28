@@ -27,6 +27,7 @@ import ForumChat from "@/components/forum/ForumChat";
 import ForumWelcome from "@/components/forum/ForumWelcome";
 import { useForumConnection } from "@/hooks/useForumConnection";
 import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import forumService from "@/services/forumService";
 
 const CommunityForum = () => {
   const [selectedChannel, setSelectedChannel] = useState(null);
