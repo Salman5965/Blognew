@@ -78,7 +78,7 @@ export const ROUTES = {
   USER_PROFILE: "/users",
   FOLLOWERS: "/users/:userId/followers",
   FOLLOWING: "/users/:userId/following",
-  DISCOVER: "/discover",
+
   ABOUT: "/about",
   CONTACT: "/contact",
   PRIVACY: "/privacy",
