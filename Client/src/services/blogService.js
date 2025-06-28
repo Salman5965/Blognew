@@ -345,17 +345,19 @@ class BlogService {
       ) {
         console.error("Network error fetching blogs:", error);
 
-        // Return empty data structure instead of throwing
+        // Return mock data structure with sample blogs for better UX
+        const mockBlogs = this.generateMockBlogs();
         return {
-          blogs: [],
+          blogs: mockBlogs,
           pagination: {
             currentPage: query.page || 1,
-            totalPages: 0,
-            totalBlogs: 0,
+            totalPages: 1,
+            totalBlogs: mockBlogs.length,
             hasNextPage: false,
             hasPrevPage: false,
             limit: query.limit || PAGINATION.BLOG_LIMIT,
           },
+          isOffline: true, // Flag to indicate this is offline data
         };
       }
 
