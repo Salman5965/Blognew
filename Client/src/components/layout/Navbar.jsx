@@ -88,6 +88,12 @@ export const Navbar = () => {
                 Home
               </Link>
               <Link
+                to={ROUTES.DISCOVER}
+                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Discover
+              </Link>
+              <Link
                 to={ROUTES.FEED}
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
