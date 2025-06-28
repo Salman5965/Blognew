@@ -83,6 +83,15 @@ const Profile = () => {
     confirmPassword: "",
   });
 
+  const [privacySettings, setPrivacySettings] = useState({
+    profileVisibility: "public", // public, private
+    showEmail: false,
+    showFollowers: true,
+    showFollowing: true,
+    allowMessages: true,
+    allowFollow: true,
+  });
+
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
@@ -100,6 +109,16 @@ const Profile = () => {
           linkedin: user.socialLinks?.linkedin || "",
           website: user.socialLinks?.website || "",
         },
+      });
+
+      // Load privacy settings
+      setPrivacySettings({
+        profileVisibility: user.profileVisibility || "public",
+        showEmail: user.privacySettings?.showEmail || false,
+        showFollowers: user.privacySettings?.showFollowers !== false,
+        showFollowing: user.privacySettings?.showFollowing !== false,
+        allowMessages: user.privacySettings?.allowMessages !== false,
+        allowFollow: user.privacySettings?.allowFollow !== false,
       });
     }
   }, [user]);
@@ -219,7 +238,7 @@ const Profile = () => {
 
       toast({
         title: "Success",
-        description: "Password changed successfully!",
+        description: "Password changed successfully",
       });
     } catch (error) {
       toast({
@@ -229,6 +248,38 @@ const Profile = () => {
       });
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+  const handleSavePrivacySettings = async () => {
+    try {
+      setIsLoading(true);
+
+      // Update profile with privacy settings
+      await updateProfile({
+        ...profileForm,
+        profileVisibility: privacySettings.profileVisibility,
+        privacySettings: {
+          showEmail: privacySettings.showEmail,
+          showFollowers: privacySettings.showFollowers,
+          showFollowing: privacySettings.showFollowing,
+          allowMessages: privacySettings.allowMessages,
+          allowFollow: privacySettings.allowFollow,
+        },
+      });
+
+      toast({
+        title: "Success",
+        description: "Privacy settings updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update privacy settings",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
