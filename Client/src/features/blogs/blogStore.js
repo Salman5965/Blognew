@@ -101,6 +101,7 @@ export const useBlogStore = create(
             },
             isLoading: false,
             error: null,
+            lastFetchTime: Date.now(),
           });
         } catch (error) {
           console.error("Error fetching blogs:", error);
