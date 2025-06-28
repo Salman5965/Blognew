@@ -7,7 +7,7 @@ import {
   deleteUser,
   getUserStats,
 } from "../controllers/userController.js";
-import { authenticateToken, authorizeAdmin } from "../middlewares/auth.js";
+import { protect, authorize } from "../middlewares/auth.js";
 import { validateUpdateUser } from "../validators/userValidator.js";
 import { rateLimiter } from "../middlewares/rateLimiter.js";
 import User from "../models/User.js";
