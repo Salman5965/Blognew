@@ -44,111 +44,122 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
   const typingTimeoutRef = useRef(null);
   const { user } = useAuthContext();
 
-  // Mock messages for the channel
+  // Initialize real-time chat functionality
   useEffect(() => {
-    const mockMessages = [
-      {
-        id: 1,
-        user: {
-          id: "user1",
-          name: "Alex Chen",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-          role: "Moderator",
-          isOnline: true,
-        },
-        content: `Welcome to #${channel.name}! 🎉 This is where we discuss ${channel.description.toLowerCase()}. Feel free to ask questions and share your knowledge!`,
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-        reactions: [
-          { emoji: "👋", count: 12, users: ["user2", "user3"] },
-          { emoji: "🎉", count: 8, users: ["user4"] },
-        ],
-        isPinned: true,
+    if (!channel || !user) return;
+
+    setIsLoading(true);
+
+    // Connect to socket if not connected
+    if (!socketService.connected) {
+      socketService.connect();
+    }
+
+    // Load initial messages
+    const loadMessages = async () => {
+      try {
+        const data = await forumService.getChannelMessages(
+          channel.id || channel._id,
+        );
+        setMessages(data.messages || []);
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+        // Fall back to mock messages on error
+        setMessages(getMockMessages());
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMessages();
+
+    // Join the channel
+    socketService.joinChannel(channel.id || channel._id);
+
+    // Socket event listeners
+    const handleNewMessage = (newMessage) => {
+      setMessages((prev) => [...prev, newMessage]);
+    };
+
+    const handleMessageReaction = (data) => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === data.messageId || msg._id === data.messageId
+            ? { ...msg, reactions: data.reactions }
+            : msg,
+        ),
+      );
+    };
+
+    const handleUserTyping = (data) => {
+      if (
+        data.userId !== user.id &&
+        data.channelId === (channel.id || channel._id)
+      ) {
+        setTypingUsers((prev) =>
+          prev.includes(data.username) ? prev : [...prev, data.username],
+        );
+      }
+    };
+
+    const handleUserStoppedTyping = (data) => {
+      if (data.channelId === (channel.id || channel._id)) {
+        setTypingUsers((prev) =>
+          prev.filter((username) => username !== data.username),
+        );
+      }
+    };
+
+    const handleConnectionStatus = (status) => {
+      setSocketConnected(status === "connected");
+    };
+
+    // Register socket listeners
+    socketService.on("new_message", handleNewMessage);
+    socketService.on("message_reaction", handleMessageReaction);
+    socketService.on("user_typing", handleUserTyping);
+    socketService.on("user_stopped_typing", handleUserStoppedTyping);
+    socketService.on("connectionStatusChanged", handleConnectionStatus);
+
+    // Check initial connection status
+    setSocketConnected(socketService.connected);
+
+    // Cleanup
+    return () => {
+      socketService.off("new_message", handleNewMessage);
+      socketService.off("message_reaction", handleMessageReaction);
+      socketService.off("user_typing", handleUserTyping);
+      socketService.off("user_stopped_typing", handleUserStoppedTyping);
+      socketService.off("connectionStatusChanged", handleConnectionStatus);
+      socketService.leaveChannel(channel.id || channel._id);
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [channel, user]);
+
+  // Mock messages fallback
+  const getMockMessages = () => [
+    {
+      id: 1,
+      user: {
+        id: "user1",
+        name: "Community Bot",
+        avatar:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
+        role: "Bot",
+        isOnline: true,
       },
-      {
-        id: 2,
-        user: {
-          id: "user2",
-          name: "Sarah Johnson",
-          avatar:
-            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-          role: "Developer",
-          isOnline: true,
-        },
-        content:
-          "Hey everyone! Just wanted to share this awesome article I found about React performance optimization. Has anyone tried these techniques?",
-        timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-        reactions: [
-          { emoji: "👍", count: 5, users: ["user1"] },
-          { emoji: "🔥", count: 3, users: ["user3"] },
-        ],
-      },
-      {
-        id: 3,
-        user: {
-          id: "user3",
-          name: "Mike Torres",
-          avatar:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-          role: "Senior Dev",
-          isOnline: false,
-        },
-        content:
-          "Sarah that article is fantastic! I've been using some of those techniques in production and saw a 40% performance improvement. Especially the memo() and useMemo() optimizations.",
-        timestamp: new Date(Date.now() - 1000 * 60 * 25), // 25 minutes ago
-        reactions: [{ emoji: "💯", count: 7, users: ["user1", "user2"] }],
-      },
-      {
-        id: 4,
-        user: {
-          id: "user4",
-          name: "Emma Wilson",
-          avatar:
-            "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-          role: "Designer",
-          isOnline: true,
-        },
-        content:
-          "This is super helpful! I'm working on a React project and was wondering about performance. Does anyone have experience with React.lazy() for code splitting?",
-        timestamp: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
-        reactions: [],
-      },
-      {
-        id: 5,
-        user: {
-          id: "user1",
-          name: "Alex Chen",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-          role: "Moderator",
-          isOnline: true,
-        },
-        content:
-          "Emma, React.lazy() is amazing for code splitting! Here's a quick example:\n\n```jsx\nconst LazyComponent = React.lazy(() => import('./Component'));\n\nfunction App() {\n  return (\n    <Suspense fallback={<div>Loading...</div>}>\n      <LazyComponent />\n    </Suspense>\n  );\n}\n```\n\nIt really helps with initial bundle size!",
-        timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
-        reactions: [
-          { emoji: "🙌", count: 6, users: ["user4"] },
-          { emoji: "❤️", count: 4, users: ["user2", "user3"] },
-        ],
-      },
-      {
-        id: 6,
-        user: {
-          id: "user5",
-          name: "David Kim",
-          avatar:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-          role: "Student",
-          isOnline: true,
-        },
-        content:
-          "Thank you Alex! That's exactly what I needed. Quick question - what's the best way to handle error boundaries with lazy loading?",
-        timestamp: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
-        reactions: [],
-      },
-    ];
-    setMessages(mockMessages);
-  }, [channel]);
+      content: `Welcome to #${channel.name}! 🎉 This is where we discuss ${channel.description?.toLowerCase() || "various topics"}. Feel free to ask questions and share your knowledge!`,
+      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      reactions: [
+        { emoji: "👋", count: 12, users: ["user2", "user3"] },
+        { emoji: "🎉", count: 8, users: ["user4"] },
+      ],
+      isPinned: true,
+    },
+  ];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
