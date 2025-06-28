@@ -145,7 +145,7 @@ class FollowService {
   async getFollowSuggestions(limit = 10) {
     try {
       const response = await apiService.get(
-        `/users/suggestions?limit=${limit}`,
+        `/follow/suggestions?limit=${limit}`,
       );
 
       if (response.status === "success") {
