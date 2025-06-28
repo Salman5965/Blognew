@@ -31,6 +31,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import exploreService from "@/services/exploreService";
+import { useExplore } from "@/hooks/useExplore";
 import { Link } from "react-router-dom";
 
 const Explore = () => {
