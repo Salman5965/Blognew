@@ -209,7 +209,7 @@ import { useBlogStore } from "@/features/blogs/blogStore";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { DEBOUNCE_DELAY, ROUTES } from "@/utils/constant";
-import { FollowSuggestions } from "@/components/users/FollowSuggestions";
+
 import {
   Search,
   Filter,
