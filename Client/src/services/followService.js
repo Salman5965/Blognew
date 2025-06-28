@@ -12,12 +12,8 @@ class FollowService {
 
       throw new Error(response.message || "Failed to follow user");
     } catch (error) {
-      // If endpoint doesn't exist, simulate success for better UX
-      console.warn("Follow endpoint not available yet, simulating success");
-      return {
-        following: true,
-        followerCount: Math.floor(Math.random() * 100) + 1,
-      };
+      console.error("Error following user:", error);
+      throw error;
     }
   }
 
@@ -32,12 +28,8 @@ class FollowService {
 
       throw new Error(response.message || "Failed to unfollow user");
     } catch (error) {
-      // If endpoint doesn't exist, simulate success for better UX
-      console.warn("Unfollow endpoint not available yet, simulating success");
-      return {
-        following: false,
-        followerCount: Math.floor(Math.random() * 100) + 1,
-      };
+      console.error("Error unfollowing user:", error);
+      throw error;
     }
   }
 
@@ -118,9 +110,8 @@ class FollowService {
 
       return false;
     } catch (error) {
-      // If endpoint doesn't exist, return random status for demo
-      console.warn("Follow status endpoint not available yet");
-      return Math.random() > 0.7; // 30% chance of already following
+      console.error("Error checking follow status:", error);
+      return false; // Default to not following
     }
   }
 
