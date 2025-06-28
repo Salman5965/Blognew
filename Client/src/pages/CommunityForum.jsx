@@ -13,6 +13,8 @@ import {
   Heart,
   MessageCircle,
   Plus,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +25,7 @@ import { Link } from "react-router-dom";
 import ForumChannelList from "@/components/forum/ForumChannelList";
 import ForumChat from "@/components/forum/ForumChat";
 import ForumWelcome from "@/components/forum/ForumWelcome";
+import { useForumConnection } from "@/hooks/useForumConnection";
 
 const CommunityForum = () => {
   const [selectedChannel, setSelectedChannel] = useState(null);
