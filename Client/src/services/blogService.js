@@ -375,9 +375,14 @@ class BlogService {
       // Handle response that exists but indicates failure
       throw new Error(response?.message || "Blog not found");
     } catch (error) {
+      console.warn(`Error fetching blog by slug "${slug}":`, {
+        message: error.message,
+        status: error.response?.status,
+        isNetworkError: error.isNetworkError,
+      });
+
       // Handle network errors more gracefully
       if (error.isNetworkError || error.message?.includes("Failed to fetch")) {
-        console.warn(`Network error when fetching blog "${slug}":`, error);
         // Return a fallback response structure instead of throwing
         return {
           data: null,
@@ -385,15 +390,34 @@ class BlogService {
           message:
             "Unable to connect to server. Please check your internet connection and try again.",
           isNetworkError: true,
+          errorType: "network",
         };
       }
 
       // Handle 404 or other API errors
       if (error.response?.status === 404) {
-        throw new Error(`Blog with slug "${slug}" not found`);
+        return {
+          data: null,
+          status: "error",
+          message: `Blog with slug "${slug}" not found`,
+          errorType: "not_found",
+        };
       }
 
-      // Re-throw other errors
+      // Handle other API errors gracefully
+      if (error.response) {
+        return {
+          data: null,
+          status: "error",
+          message:
+            error.response.data?.message ||
+            `Server error (${error.response.status})`,
+          errorType: "api",
+          statusCode: error.response.status,
+        };
+      }
+
+      // Re-throw unexpected errors
       throw error;
     }
   }
