@@ -95,6 +95,18 @@ class ApiService {
           }
         }
 
+        // Log detailed error information for debugging
+        if (error.response?.status === 400) {
+          console.error("400 Bad Request Error:", {
+            url: error.config?.url,
+            method: error.config?.method,
+            data: error.config?.data,
+            responseData: error.response?.data,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+          });
+        }
+
         return Promise.reject(error);
       },
     );
