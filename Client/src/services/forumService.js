@@ -5,15 +5,25 @@ class ForumService {
   async getStats() {
     try {
       const response = await api.get("/forum/stats");
-      return response;
+      return {
+        success: true,
+        data: response,
+      };
     } catch (error) {
-      console.error("Error fetching forum stats:", error);
+      if (error.response?.status === 401) {
+        console.warn("Authentication required for forum stats");
+      } else {
+        console.error("Error fetching forum stats:", error);
+      }
       // Return fallback data for better UX
       return {
-        totalMembers: 2847,
-        onlineMembers: 234,
-        totalMessages: 15892,
-        channelsCount: 12,
+        success: false,
+        data: {
+          totalMembers: 2847,
+          onlineMembers: 234,
+          totalMessages: 15892,
+          channelsCount: 12,
+        },
       };
     }
   }
