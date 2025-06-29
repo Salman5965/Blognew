@@ -242,7 +242,7 @@ export const CreateBlog = () => {
     title.trim().length > 0 &&
     content.trim().length > 0 &&
     category &&
-    category.length > 0;
+    category.trim().length > 0;
 
   // Helper function to get category label from slug
   const getCategoryLabel = (categorySlug) => {
@@ -273,7 +273,11 @@ export const CreateBlog = () => {
     if (!data.title?.trim()) errors.push("Title is required");
     if (!data.content?.trim()) errors.push("Content is required");
     if (!data.category?.trim()) errors.push("Category is required");
-    return { canPublish: errors.length === 0, errors };
+    return {
+      isValid: errors.length === 0,
+      canPublish: errors.length === 0,
+      errors,
+    };
   };
 
   // Inline publishing checklist
