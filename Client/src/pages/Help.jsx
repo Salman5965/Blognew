@@ -23,6 +23,10 @@ import {
   Mail,
   Phone,
   Clock,
+  Star,
+  ThumbsUp,
+  Download,
+  Globe,
 } from "lucide-react";
 import HelpChatbot from "@/components/help/HelpChatbot";
 
@@ -31,6 +35,32 @@ const Help = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [expandedFaq, setExpandedFaq] = useState(null);
+
+  const handleQuickAction = (action) => {
+    switch (action) {
+      case "guide":
+        setSelectedCategory("getting-started");
+        setExpandedFaq(1);
+        break;
+      case "videos":
+        window.open("https://www.youtube.com/@writenest", "_blank");
+        break;
+      case "contact":
+        navigate("/contact");
+        break;
+      case "docs":
+        window.open("/api-docs", "_blank");
+        break;
+      case "community":
+        navigate("/community");
+        break;
+      case "status":
+        window.open("https://status.writenest.com", "_blank");
+        break;
+      default:
+        break;
+    }
+  };
 
   const categories = [
     { id: "all", name: "All Topics", icon: HelpCircle, count: 47 },
@@ -44,6 +74,51 @@ const Help = () => {
       name: "Billing & Subscriptions",
       icon: FileText,
       count: 5,
+    },
+  ];
+
+  const quickActions = [
+    {
+      icon: Book,
+      title: "Getting Started Guide",
+      description: "Learn the basics of using our platform",
+      action: "guide",
+      color: "bg-blue-500",
+    },
+    {
+      icon: Video,
+      title: "Video Tutorials",
+      description: "Watch step-by-step video guides",
+      action: "videos",
+      color: "bg-red-500",
+    },
+    {
+      icon: MessageCircle,
+      title: "Contact Support",
+      description: "Get in touch with our support team",
+      action: "contact",
+      color: "bg-green-500",
+    },
+    {
+      icon: FileText,
+      title: "API Documentation",
+      description: "Browse our comprehensive docs",
+      action: "docs",
+      color: "bg-purple-500",
+    },
+    {
+      icon: Globe,
+      title: "Community Forum",
+      description: "Connect with other users",
+      action: "community",
+      color: "bg-orange-500",
+    },
+    {
+      icon: Star,
+      title: "Service Status",
+      description: "Check system status and uptime",
+      action: "status",
+      color: "bg-indigo-500",
     },
   ];
 
@@ -66,14 +141,14 @@ const Help = () => {
       title: "Video Tutorials",
       description: "Watch and learn",
       icon: Video,
-      link: "/help/videos",
+      action: () => handleQuickAction("videos"),
       category: "getting-started",
     },
     {
       title: "Contact Support",
       description: "Get personalized help",
       icon: MessageCircle,
-      link: "/contact",
+      action: () => handleQuickAction("contact"),
       category: "all",
     },
   ];
@@ -89,9 +164,9 @@ const Help = () => {
     {
       id: 2,
       category: "getting-started",
-      question: "Is BlogHub free to use?",
+      question: "Is WriteNest free to use?",
       answer:
-        "Yes! BlogHub offers a free plan that includes basic blogging features, unlimited posts, and community access. We also offer premium plans with advanced features like custom domains, analytics, and priority support.",
+        "Yes! WriteNest offers a free plan that includes basic blogging features, unlimited posts, and community access. We also offer premium plans with advanced features like custom domains, analytics, and priority support.",
     },
     {
       id: 3,
@@ -147,21 +222,21 @@ const Help = () => {
       category: "troubleshooting",
       question: "My blog post isn't showing up in search",
       answer:
-        "New posts may take a few minutes to appear in search results. Make sure your post is published (not in draft), has relevant tags, and contains good SEO practices like descriptive titles and meta descriptions.",
+        "New posts may take a few minutes to appear in search results. Make sure your post is published (not in draft mode) and includes relevant tags. If it's still not appearing after 30 minutes, contact support.",
     },
     {
       id: 11,
       category: "billing",
       question: "How do I upgrade to a premium plan?",
       answer:
-        "To upgrade: 1) Go to your Dashboard, 2) Click 'Upgrade' or visit Billing Settings, 3) Choose your plan, 4) Complete payment. Your premium features will be activated immediately.",
+        "To upgrade: 1) Go to your Account Settings, 2) Click 'Billing & Plans', 3) Choose your preferred plan, 4) Enter payment details, and 5) Confirm upgrade. Your new features will be available immediately.",
     },
     {
       id: 12,
       category: "billing",
       question: "Can I cancel my subscription anytime?",
       answer:
-        "Yes, you can cancel your subscription at any time from the Billing Settings. Your premium features will remain active until the end of your billing period, then your account will revert to the free plan.",
+        "Yes, you can cancel your subscription at any time from your Account Settings > Billing. You'll continue to have premium access until the end of your current billing period.",
     },
   ];
 
@@ -175,69 +250,85 @@ const Help = () => {
     return matchesCategory && matchesSearch;
   });
 
-  const toggleFaq = (faqId) => {
-    setExpandedFaq(expandedFaq === faqId ? null : faqId);
-  };
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  const supportContacts = [
+    {
+      type: "Email Support",
+      value: "support@writenest.com",
+      description: "General inquiries and support",
+      icon: Mail,
+      action: () => window.open("mailto:support@writenest.com", "_blank"),
+    },
+    {
+      type: "Live Chat",
+      value: "Available 24/7",
+      description: "Instant help from our chatbot",
+      icon: MessageCircle,
+      action: () => {}, // Chatbot is already on the page
+    },
+    {
+      type: "Phone Support",
+      value: "+1 (555) 123-4567",
+      description: "Premium users only",
+      icon: Phone,
+      action: () => window.open("tel:+15551234567", "_blank"),
+    },
+  ];
 
   return (
-    <PageWrapper className="py-8">
-      <div className="max-w-6xl mx-auto">
+    <PageWrapper>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <HelpCircle className="h-16 w-16 text-primary" />
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Help <span className="text-primary">Center</span>
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Find answers to common questions, learn how to use BlogHub features,
-            and get the support you need to create amazing content.
+          <HelpCircle className="h-16 w-16 mx-auto mb-4 text-primary" />
+          <h1 className="text-4xl font-bold mb-4">How can we help you?</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Find answers to common questions, browse our documentation, or get
+            in touch with our support team.
           </p>
         </div>
 
-        {/* Search Bar */}
+        {/* Search */}
         <div className="max-w-2xl mx-auto mb-12">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Search for help articles, tutorials, or FAQs..."
+              placeholder="Search for help topics..."
               value={searchQuery}
-              onChange={handleSearch}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 h-14 text-lg"
             />
           </div>
         </div>
 
-        {/* Quick Links */}
+        {/* Quick Actions */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-center">Quick Start</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickLinks.map((link, index) => {
-              const Icon = link.icon;
+          <h2 className="text-2xl font-bold mb-6">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {quickActions.map((action, index) => {
+              const Icon = action.icon;
               return (
                 <Card
                   key={index}
                   className="hover:shadow-lg transition-shadow cursor-pointer group"
+                  onClick={() => handleQuickAction(action.action)}
                 >
-                  <CardContent className="p-6 text-center">
-                    <div className="mb-4">
-                      <div className="inline-flex p-3 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                        <Icon className="h-6 w-6 text-primary" />
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div
+                        className={`p-3 rounded-lg ${action.color} group-hover:scale-110 transition-transform`}
+                      >
+                        <Icon className="h-6 w-6 text-white" />
                       </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+                          {action.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {action.description}
+                        </p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
-                    <h3 className="font-semibold mb-2">{link.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {link.description}
-                    </p>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Learn More
-                      <ExternalLink className="h-3 w-3 ml-2" />
-                    </Button>
                   </CardContent>
                 </Card>
               );
@@ -246,34 +337,40 @@ const Help = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Categories Sidebar */}
+          {/* Categories */}
           <div className="lg:col-span-1">
             <Card>
               <CardHeader>
-                <CardTitle>Browse by Category</CardTitle>
+                <CardTitle className="text-lg">Categories</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="space-y-1">
                   {categories.map((category) => {
                     const Icon = category.icon;
-                    const isSelected = selectedCategory === category.id;
                     return (
                       <button
                         key={category.id}
                         onClick={() => setSelectedCategory(category.id)}
-                        className={`w-full flex items-center justify-between p-3 text-left hover:bg-muted/50 transition-colors ${
-                          isSelected
-                            ? "bg-primary/10 text-primary border-r-2 border-primary"
-                            : ""
+                        className={`w-full flex items-center justify-between p-3 text-left transition-colors ${
+                          selectedCategory === category.id
+                            ? "bg-primary text-primary-foreground"
+                            : "hover:bg-muted"
                         }`}
                       >
-                        <div className="flex items-center">
-                          <Icon className="h-4 w-4 mr-3" />
+                        <div className="flex items-center gap-3">
+                          <Icon className="h-4 w-4" />
                           <span className="text-sm font-medium">
                             {category.name}
                           </span>
                         </div>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge
+                          variant={
+                            selectedCategory === category.id
+                              ? "secondary"
+                              : "outline"
+                          }
+                          className="text-xs"
+                        >
                           {category.count}
                         </Badge>
                       </button>
@@ -286,172 +383,146 @@ const Help = () => {
             {/* Contact Support */}
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle className="text-lg">Need More Help?</CardTitle>
+                <CardTitle className="text-lg">Contact Support</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-medium">Email Support</p>
-                    <p className="text-sm text-muted-foreground">
-                      support@bloghub.com
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <MessageCircle className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-medium">Live Chat</p>
-                    <p className="text-sm text-muted-foreground">
-                      Available 24/7
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Clock className="h-5 w-5 text-primary" />
-                  <div>
-                    <p className="font-medium">Response Time</p>
-                    <p className="text-sm text-muted-foreground">
-                      Within 24 hours
-                    </p>
-                  </div>
-                </div>
-                <Button className="w-full mt-4" asChild>
-                  <a href="/contact">Contact Support</a>
-                </Button>
+                {supportContacts.map((contact, index) => {
+                  const Icon = contact.icon;
+                  return (
+                    <Button
+                      key={index}
+                      variant="ghost"
+                      className="w-full justify-start h-auto p-3"
+                      onClick={contact.action}
+                    >
+                      <div className="flex items-start gap-3">
+                        <Icon className="h-5 w-5 mt-0.5 text-primary" />
+                        <div className="text-left">
+                          <div className="font-medium text-sm">
+                            {contact.type}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {contact.value}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {contact.description}
+                          </div>
+                        </div>
+                      </div>
+                    </Button>
+                  );
+                })}
               </CardContent>
             </Card>
           </div>
 
-          {/* FAQ Content */}
+          {/* FAQs */}
           <div className="lg:col-span-3">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold">
-                Frequently Asked Questions
-                {searchQuery && (
-                  <span className="text-lg text-muted-foreground ml-2">
-                    ({filteredFaqs.length} results)
-                  </span>
-                )}
-              </h2>
-              {searchQuery && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedCategory("all");
-                  }}
-                >
-                  Clear Search
-                </Button>
-              )}
-            </div>
-
-            {filteredFaqs.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <HelpCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">
-                    No results found
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    Try adjusting your search terms or browse a different
-                    category.
-                  </p>
-                  <Button variant="outline" onClick={() => setSearchQuery("")}>
-                    Clear Search
-                  </Button>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {filteredFaqs.map((faq) => (
-                  <Card key={faq.id}>
-                    <CardContent className="p-0">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  Frequently Asked Questions
+                  <Badge variant="outline" className="ml-2">
+                    {filteredFaqs.length} results
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {filteredFaqs.map((faq) => (
+                    <div key={faq.id} className="border rounded-lg">
                       <button
-                        onClick={() => toggleFaq(faq.id)}
-                        className="w-full p-6 text-left hover:bg-muted/50 transition-colors"
+                        onClick={() =>
+                          setExpandedFaq(expandedFaq === faq.id ? null : faq.id)
+                        }
+                        className="w-full flex items-center justify-between p-4 text-left hover:bg-muted transition-colors"
                       >
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold pr-4">{faq.question}</h3>
-                          {expandedFaq === faq.id ? (
-                            <ChevronDown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          ) : (
-                            <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          )}
-                        </div>
+                        <span className="font-medium">{faq.question}</span>
+                        {expandedFaq === faq.id ? (
+                          <ChevronDown className="h-4 w-4" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4" />
+                        )}
                       </button>
                       {expandedFaq === faq.id && (
-                        <div className="px-6 pb-6">
-                          <div className="pt-4 border-t">
-                            <p className="text-muted-foreground leading-relaxed">
-                              {faq.answer}
-                            </p>
+                        <div className="p-4 pt-0 border-t">
+                          <p className="text-muted-foreground leading-relaxed">
+                            {faq.answer}
+                          </p>
+                          <div className="flex items-center gap-2 mt-4">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-xs"
+                            >
+                              <ThumbsUp className="h-3 w-3 mr-1" />
+                              Helpful
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-xs"
+                            >
+                              <MessageCircle className="h-3 w-3 mr-1" />
+                              Need more help?
+                            </Button>
                           </div>
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+                    </div>
+                  ))}
+                </div>
 
-        {/* Additional Resources */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold mb-6 text-center">
-            Additional Resources
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <Book className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">User Guide</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Comprehensive documentation covering all BlogHub features
-                </p>
-                <Button variant="outline" size="sm">
-                  Read Guide
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <Video className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Video Tutorials</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Step-by-step video guides for visual learners
-                </p>
-                <Button variant="outline" size="sm">
-                  Watch Videos
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <MessageCircle className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Community Forum</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Connect with other users and get community support
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/community")}
-                >
-                  Join Forum
-                </Button>
+                {filteredFaqs.length === 0 && (
+                  <div className="text-center py-12">
+                    <Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="font-semibold mb-2">No results found</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Try adjusting your search or browse different categories
+                    </p>
+                    <Button
+                      onClick={() => {
+                        setSearchQuery("");
+                        setSelectedCategory("all");
+                      }}
+                    >
+                      Clear search
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
         </div>
+
+        {/* Still need help section */}
+        <Card className="mt-12 bg-gradient-to-r from-primary/5 to-secondary/5">
+          <CardContent className="p-8 text-center">
+            <MessageCircle className="h-12 w-12 mx-auto mb-4 text-primary" />
+            <h3 className="text-xl font-bold mb-2">Still need help?</h3>
+            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+              Can't find what you're looking for? Our support team is here to
+              help you get the most out of WriteNest.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={() => handleQuickAction("contact")} size="lg">
+                <Mail className="h-4 w-4 mr-2" />
+                Contact Support
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleQuickAction("community")}
+                size="lg"
+              >
+                <Globe className="h-4 w-4 mr-2" />
+                Join Community
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Help Chatbot */}
+      {/* Help Chatbot - positioned absolutely */}
       <HelpChatbot />
     </PageWrapper>
   );
