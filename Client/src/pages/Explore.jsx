@@ -396,10 +396,20 @@ const Explore = () => {
                             <span className="flex items-center space-x-1">
                               <Clock className="h-3 w-3" />
                               <span>
-                                {formatDistanceToNow(
-                                  new Date(content.createdAt),
-                                  { addSuffix: true },
-                                )}
+                                {(() => {
+                                  try {
+                                    const date = content.createdAt
+                                      ? new Date(content.createdAt)
+                                      : new Date();
+                                    return isNaN(date.getTime())
+                                      ? "Recently"
+                                      : formatDistanceToNow(date, {
+                                          addSuffix: true,
+                                        });
+                                  } catch (error) {
+                                    return "Recently";
+                                  }
+                                })()}
                               </span>
                             </span>
                           </div>
