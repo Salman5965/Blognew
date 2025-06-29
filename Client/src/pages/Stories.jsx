@@ -62,7 +62,7 @@ const Stories = () => {
       await storiesService.likeStory(storyId);
       setStories((prev) =>
         prev.map((story) =>
-          story.id === storyId
+          (story.id || story._id) === storyId
             ? { ...story, likes: story.likes + 1, isLiked: !story.isLiked }
             : story,
         ),
