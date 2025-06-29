@@ -214,16 +214,15 @@ export const Navbar = () => {
                       <MessageCircle className="mr-2 h-4 w-4" />
                       <span>Messages</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/community")}>
-                      <Users className="mr-2 h-4 w-4" />
-                      <span>Community</span>
-                    </DropdownMenuItem>
-                    Log out
+                  <DropdownMenuItem onClick={() => navigate("/community")}>
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Community</span>
                   </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-          ) : (
-            <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
               <Button variant="ghost" asChild>
                 <Link to={ROUTES.LOGIN}>Sign In</Link>
               </Button>
