@@ -159,23 +159,13 @@ const useNotificationStore = create((set, get) => ({
 
     try {
       const result = await notificationService.getPreferences();
-      if (result.success) {
-        set({
-          preferences: result.data,
-          isPreferencesLoading: false,
-        });
-      } else {
-        // Use default preferences on failure
-        set({
-          preferences: notificationService.getDefaultPreferences(),
-          isPreferencesLoading: false,
-        });
-      }
+      // Always use the result data since the service handles errors internally
+      set({
+        preferences: result.data,
+        isPreferencesLoading: false,
+      });
     } catch (error) {
-      // Silently handle 404s and use defaults
-      if (error.response?.status !== 404) {
-        console.error("Error fetching preferences:", error);
-      }
+      // This should rarely happen since the service handles errors
       set({
         preferences: notificationService.getDefaultPreferences(),
         isPreferencesLoading: false,
