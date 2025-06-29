@@ -17,19 +17,21 @@ import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { ROUTES, DEBOUNCE_DELAY } from "@/utils/constant";
 import {
   Search,
-  User,
+  Bell,
   Settings,
+  User,
   LogOut,
-  Plus,
-  BookOpen,
   Sun,
   Moon,
-  Monitor,
-  HelpCircle,
+  Menu,
+  X,
+  Plus,
+  Edit3,
+  BarChart3,
+  FileText,
+  MessageCircle,
+  Users,
 } from "lucide-react";
-import { useBlogStore } from "@/features/blogs/blogStore";
-import { ChatButton } from "@/components/chat/ChatButton";
-import { NotificationButton } from "@/components/notifications";
 
 export const Navbar = () => {
   const navigate = useNavigate();
@@ -201,10 +203,20 @@ export const Navbar = () => {
                       <HelpCircle className="mr-2 h-4 w-4" />
                       Help
                     </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
+                    <DropdownMenuItem
+                      onClick={() => navigate("/notifications")}
+                    >
+                      <Bell className="mr-2 h-4 w-4" />
+                      <span>Notifications</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/messages")}>
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      <span>Messages</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/community")}>
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Community</span>
+                    </DropdownMenuItem>
                     Log out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
