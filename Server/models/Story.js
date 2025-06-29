@@ -13,6 +13,10 @@ const storySchema = new mongoose.Schema(
       required: [true, "Story content is required"],
       minlength: [10, "Content must be at least 10 characters"],
     },
+    excerpt: {
+      type: String,
+      maxlength: [300, "Excerpt cannot exceed 300 characters"],
+    },
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
