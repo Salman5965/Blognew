@@ -47,8 +47,8 @@ const Notifications = () => {
     return <Navigate to="/auth/signin" replace />;
   }
 
-  // Filter notifications
-  const filteredNotifications = notifications.filter((notification) => {
+  // Filter notifications - ensure notifications is an array
+  const filteredNotifications = (notifications || []).filter((notification) => {
     const matchesReadFilter =
       filter === "all" ||
       (filter === "unread" && !notification.isRead) ||

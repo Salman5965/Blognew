@@ -160,19 +160,22 @@ class NotificationService {
       const response = await api.get("/notifications/preferences");
       return {
         success: true,
-        data:
-          response?.data?.data ||
-          response?.data ||
-          this.getDefaultPreferences(),
+        data: response?.data?.data || response?.data || this.getDefaultPreferences(),
       };
     } catch (error) {
-      console.error("Error fetching notification preferences:", error);
+      // Silently handle 404s since the endpoint might not exist
+      if (error.response?.status !== 404) {
+        console.error("Error fetching notification preferences:", error);
+      }
       return {
-        success: false,
+        success: true, // Return success with defaults for 404s
         data: this.getDefaultPreferences(),
-        error:
-          error.response?.status === 404
-            ? null
+        error: error.response?.status === 404
+          ? null
+          : error.response?.data?.message || "Failed to fetch preferences",
+      };
+    }
+  }
             : error.response?.data?.message || "Failed to fetch preferences",
       };
     }

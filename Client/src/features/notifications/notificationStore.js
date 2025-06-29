@@ -2,19 +2,19 @@ import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import notificationService from "../../services/notificationService";
 
-const useNotificationStore = create(
-  subscribeWithSelector((set, get) => ({
-    // State
-    notifications: [],
-    unreadCount: 0,
-    isLoading: false,
-    error: null,
-    pagination: {
-      currentPage: 1,
-      totalPages: 1,
-      totalNotifications: 0,
-      hasNext: false,
-      hasPrev: false,
+const useNotificationStore = create((set, get) => ({
+  // State
+  notifications: [],
+  unreadCount: 0,
+  isLoading: false,
+  error: null,
+  pagination: {
+    currentPage: 1,
+    totalPages: 1,
+    hasNext: false,
+    hasPrev: false,
+    totalCount: 0,
+  },
     },
     preferences: null,
     isPreferencesLoading: false,
@@ -38,19 +38,21 @@ const useNotificationStore = create(
         );
 
         if (result.success) {
+          const newNotifications = result.data.notifications || [];
           set((state) => ({
             notifications: append
-              ? [...state.notifications, ...result.data]
-              : result.data,
+              ? [...(state.notifications || []), ...newNotifications]
+              : newNotifications,
             pagination: result.pagination,
             isLoading: false,
           }));
         } else {
           set({
-            notifications: append ? get().notifications : result.data,
-            pagination: result.pagination,
-            error: result.error,
+            notifications: [],
             isLoading: false,
+            error: result.error || "Failed to fetch notifications"
+          });
+        }
           });
         }
       } catch (error) {

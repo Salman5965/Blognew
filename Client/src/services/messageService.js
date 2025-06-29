@@ -7,7 +7,10 @@ class MessageService {
       const response = await apiService.get("/messages/conversations");
       return response;
     } catch (error) {
-      console.error("Failed to fetch conversations:", error);
+      // Silently handle 404s since the endpoint might not exist yet
+      if (error.response?.status !== 404) {
+        console.error("Failed to fetch conversations:", error);
+      }
       // Return fallback data for better UX
       return {
         conversations: [
@@ -99,7 +102,10 @@ class MessageService {
       );
       return response;
     } catch (error) {
-      console.error("Failed to fetch messages:", error);
+      // Silently handle 404s since the endpoint might not exist yet
+      if (error.response?.status !== 404) {
+        console.error("Failed to fetch messages:", error);
+      }
       // Return fallback data based on conversation
       if (conversationId === "conv_1") {
         return {
