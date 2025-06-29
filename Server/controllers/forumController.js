@@ -63,8 +63,18 @@ export const getChannelById = async (req, res) => {
   try {
     const { channelId } = req.params;
 
-    const channel = await ForumChannel.findById(channelId)
-      .populate("createdBy", "username firstName lastName avatar")
+    // Find channel by ObjectId or name
+    let channel;
+    if (mongoose.Types.ObjectId.isValid(channelId)) {
+      channel = await ForumChannel.findById(channelId);
+    } else {
+      channel = await ForumChannel.findOne({ name: channelId });
+    }
+
+    if (channel) {
+      channel = await ForumChannel.findById(channel._id)
+        .populate("createdBy", "username firstName lastName avatar");
+    }
       .populate("moderators", "username firstName lastName avatar");
 
     if (!channel) {
@@ -216,8 +226,14 @@ export const sendMessage = async (req, res) => {
     const { channelId } = req.params;
     const { content, parentMessage, replyTo } = req.body;
 
-    // Verify channel exists
-    const channel = await ForumChannel.findById(channelId);
+    // Verify channel exists - try to find by ObjectId first, then by name
+    let channel;
+    if (mongoose.Types.ObjectId.isValid(channelId)) {
+      channel = await ForumChannel.findById(channelId);
+    } else {
+      channel = await ForumChannel.findOne({ name: channelId });
+    }
+
     if (!channel) {
       return res.status(404).json({
         status: "error",
@@ -228,7 +244,7 @@ export const sendMessage = async (req, res) => {
     const message = new ForumMessage({
       content,
       author: req.user.id,
-      channel: channelId,
+      channel: channel._id,
       parentMessage: parentMessage || null,
       replyTo: replyTo || null,
     });
