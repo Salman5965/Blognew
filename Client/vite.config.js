@@ -1,3 +1,27 @@
+<<<<<<< HEAD
+=======
+// import { defineConfig } from "vite";
+// import react from "@vitejs/plugin-react";
+// import path from "path";
+
+// export default defineConfig({
+//   plugins: [react()],
+//   resolve: {
+//     alias: {
+//       "@": path.resolve(__dirname, "./src"),
+//     },
+//   },
+//   server: {
+//     proxy: {
+//       "/api": {
+//         target: "http://localhost:3001",
+//         changeOrigin: true,
+//         secure: false,
+//       },
+//     },
+//   },
+// });
+>>>>>>> 0263ede (Fix proxy port in Vite config to match server port)
 
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
@@ -5,10 +29,10 @@ import path from "path";
 
 export default defineConfig({
   plugins: [
-  react({
-    jsxImportSource: "react", // for @vitejs/plugin-react-swc
-  }),
-],
+    react({
+      jsxImportSource: "react", // for @vitejs/plugin-react-swc
+    }),
+  ],
 
   resolve: {
     alias: {
@@ -18,7 +42,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:3001",
+        target: "http://localhost:3002",
         changeOrigin: true,
         secure: false,
       },
