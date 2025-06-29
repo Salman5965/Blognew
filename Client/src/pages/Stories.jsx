@@ -65,7 +65,24 @@ const Stories = () => {
       setStories((prev) =>
         prev.map((story) =>
           (story.id || story._id) === storyId
-            ? { ...story, likes: story.likes + 1, isLiked: !story.isLiked }
+            ? {
+                ...story,
+                likes: Array.isArray(story.likes)
+                  ? story.isLiked
+                    ? story.likes.length - 1
+                    : story.likes.length + 1
+                  : story.isLiked
+                    ? (story.likes || 0) - 1
+                    : (story.likes || 0) + 1,
+                likeCount: Array.isArray(story.likes)
+                  ? story.isLiked
+                    ? story.likes.length - 1
+                    : story.likes.length + 1
+                  : story.isLiked
+                    ? (story.likeCount || 0) - 1
+                    : (story.likeCount || 0) + 1,
+                isLiked: !story.isLiked,
+              }
             : story,
         ),
       );
