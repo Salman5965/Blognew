@@ -77,7 +77,7 @@ export const useExplore = (options = {}) => {
             : prevData.recommendedUsers,
         trendingTopics:
           topicsResult.status === "fulfilled"
-            ? topicsResult.value || []
+            ? topicsResult.value.topics || []
             : prevData.trendingTopics,
         exploreStats:
           statsResult.status === "fulfilled"
