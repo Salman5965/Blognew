@@ -66,6 +66,26 @@ class StoriesService {
     }
   }
 
+  // Get featured stories (alias for popular stories for now)
+  async getFeaturedStories(limit = 10) {
+    try {
+      // For now, use popular stories as featured stories
+      // This could be a separate endpoint in the future
+      const response = await apiService.get(`/stories/popular?limit=${limit}`);
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to fetch featured stories");
+    } catch (error) {
+      console.error("Failed to fetch featured stories:", error);
+      return {
+        stories: [],
+      };
+    }
+  }
+
   // Get my stories
   async getMyStories(filters = {}) {
     try {
