@@ -255,7 +255,7 @@ class ExploreService {
     return {
       users: [
         {
-          _id: "user1",
+          _id: "507f1f77bcf86cd799439021",
           username: "code_ninja",
           firstName: "Kevin",
           lastName: "Wong",
@@ -270,7 +270,7 @@ class ExploreService {
           mutualConnections: 5,
         },
         {
-          _id: "user2",
+          _id: "507f1f77bcf86cd799439022",
           username: "data_scientist",
           firstName: "Emma",
           lastName: "Rodriguez",
