@@ -376,6 +376,26 @@ const App = () => (
                     {/* Daily Drip */}
                     <Route path="/daily-drip" element={<DailyDrip />} />
 
+                    {/* Story creation - protected */}
+                    <Route
+                      path="/stories/create"
+                      element={
+                        <PrivateRoute>
+                          <CreateStory />
+                        </PrivateRoute>
+                      }
+                    />
+
+                    {/* Messages - protected */}
+                    <Route
+                      path="/messages"
+                      element={
+                        <PrivateRoute>
+                          <Messages />
+                        </PrivateRoute>
+                      }
+                    />
+
                     {/* Catch-all route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
