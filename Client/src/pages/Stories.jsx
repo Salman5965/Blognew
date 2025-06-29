@@ -172,36 +172,44 @@ const Stories = () => {
 
     // If all copy methods failed, show manual copy option
     if (!copySuccess) {
+      // Create a temporary modal-like element for manual copying
+      const copyModal = document.createElement("div");
+      copyModal.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border: 2px solid #007bff;
+        border-radius: 8px;
+        padding: 20px;
+        z-index: 10000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 400px;
+        word-break: break-all;
+      `;
+
+      copyModal.innerHTML = `
+        <div style="margin-bottom: 10px; font-weight: bold;">Copy this link to share:</div>
+        <input type="text" value="${shareUrl}" readonly style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 10px;" onclick="this.select()">
+        <button onclick="this.parentElement.remove()" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">Close</button>
+      `;
+
+      document.body.appendChild(copyModal);
+
+      // Auto-remove after 15 seconds
+      setTimeout(() => {
+        if (document.body.contains(copyModal)) {
+          document.body.removeChild(copyModal);
+        }
+      }, 15000);
+
+      // Also show a toast
       toast({
         title: "Copy link manually",
-        description: shareUrl,
-        duration: 10000,
-        action: {
-          label: "Select All",
-          onClick: () => {
-            // Create a temporary text area for easy selection
-            const tempTextArea = document.createElement("textarea");
-            tempTextArea.value = shareUrl;
-            tempTextArea.style.position = "fixed";
-            tempTextArea.style.left = "50%";
-            tempTextArea.style.top = "50%";
-            tempTextArea.style.transform = "translate(-50%, -50%)";
-            tempTextArea.style.zIndex = "9999";
-            tempTextArea.style.padding = "10px";
-            tempTextArea.style.border = "2px solid #007bff";
-            tempTextArea.style.borderRadius = "4px";
-            document.body.appendChild(tempTextArea);
-            tempTextArea.focus();
-            tempTextArea.select();
-
-            // Remove after 5 seconds
-            setTimeout(() => {
-              if (document.body.contains(tempTextArea)) {
-                document.body.removeChild(tempTextArea);
-              }
-            }, 5000);
-          },
-        },
+        description:
+          "Clipboard access is restricted. Use the popup to copy the link.",
+        duration: 5000,
       });
     }
   };
