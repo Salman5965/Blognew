@@ -142,7 +142,13 @@ class StoriesService {
           status: error.response.status,
           statusText: error.response.statusText,
           data: error.response.data,
+          headers: error.response.headers,
         });
+
+        // If it's a validation error, show the specific validation messages
+        if (error.response.status === 400 && error.response.data?.errors) {
+          console.error("Validation errors:", error.response.data.errors);
+        }
       }
 
       throw error;

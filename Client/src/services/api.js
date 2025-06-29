@@ -121,7 +121,7 @@ class ApiService {
           console.error("400 Bad Request Error:", {
             url: error.config?.url,
             method: error.config?.method,
-            data: error.config?.data,
+            data: JSON.parse(error.config?.data || "{}"),
             responseData: error.response?.data,
             status: error.response?.status,
             statusText: error.response?.statusText,
