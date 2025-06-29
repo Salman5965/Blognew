@@ -165,12 +165,41 @@ class NotificationService {
           hasNext: false,
           hasPrev: false,
         },
-        error:
-          error.response?.status === 404
-            ? null
-            : error.response?.data?.message || "Failed to fetch notifications",
+        error: error.response?.data?.message || "Failed to fetch preferences",
       };
     }
+  }
+
+  getDefaultPreferences() {
+    return {
+      email: {
+        likes: true,
+        comments: true,
+        follows: true,
+        mentions: true,
+        newsletters: false,
+        promotions: false,
+      },
+      push: {
+        likes: false,
+        comments: true,
+        follows: true,
+        mentions: true,
+        announcements: false,
+      },
+      inApp: {
+        likes: true,
+        comments: true,
+        follows: true,
+        mentions: true,
+        system: true,
+      },
+    };
+  }
+}
+
+const notificationService = new NotificationService();
+export default notificationService;
   }
           firstName: "John",
           lastName: "Doe",
