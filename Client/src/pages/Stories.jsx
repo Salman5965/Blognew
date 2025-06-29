@@ -236,7 +236,9 @@ const Stories = () => {
                               </AvatarFallback>
                             </Avatar>
                             <span className="text-sm text-muted-foreground">
-                              {story.author.name}
+                              {story.author?.name ||
+                                story.author?.username ||
+                                "Unknown Author"}
                             </span>
                           </div>
                           <div className="flex items-center gap-3 text-sm text-muted-foreground">
@@ -361,7 +363,9 @@ const Stories = () => {
                                 </AvatarFallback>
                               </Avatar>
                               <span className="text-sm text-muted-foreground">
-                                {story.author.name}
+                                {story.author?.name ||
+                                  story.author?.username ||
+                                  "Unknown Author"}
                               </span>
                               {story.author.isVerified && (
                                 <Badge variant="secondary" className="text-xs">
