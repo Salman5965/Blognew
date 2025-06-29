@@ -179,7 +179,11 @@ class BlogService {
   }
 
   async createBlog(blogData) {
+    console.log("BlogService: Creating blog with data:", blogData);
+
     const response = await apiService.post("/blogs", blogData);
+
+    console.log("BlogService: Response from server:", response);
 
     if (response.status === "success") {
       return response.data;
