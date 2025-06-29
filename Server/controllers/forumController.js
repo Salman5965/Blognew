@@ -166,7 +166,7 @@ export const getChannelMessages = async (req, res) => {
       });
     }
 
-    let query = { channel: channelId, isDeleted: false };
+    let query = { channel: channel._id, isDeleted: false };
 
     // For pagination with "before" cursor
     if (before) {
