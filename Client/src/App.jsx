@@ -365,6 +365,9 @@ const App = () => (
                       }
                     />
 
+                    {/* Daily Drip */}
+                    <Route path="/daily-drip" element={<DailyDrip />} />
+
                     {/* Catch-all route */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
