@@ -146,12 +146,23 @@ export const getStoryById = async (req, res, next) => {
     // Add user-specific like status
     const storyWithLikeStatus = {
       ...story.toObject(),
+      author: story.author
+        ? {
+            ...story.author.toObject(),
+            name:
+              `${story.author.firstName || ""} ${story.author.lastName || ""}`.trim() ||
+              story.author.username,
+            isVerified: false,
+          }
+        : null,
       isLiked: req.user
         ? story.likes.some(
             (like) => like.user.toString() === req.user.id.toString(),
           )
         : false,
       likeCount: story.likes ? story.likes.length : 0,
+      likes: story.likes ? story.likes.length : 0,
+      comments: 0,
     };
 
     res.status(200).json({
