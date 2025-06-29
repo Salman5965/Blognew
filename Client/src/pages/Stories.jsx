@@ -29,8 +29,7 @@ import storiesService from "@/services/storiesService";
 const Stories = () => {
   const [stories, setStories] = useState([]);
   const [featuredStories, setFeaturedStories] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [playingAudio, setPlayingAudio] = useState(null);
@@ -39,23 +38,18 @@ const Stories = () => {
 
   useEffect(() => {
     loadStories();
-  }, [selectedCategory, searchQuery]);
+  }, [searchQuery]);
 
   const loadStories = async () => {
     try {
       setIsLoading(true);
-      const [storiesData, featuredData, categoriesData] = await Promise.all([
-        storiesService.getStories({
-          category: selectedCategory,
-          search: searchQuery,
-        }),
+      const [storiesData, featuredData] = await Promise.all([
+        storiesService.getStories({ search: searchQuery }),
         storiesService.getFeaturedStories(),
-        storiesService.getCategories(),
       ]);
 
       setStories(storiesData.stories || []);
       setFeaturedStories(featuredData.stories || []);
-      setCategories(categoriesData.categories || []);
     } catch (error) {
       console.error("Failed to load stories:", error);
     } finally {
@@ -177,29 +171,6 @@ const Stories = () => {
                 Share Your Story
               </Button>
             </div>
-
-            {/* Category Filters */}
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button
-                variant={selectedCategory === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory("all")}
-              >
-                All Stories
-              </Button>
-              {categories.map((category) => (
-                <Button
-                  key={category.id}
-                  variant={
-                    selectedCategory === category.id ? "default" : "outline"
-                  }
-                  size="sm"
-                  onClick={() => setSelectedCategory(category.id)}
-                >
-                  {category.name}
-                </Button>
-              ))}
-            </div>
           </div>
         </div>
       </div>
@@ -245,9 +216,6 @@ const Stories = () => {
                         )}
                       </div>
                       <CardContent className="p-6">
-                        <Badge variant="secondary" className="mb-2">
-                          {story.category}
-                        </Badge>
                         <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
                           {story.title}
                         </h3>
@@ -354,9 +322,6 @@ const Stories = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">
-                                {story.category}
-                              </Badge>
                               {story.location && (
                                 <span className="flex items-center gap-1 text-xs text-muted-foreground">
                                   <MapPin className="h-3 w-3" />
@@ -471,27 +436,27 @@ const Stories = () => {
               </CardContent>
             </Card>
 
-            {/* Popular Categories */}
+            {/* Popular Topics */}
             <Card>
               <CardHeader>
-                <h3 className="font-semibold">Popular Categories</h3>
+                <h3 className="font-semibold">Popular Topics</h3>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   {[
-                    { name: "Overcoming Challenges", count: 342 },
-                    { name: "Family & Relationships", count: 289 },
-                    { name: "Career Journey", count: 234 },
-                    { name: "Health & Wellness", count: 198 },
-                    { name: "Travel & Adventure", count: 167 },
-                  ].map((category, index) => (
+                    { name: "Personal Growth", count: 342 },
+                    { name: "Life Lessons", count: 289 },
+                    { name: "Inspirational", count: 234 },
+                    { name: "Real Experiences", count: 198 },
+                    { name: "Life Stories", count: 167 },
+                  ].map((topic, index) => (
                     <div
                       key={index}
                       className="flex justify-between items-center"
                     >
-                      <span className="text-sm">{category.name}</span>
+                      <span className="text-sm">{topic.name}</span>
                       <Badge variant="secondary" className="text-xs">
-                        {category.count}
+                        {topic.count}
                       </Badge>
                     </div>
                   ))}

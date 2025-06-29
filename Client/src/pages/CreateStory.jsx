@@ -38,16 +38,13 @@ const CreateStory = () => {
     title: "",
     content: "",
     excerpt: "",
-    category: "",
     location: "",
     coverImage: null,
     audioFile: null,
-    tags: [],
     isPublic: true,
     allowComments: true,
   });
-  const [categories, setCategories] = useState([]);
-  const [tagInput, setTagInput] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isPreview, setIsPreview] = useState(false);
@@ -60,19 +57,6 @@ const CreateStory = () => {
   const { user } = useAuthContext();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  useEffect(() => {
-    loadCategories();
-  }, []);
-
-  const loadCategories = async () => {
-    try {
-      const response = await storiesService.getCategories();
-      setCategories(response.categories || []);
-    } catch (error) {
-      console.error("Failed to load categories:", error);
-    }
-  };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -164,23 +148,6 @@ const CreateStory = () => {
     }
   };
 
-  const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData((prev) => ({
-        ...prev,
-        tags: [...prev.tags, tagInput.trim()],
-      }));
-      setTagInput("");
-    }
-  };
-
-  const removeTag = (tagToRemove) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: prev.tags.filter((tag) => tag !== tagToRemove),
-    }));
-  };
-
   const validateForm = () => {
     const newErrors = {};
 
@@ -194,10 +161,6 @@ const CreateStory = () => {
       newErrors.content = "Story content is required";
     } else if (formData.content.length < 100) {
       newErrors.content = "Story must be at least 100 characters";
-    }
-
-    if (!formData.category) {
-      newErrors.category = "Please select a category";
     }
 
     if (!formData.excerpt.trim()) {
@@ -326,9 +289,6 @@ const CreateStory = () => {
               )}
 
               <div className="flex items-center gap-2 mb-4">
-                {formData.category && (
-                  <Badge variant="secondary">{formData.category}</Badge>
-                )}
                 {formData.location && (
                   <span className="flex items-center gap-1 text-sm text-muted-foreground">
                     <MapPin className="h-3 w-3" />
@@ -365,18 +325,6 @@ const CreateStory = () => {
                   </p>
                 ))}
               </div>
-
-              {formData.tags.length > 0 && (
-                <div className="mt-8 pt-6 border-t">
-                  <div className="flex flex-wrap gap-2">
-                    {formData.tags.map((tag, index) => (
-                      <Badge key={index} variant="outline">
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         ) : (
@@ -545,42 +493,12 @@ const CreateStory = () => {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Category */}
+              {/* Story Details */}
               <Card>
                 <CardHeader>
                   <h3 className="font-semibold">Story Details</h3>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Category *
-                    </label>
-                    <Select
-                      value={formData.category}
-                      onValueChange={(value) =>
-                        handleInputChange("category", value)
-                      }
-                    >
-                      <SelectTrigger
-                        className={errors.category ? "border-destructive" : ""}
-                      >
-                        <SelectValue placeholder="Choose a category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category.id} value={category.name}>
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {errors.category && (
-                      <p className="text-sm text-destructive mt-1">
-                        {errors.category}
-                      </p>
-                    )}
-                  </div>
-
+                <CardContent>
                   <div>
                     <label className="block text-sm font-medium mb-2">
                       Location (Optional)
@@ -592,50 +510,6 @@ const CreateStory = () => {
                         handleInputChange("location", e.target.value)
                       }
                     />
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tags */}
-              <Card>
-                <CardHeader>
-                  <h3 className="font-semibold">Tags</h3>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Add a tag"
-                        value={tagInput}
-                        onChange={(e) => setTagInput(e.target.value)}
-                        onKeyPress={(e) =>
-                          e.key === "Enter" && (e.preventDefault(), addTag())
-                        }
-                      />
-                      <Button size="sm" onClick={addTag}>
-                        <Tag className="h-4 w-4" />
-                      </Button>
-                    </div>
-
-                    {formData.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {formData.tags.map((tag, index) => (
-                          <Badge
-                            key={index}
-                            variant="secondary"
-                            className="flex items-center gap-1"
-                          >
-                            #{tag}
-                            <button
-                              onClick={() => removeTag(tag)}
-                              className="ml-1 hover:text-destructive"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </CardContent>
               </Card>
