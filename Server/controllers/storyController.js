@@ -63,12 +63,23 @@ export const getStories = async (req, res, next) => {
     // Add user-specific like status if user is authenticated
     const storiesWithLikeStatus = stories.map((story) => ({
       ...story,
+      author: story.author
+        ? {
+            ...story.author,
+            name:
+              `${story.author.firstName || ""} ${story.author.lastName || ""}`.trim() ||
+              story.author.username,
+            isVerified: false, // Add default verified status
+          }
+        : null,
       isLiked: req.user
         ? story.likes.some(
             (like) => like.user.toString() === req.user.id.toString(),
           )
         : false,
       likeCount: story.likes ? story.likes.length : 0,
+      likes: story.likes ? story.likes.length : 0, // Add likes count as number
+      comments: 0, // Add default comments count
     }));
 
     // Get total count for pagination
