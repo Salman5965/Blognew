@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,26 +42,7 @@ export const NewChatTab = () => {
     }
   };
 
-  const suggestedUsers = [
-    {
-      id: "suggested1",
-      username: "tech_writer",
-      name: "Alex Thompson",
-      avatar: "/placeholder.svg",
-    },
-    {
-      id: "suggested2",
-      username: "design_guru",
-      name: "Maya Chen",
-      avatar: "/placeholder.svg",
-    },
-    {
-      id: "suggested3",
-      username: "code_ninja",
-      name: "Jordan Smith",
-      avatar: "/placeholder.svg",
-    },
-  ];
+  const suggestedUsers = [];
 
   return (
     <div className="flex flex-col h-full">
