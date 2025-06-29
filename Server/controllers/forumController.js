@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import ForumChannel from "../models/ForumChannel.js";
 import ForumMessage from "../models/ForumMessage.js";
 import User from "../models/User.js";
