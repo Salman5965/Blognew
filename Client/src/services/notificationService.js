@@ -152,9 +152,7 @@ class NotificationService {
   // Update notification preferences
   async updatePreferences(preferences) {
     try {
-      const response = await api.put("/notifications/preferences", {
-        preferences,
-      });
+      const response = await api.patch("/notifications/settings", preferences);
       return {
         success: true,
         data: response?.data || preferences,
