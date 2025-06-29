@@ -31,207 +31,301 @@ import {
   FileText,
   MessageCircle,
   Users,
+  BookOpen,
+  HelpCircle,
 } from "lucide-react";
 
 export const Navbar = () => {
-  const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuthContext();
-  const { theme, setTheme, actualTheme } = useTheme();
-  const { updateFilters, filters } = useBlogStore();
+  const { theme, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
-  const [debouncedSearch] = useDebouncedCallback((searchTerm) => {
-    updateFilters({ search: searchTerm });
-  }, DEBOUNCE_DELAY.SEARCH);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [filters, setFilters] = React.useState({
+    search: "",
+    category: "",
+    sortBy: "latest",
+  });
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate(ROUTES.HOME);
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+  const debouncedSearch = useDebouncedCallback((value) => {
+    setFilters((prev) => ({ ...prev, search: value }));
+  }, DEBOUNCE_DELAY);
 
-  const toggleTheme = () => {
-    const themes = ["light", "dark", "system"];
-    const currentIndex = themes.indexOf(theme);
-    const nextIndex = (currentIndex + 1) % themes.length;
-    setTheme(themes[nextIndex]);
-  };
-
-  const getThemeIcon = () => {
-    switch (theme) {
-      case "light":
-        return <Sun className="h-4 w-4" />;
-      case "dark":
-        return <Moon className="h-4 w-4" />;
-      case "system":
-        return <Monitor className="h-4 w-4" />;
-      default:
-        return <Sun className="h-4 w-4" />;
-    }
+  const handleCreatePost = () => {
+    navigate(ROUTES.CREATE_BLOG);
   };
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        {/* Logo and Navigation */}
-        <div className="flex items-center space-x-6">
-          <Link to={ROUTES.HOME} className="flex items-center space-x-2">
-            <BookOpen className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">BlogHub</span>
-          </Link>
+    <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center space-x-8">
+            <Link to={ROUTES.HOME} className="flex items-center space-x-2">
+              <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-lg">
+                  B
+                </span>
+              </div>
+              <span className="font-bold text-xl">BlogHub</span>
+            </Link>
 
-          {/* Navigation Links */}
-          {isAuthenticated && (
-            <div className="hidden md:flex items-center space-x-6">
-              <Link
-                to={ROUTES.HOME}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                to={ROUTES.FEED}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Feed
-              </Link>
-              <Link
-                to={ROUTES.EXPLORE}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Explore
-              </Link>
-
-              <Link
-                to="/daily-drip"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                DailyDrip
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Search Bar */}
-        <div className="flex-1 max-w-md mx-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search blogs..."
-              className="pl-10"
-              defaultValue={filters.search}
-              onChange={(e) => debouncedSearch(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center space-x-4">
-          {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-          >
-            {getThemeIcon()}
-          </Button>
-
-          {isAuthenticated ? (
-            <>
-              {/* Create Blog Button */}
-              <Button asChild>
-                <Link to={ROUTES.CREATE_BLOG}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Write
+            {/* Desktop Navigation */}
+            {isAuthenticated && (
+              <div className="hidden md:flex items-center space-x-8">
+                <Link
+                  to={ROUTES.FEED}
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Feed
                 </Link>
-              </Button>
+                <Link
+                  to="/explore"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Explore
+                </Link>
+                <Link
+                  to="/daily-drip"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  DailyDrip
+                </Link>
+              </div>
+            )}
+          </div>
 
-              {/* Notification Button */}
-              <NotificationButton />
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md mx-8">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Search blogs..."
+                className="pl-10"
+                defaultValue={filters.search}
+                onChange={(e) => debouncedSearch(e.target.value)}
+              />
+            </div>
+          </div>
 
-              {/* Chat Button */}
-              <ChatButton />
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="hidden md:flex"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
 
-              {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
+            {isAuthenticated ? (
+              <>
+                {/* Create Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCreatePost}
+                  className="hidden md:flex items-center space-x-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Create</span>
+                </Button>
+
+                {/* Mobile menu button */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  {isMobileMenuOpen ? (
+                    <X className="h-4 w-4" />
+                  ) : (
+                    <Menu className="h-4 w-4" />
+                  )}
+                </Button>
+
+                {/* Notifications */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative hidden md:flex"
+                  onClick={() => navigate("/notifications")}
+                >
+                  <Bell className="h-4 w-4" />
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
                   >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.avatar} alt={user?.username} />
-                      <AvatarFallback>
-                        {user?.username?.charAt(0).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user?.username}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user?.email}
-                      </p>
+                    3
+                  </Badge>
+                </Button>
+
+                {/* User Menu */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-8 w-8 rounded-full"
+                    >
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user?.avatar} alt={user?.username} />
+                        <AvatarFallback>
+                          {user?.username?.charAt(0)?.toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <div className="flex items-center justify-start gap-2 p-2">
+                      <div className="flex flex-col space-y-1 leading-none">
+                        <p className="font-medium">{user?.username}</p>
+                        <p className="w-[200px] truncate text-sm text-muted-foreground">
+                          {user?.email}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to={ROUTES.DASHBOARD}>
-                      <User className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to={ROUTES.MY_BLOGS}>
-                      <BookOpen className="mr-2 h-4 w-4" />
-                      My Blogs
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to={ROUTES.PROFILE}>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Profile
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to={ROUTES.HELP}>
-                      <HelpCircle className="mr-2 h-4 w-4" />
-                      Help
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => navigate("/notifications")}
-                  >
-                    <Bell className="mr-2 h-4 w-4" />
-                    <span>Notifications</span>
-                  </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to={ROUTES.DASHBOARD}>
+                        <User className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to={ROUTES.MY_BLOGS}>
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        My Blogs
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to={ROUTES.PROFILE}>
+                        <Settings className="mr-2 h-4 w-4" />
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to={ROUTES.HELP}>
+                        <HelpCircle className="mr-2 h-4 w-4" />
+                        Help
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      onClick={() => navigate("/notifications")}
+                    >
+                      <Bell className="mr-2 h-4 w-4" />
+                      <span>Notifications</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/messages")}>
                       <MessageCircle className="mr-2 h-4 w-4" />
                       <span>Messages</span>
                     </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/community")}>
-                    <Users className="mr-2 h-4 w-4" />
-                    <span>Community</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-              <Button variant="ghost" asChild>
-                <Link to={ROUTES.LOGIN}>Sign In</Link>
-              </Button>
-              <Button asChild>
-                <Link to={ROUTES.REGISTER}>Sign Up</Link>
-              </Button>
-            </>
-          )}
+                    <DropdownMenuItem onClick={() => navigate("/community")}>
+                      <Users className="mr-2 h-4 w-4" />
+                      <span>Community</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to={ROUTES.LOGIN}>Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link to={ROUTES.REGISTER}>Sign Up</Link>
+                </Button>
+              </>
+            )}
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && isAuthenticated && (
+          <div className="md:hidden border-t py-4">
+            <div className="flex flex-col space-y-2">
+              <Link
+                to={ROUTES.FEED}
+                className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Feed
+              </Link>
+              <Link
+                to="/explore"
+                className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Explore
+              </Link>
+              <Link
+                to="/community"
+                className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Community
+              </Link>
+              <Link
+                to="/daily-drip"
+                className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                DailyDrip
+              </Link>
+              <Button
+                variant="ghost"
+                className="justify-start"
+                onClick={() => {
+                  handleCreatePost();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create Post
+              </Button>
+              <Button
+                variant="ghost"
+                className="justify-start"
+                onClick={() => {
+                  navigate("/notifications");
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <Bell className="mr-2 h-4 w-4" />
+                Notifications
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={toggleTheme}
+                className="justify-start"
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Sun className="mr-2 h-4 w-4" />
+                    Light Mode
+                  </>
+                ) : (
+                  <>
+                    <Moon className="mr-2 h-4 w-4" />
+                    Dark Mode
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );
