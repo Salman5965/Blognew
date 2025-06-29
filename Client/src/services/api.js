@@ -179,6 +179,17 @@ class ApiService {
         };
         throw networkError;
       }
+
+      // For 404 errors, return a special response instead of throwing
+      if (error.response?.status === 404) {
+        return {
+          _isError: true,
+          status: 404,
+          message: "Not Found",
+          data: null,
+        };
+      }
+
       throw error;
     }
   }

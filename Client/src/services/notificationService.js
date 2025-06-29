@@ -174,6 +174,16 @@ class NotificationService {
   async getPreferences() {
     try {
       const response = await api.get("/notifications/preferences");
+
+      // Check if this is a 404 response from our API service
+      if (response?._isError && response.status === 404) {
+        return {
+          success: true,
+          data: this.getDefaultPreferences(),
+          error: null,
+        };
+      }
+
       return {
         success: true,
         data:
