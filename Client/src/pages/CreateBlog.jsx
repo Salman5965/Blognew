@@ -170,10 +170,18 @@ export const CreateBlog = () => {
       setError(null);
       setIsSaving(true);
 
-      if (publish && !validation.isValid) {
-        setError(`Cannot publish: ${validation.errors.join(", ")}`);
-        setIsSaving(false);
-        return;
+      // Validate before publishing
+      if (publish) {
+        const errors = [];
+        if (!title?.trim()) errors.push("Title is required");
+        if (!content?.trim()) errors.push("Content is required");
+        if (!category?.trim()) errors.push("Category is required");
+
+        if (errors.length > 0) {
+          setError(`Cannot publish: ${errors.join(", ")}`);
+          setIsSaving(false);
+          return;
+        }
       }
 
       const blogData = {
@@ -186,6 +194,8 @@ export const CreateBlog = () => {
         status: publish ? "published" : "draft",
       };
 
+      console.log("Sending blog data:", blogData); // Debug log
+
       const createdBlog = await createBlog(blogData);
 
       if (publish) {
@@ -194,6 +204,7 @@ export const CreateBlog = () => {
         navigate(ROUTES.MY_BLOGS);
       }
     } catch (err) {
+      console.error("Blog creation error:", err); // Debug log
       setError(err instanceof Error ? err.message : "Failed to save blog");
     } finally {
       setIsSaving(false);
