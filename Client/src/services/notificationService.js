@@ -182,12 +182,9 @@ class NotificationService {
           this.getDefaultPreferences(),
       };
     } catch (error) {
-      // Silently handle 404s since the endpoint might not exist
-      if (error.response?.status !== 404) {
-        console.error("Error fetching notification preferences:", error);
-      }
+      // Always return a successful response with defaults - never throw
       return {
-        success: true, // Return success with defaults for 404s
+        success: true,
         data: this.getDefaultPreferences(),
         error:
           error.response?.status === 404
