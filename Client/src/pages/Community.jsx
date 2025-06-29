@@ -224,61 +224,67 @@ const Community = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {isLoading
-                  ? Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="animate-pulse">
-                        <div className="flex items-start space-x-3">
-                          <div className="w-10 h-10 bg-muted rounded-full"></div>
-                          <div className="flex-1 space-y-2">
-                            <div className="h-4 bg-muted rounded w-3/4"></div>
-                            <div className="h-3 bg-muted rounded w-1/2"></div>
+                {isLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="animate-pulse">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-10 h-10 bg-muted rounded-full"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-muted rounded w-3/4"></div>
+                          <div className="h-3 bg-muted rounded w-1/2"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : Array.isArray(featuredDiscussions) ? (
+                  featuredDiscussions.map((discussion) => (
+                    <div
+                      key={discussion.id}
+                      className="flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={discussion.author.avatar} />
+                        <AvatarFallback>
+                          {discussion.author.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="font-medium truncate">
+                            {discussion.title}
+                          </h4>
+                          {discussion.isPinned && (
+                            <Badge variant="secondary" className="text-xs">
+                              Pinned
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+                          {discussion.excerpt}
+                        </p>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span>by {discussion.author.name}</span>
+                          <div className="flex items-center gap-1">
+                            <MessageCircle className="h-3 w-3" />
+                            {discussion.replies}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Eye className="h-3 w-3" />
+                            {discussion.views}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {discussion.lastActivity}
                           </div>
                         </div>
                       </div>
-                    ))
-                  : (featuredDiscussions || []).map((discussion) => (
-                      <div
-                        key={discussion.id}
-                        className="flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
-                      >
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={discussion.author.avatar} />
-                          <AvatarFallback>
-                            {discussion.author.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h4 className="font-medium truncate">
-                              {discussion.title}
-                            </h4>
-                            {discussion.isPinned && (
-                              <Badge variant="secondary" className="text-xs">
-                                Pinned
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-                            {discussion.excerpt}
-                          </p>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>by {discussion.author.name}</span>
-                            <div className="flex items-center gap-1">
-                              <MessageCircle className="h-3 w-3" />
-                              {discussion.replies}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Eye className="h-3 w-3" />
-                              {discussion.views}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {discussion.lastActivity}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-center text-muted-foreground">
+                    <p>No discussions available</p>
+                  </div>
+                )}
                 <Button
                   variant="outline"
                   className="w-full"
@@ -300,25 +306,31 @@ const Community = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {isLoading
-                    ? Array.from({ length: 8 }).map((_, i) => (
-                        <div
-                          key={i}
-                          className="h-6 w-16 bg-muted rounded-full animate-pulse"
-                        ></div>
-                      ))
-                    : (popularTopics || []).map((topic) => (
-                        <Badge
-                          key={topic.id}
-                          variant="secondary"
-                          className="hover:bg-primary hover:text-primary-foreground cursor-pointer transition-colors"
-                        >
-                          #{topic.name}
-                          <span className="ml-1 text-xs opacity-70">
-                            {topic.count}
-                          </span>
-                        </Badge>
-                      ))}
+                  {isLoading ? (
+                    Array.from({ length: 8 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="h-6 w-16 bg-muted rounded-full animate-pulse"
+                      ></div>
+                    ))
+                  ) : Array.isArray(popularTopics) ? (
+                    popularTopics.map((topic) => (
+                      <Badge
+                        key={topic.id}
+                        variant="secondary"
+                        className="hover:bg-primary hover:text-primary-foreground cursor-pointer transition-colors"
+                      >
+                        #{topic.name}
+                        <span className="ml-1 text-xs opacity-70">
+                          {topic.count}
+                        </span>
+                      </Badge>
+                    ))
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No topics available
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -335,46 +347,50 @@ const Community = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {isLoading
-                  ? Array.from({ length: 5 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center space-x-3 animate-pulse"
-                      >
-                        <div className="w-8 h-8 bg-muted rounded-full"></div>
-                        <div className="flex-1 space-y-1">
-                          <div className="h-3 bg-muted rounded w-2/3"></div>
-                          <div className="h-2 bg-muted rounded w-1/3"></div>
-                        </div>
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center space-x-3 animate-pulse"
+                    >
+                      <div className="w-8 h-8 bg-muted rounded-full"></div>
+                      <div className="flex-1 space-y-1">
+                        <div className="h-3 bg-muted rounded w-2/3"></div>
+                        <div className="h-2 bg-muted rounded w-1/3"></div>
                       </div>
-                    ))
-                  : (topMembers || []).map((member, index) => (
-                      <div
-                        key={member.id}
-                        className="flex items-center space-x-3"
-                      >
-                        <div className="flex items-center space-x-1">
-                          {getRankIcon(index + 1)}
-                          <span className="text-xs font-medium">
-                            #{index + 1}
-                          </span>
-                        </div>
-                        <Avatar className="w-8 h-8">
-                          <AvatarImage src={member.avatar} />
-                          <AvatarFallback>
-                            {member.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">
-                            {member.name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {member.points} points
-                          </p>
-                        </div>
+                    </div>
+                  ))
+                ) : Array.isArray(topMembers) ? (
+                  topMembers.map((member, index) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center space-x-3"
+                    >
+                      <div className="flex items-center space-x-1">
+                        {getRankIcon(index + 1)}
+                        <span className="text-xs font-medium">
+                          #{index + 1}
+                        </span>
                       </div>
-                    ))}
+                      <Avatar className="w-8 h-8">
+                        <AvatarImage src={member.avatar} />
+                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {member.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {member.points} points
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-3 text-center text-muted-foreground text-sm">
+                    No contributors available
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -387,38 +403,44 @@ const Community = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {isLoading
-                  ? Array.from({ length: 6 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start space-x-2 animate-pulse"
-                      >
-                        <div className="w-4 h-4 bg-muted rounded mt-0.5"></div>
-                        <div className="flex-1 space-y-1">
-                          <div className="h-3 bg-muted rounded w-full"></div>
-                          <div className="h-2 bg-muted rounded w-1/3"></div>
-                        </div>
+                {isLoading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="flex items-start space-x-2 animate-pulse"
+                    >
+                      <div className="w-4 h-4 bg-muted rounded mt-0.5"></div>
+                      <div className="flex-1 space-y-1">
+                        <div className="h-3 bg-muted rounded w-full"></div>
+                        <div className="h-2 bg-muted rounded w-1/3"></div>
                       </div>
-                    ))
-                  : (recentActivity || []).map((activity) => (
-                      <div
-                        key={activity.id}
-                        className="flex items-start space-x-2"
-                      >
-                        {getActivityIcon(activity.type)}
-                        <div className="flex-1 text-xs">
-                          <p className="text-foreground">
-                            <span className="font-medium">
-                              {activity.user.name}
-                            </span>{" "}
-                            {activity.action}
-                          </p>
-                          <p className="text-muted-foreground">
-                            {activity.timestamp}
-                          </p>
-                        </div>
+                    </div>
+                  ))
+                ) : Array.isArray(recentActivity) ? (
+                  recentActivity.map((activity) => (
+                    <div
+                      key={activity.id}
+                      className="flex items-start space-x-2"
+                    >
+                      {getActivityIcon(activity.type)}
+                      <div className="flex-1 text-xs">
+                        <p className="text-foreground">
+                          <span className="font-medium">
+                            {activity.user.name}
+                          </span>{" "}
+                          {activity.action}
+                        </p>
+                        <p className="text-muted-foreground">
+                          {activity.timestamp}
+                        </p>
                       </div>
-                    ))}
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-3 text-center text-muted-foreground text-sm">
+                    No recent activity
+                  </div>
+                )}
               </CardContent>
             </Card>
 
