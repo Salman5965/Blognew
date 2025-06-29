@@ -222,20 +222,32 @@ export const Navbar = () => {
                       <span>Community</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={toggleTheme}>
-                      {theme === "dark" ? (
-                        <Sun className="mr-2 h-4 w-4" />
-                      ) : (
-                        <Moon className="mr-2 h-4 w-4" />
-                      )}
-                      <span>
-                        {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                      </span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={logout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
+                    <div className="flex items-center gap-1 p-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={toggleTheme}
+                        className="flex-1 justify-start h-8"
+                      >
+                        {theme === "dark" ? (
+                          <Sun className="mr-2 h-4 w-4" />
+                        ) : (
+                          <Moon className="mr-2 h-4 w-4" />
+                        )}
+                        <span className="text-sm">
+                          {theme === "dark" ? "Light" : "Dark"}
+                        </span>
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={logout}
+                        className="flex-1 justify-start h-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+                      >
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span className="text-sm">Logout</span>
+                      </Button>
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
