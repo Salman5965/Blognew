@@ -40,12 +40,21 @@ class ForumService {
       });
 
       const response = await api.get(`/forum/channels?${params}`);
-      return response;
+      return {
+        success: true,
+        data: response,
+      };
     } catch (error) {
-      console.error("Error fetching channels:", error);
+      if (error.response?.status === 401) {
+        console.warn("Authentication required for forum channels");
+      } else {
+        console.error("Error fetching channels:", error);
+      }
       // Return fallback channels for better UX
       return {
-        channels: [
+        success: false,
+        data: {
+          channels: [
           {
             id: "general",
             name: "General Discussion",
