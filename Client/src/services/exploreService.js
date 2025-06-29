@@ -208,6 +208,8 @@ class ExploreService {
       };
     }
   }
+
+  async getRecommendedUsers(options = {}) {
     try {
       const params = new URLSearchParams();
       params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
