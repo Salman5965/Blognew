@@ -378,7 +378,9 @@ const Stories = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleLike(story.id)}
+                                onClick={() =>
+                                  handleLike(story.id || story._id)
+                                }
                                 className={`h-8 px-2 ${story.isLiked ? "text-red-500" : ""}`}
                               >
                                 <Heart
