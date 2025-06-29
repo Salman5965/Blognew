@@ -223,6 +223,11 @@ class StoriesService {
     }
   }
 
+  // Alias for toggleLikeStory (for compatibility)
+  async likeStory(storyId) {
+    return this.toggleLikeStory(storyId);
+  }
+
   // Search stories
   async searchStories(query, filters = {}) {
     try {
