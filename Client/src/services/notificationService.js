@@ -171,7 +171,7 @@ class NotificationService {
   // Get notification preferences
   async getPreferences() {
     try {
-      const response = await api.get("/notifications/preferences");
+      const response = await api.get("/notifications/settings");
 
       // Check if this is a 404 response from our API service
       if (response?._isError && response.status === 404) {
