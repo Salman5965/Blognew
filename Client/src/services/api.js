@@ -140,28 +140,31 @@ class ApiService {
       // Debug error response
       debugApiResponse(url, null, error);
 
-      // Log the error for debugging with proper serialization
-      const errorDetails = {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        isNetworkError: error.isNetworkError,
-        code: error.code,
-        baseURL: this.instance.defaults.baseURL,
-        url: url,
-        timestamp: new Date().toISOString(),
-      };
-      console.error(
-        `API Error for ${url}:`,
-        JSON.stringify(errorDetails, null, 2),
-      );
-
-      // Also log response data if available
-      if (error.response?.data) {
+      // Only log errors that aren't expected 404s
+      if (error.response?.status !== 404) {
+        // Log the error for debugging with proper serialization
+        const errorDetails = {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          isNetworkError: error.isNetworkError,
+          code: error.code,
+          baseURL: this.instance.defaults.baseURL,
+          url: url,
+          timestamp: new Date().toISOString(),
+        };
         console.error(
-          "Error response data:",
-          JSON.stringify(error.response.data, null, 2),
+          `API Error for ${url}:`,
+          JSON.stringify(errorDetails, null, 2),
         );
+
+        // Also log response data if available
+        if (error.response?.data) {
+          console.error(
+            "Error response data:",
+            JSON.stringify(error.response.data, null, 2),
+          );
+        }
       }
 
       // Handle network errors gracefully
