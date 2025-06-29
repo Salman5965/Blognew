@@ -63,6 +63,7 @@ export const getStories = async (req, res, next) => {
     // Add user-specific like status if user is authenticated
     const storiesWithLikeStatus = stories.map((story) => ({
       ...story,
+      id: story._id.toString(), // Add id field for React keys
       author: story.author
         ? {
             ...story.author,
