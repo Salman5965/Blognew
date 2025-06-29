@@ -236,7 +236,7 @@ const Community = () => {
                         </div>
                       </div>
                     ))
-                  : featuredDiscussions.map((discussion) => (
+                  : (featuredDiscussions || []).map((discussion) => (
                       <div
                         key={discussion.id}
                         className="flex items-start space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
@@ -307,7 +307,7 @@ const Community = () => {
                           className="h-6 w-16 bg-muted rounded-full animate-pulse"
                         ></div>
                       ))
-                    : popularTopics.map((topic) => (
+                    : (popularTopics || []).map((topic) => (
                         <Badge
                           key={topic.id}
                           variant="secondary"
@@ -348,7 +348,7 @@ const Community = () => {
                         </div>
                       </div>
                     ))
-                  : topMembers.map((member, index) => (
+                  : (topMembers || []).map((member, index) => (
                       <div
                         key={member.id}
                         className="flex items-center space-x-3"
@@ -400,7 +400,7 @@ const Community = () => {
                         </div>
                       </div>
                     ))
-                  : recentActivity.map((activity) => (
+                  : (recentActivity || []).map((activity) => (
                       <div
                         key={activity.id}
                         className="flex items-start space-x-2"
