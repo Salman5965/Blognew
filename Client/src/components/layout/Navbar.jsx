@@ -59,16 +59,35 @@ export const Navbar = () => {
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center space-x-8">
+          {/* Logo and Dark Mode */}
+          <div className="flex items-center space-x-4">
             <Link to={ROUTES.HOME} className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-lg">
-                  B
+                  S
                 </span>
               </div>
-              <span className="font-bold text-xl">BlogHub</span>
+              <span
+                className="font-bold text-xl"
+                style={{ fontFamily: "Pacifico, cursive" }}
+              >
+                SilentVoice
+              </span>
             </Link>
+
+            {/* Dark Mode Toggle - Right of Logo */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="h-8 w-8"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </Button>
 
             {/* Desktop Navigation */}
             {isAuthenticated && (
@@ -84,6 +103,12 @@ export const Navbar = () => {
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Explore
+                </Link>
+                <Link
+                  to="/stories"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Stories
                 </Link>
                 <Link
                   to="/daily-drip"
@@ -211,16 +236,6 @@ export const Navbar = () => {
                       <span>Community</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={toggleTheme}>
-                      {theme === "dark" ? (
-                        <Sun className="mr-2 h-4 w-4" />
-                      ) : (
-                        <Moon className="mr-2 h-4 w-4" />
-                      )}
-                      <span>
-                        {theme === "dark" ? "Light Mode" : "Dark Mode"}
-                      </span>
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={logout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
@@ -258,6 +273,13 @@ export const Navbar = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Explore
+              </Link>
+              <Link
+                to="/stories"
+                className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Stories
               </Link>
               <Link
                 to="/daily-drip"

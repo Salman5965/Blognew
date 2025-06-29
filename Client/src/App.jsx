@@ -59,6 +59,7 @@ const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
 const Messages = React.lazy(() => import("./pages/Messages"));
+const Stories = React.lazy(() => import("./pages/Stories"));
 const Community = React.lazy(() => import("./pages/Community"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
 const Explore = React.lazy(() => import("./pages/Explore"));
@@ -225,6 +226,16 @@ const App = () => (
                       element={
                         <PrivateRoute>
                           <Messages />
+                        </PrivateRoute>
+                      }
+                    />
+
+                    {/* Stories */}
+                    <Route
+                      path="/stories"
+                      element={
+                        <PrivateRoute>
+                          <Stories />
                         </PrivateRoute>
                       }
                     />
