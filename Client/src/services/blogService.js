@@ -181,15 +181,34 @@ class BlogService {
   async createBlog(blogData) {
     console.log("BlogService: Creating blog with data:", blogData);
 
-    const response = await apiService.post("/blogs", blogData);
+    try {
+      const response = await apiService.post("/blogs", blogData);
 
-    console.log("BlogService: Response from server:", response);
+      console.log("BlogService: Response from server:", response);
 
-    if (response.status === "success") {
-      return response.data;
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to create blog");
+    } catch (error) {
+      console.error("BlogService: Error creating blog:", error);
+
+      // Handle validation errors from server
+      if (error.response?.status === 400 && error.response?.data) {
+        const errorData = error.response.data;
+        if (errorData.errors && Array.isArray(errorData.errors)) {
+          const errorMessages = errorData.errors
+            .map((err) => err.msg || err.message)
+            .join(", ");
+          throw new Error(`Validation failed: ${errorMessages}`);
+        } else if (errorData.message) {
+          throw new Error(errorData.message);
+        }
+      }
+
+      throw error;
     }
-
-    throw new Error(response.message || "Failed to create blog");
   }
 
   async updateBlog(id, updateData) {
