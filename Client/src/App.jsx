@@ -257,6 +257,10 @@ const App = () => (
                     <Route path={ROUTES.REGISTER} element={<Register />} />
                     <Route path={ROUTES.HELP} element={<Help />} />
 
+                    {/* Public browsing routes */}
+                    <Route path="/stories" element={<Stories />} />
+                    <Route path="/explore" element={<Explore />} />
+
                     {/* Static Pages */}
                     <Route path={ROUTES.ABOUT} element={<About />} />
                     <Route path={ROUTES.CONTACT} element={<Contact />} />
