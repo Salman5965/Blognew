@@ -292,7 +292,11 @@ const Stories = () => {
                           <div className="flex items-center gap-3 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Heart className="h-3 w-3" />
-                              {story.likes}
+                              {story.likeCount ||
+                                (Array.isArray(story.likes)
+                                  ? story.likes.length
+                                  : story.likes) ||
+                                0}
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
@@ -434,7 +438,11 @@ const Stories = () => {
                                 <Heart
                                   className={`h-4 w-4 mr-1 ${story.isLiked ? "fill-current" : ""}`}
                                 />
-                                {story.likes}
+                                {story.likeCount ||
+                                  (Array.isArray(story.likes)
+                                    ? story.likes.length
+                                    : story.likes) ||
+                                  0}
                               </Button>
 
                               <Button
