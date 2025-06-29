@@ -122,7 +122,11 @@ class StoriesService {
   // Create a new story
   async createStory(storyData) {
     try {
+      console.log("StoriesService: Creating story with data:", storyData);
+
       const response = await apiService.post("/stories", storyData);
+
+      console.log("StoriesService: Response from server:", response);
 
       if (response.status === "success") {
         return response.data;
@@ -130,7 +134,17 @@ class StoriesService {
 
       throw new Error(response.message || "Failed to create story");
     } catch (error) {
-      console.error("Failed to create story:", error);
+      console.error("StoriesService: Failed to create story:", error);
+
+      // Log more details about the error
+      if (error.response) {
+        console.error("StoriesService: Error response:", {
+          status: error.response.status,
+          statusText: error.response.statusText,
+          data: error.response.data,
+        });
+      }
+
       throw error;
     }
   }
