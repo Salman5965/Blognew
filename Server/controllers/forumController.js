@@ -149,8 +149,15 @@ export const getChannelMessages = async (req, res) => {
     const { channelId } = req.params;
     const { page = 1, limit = 50, before } = req.query;
 
-    // Verify channel exists
-    const channel = await ForumChannel.findById(channelId);
+    // Verify channel exists - try to find by ObjectId first, then by name
+    let channel;
+    if (mongoose.Types.ObjectId.isValid(channelId)) {
+      channel = await ForumChannel.findById(channelId);
+    } else {
+      // If not a valid ObjectId, try to find by name
+      channel = await ForumChannel.findOne({ name: channelId });
+    }
+
     if (!channel) {
       return res.status(404).json({
         status: "error",
