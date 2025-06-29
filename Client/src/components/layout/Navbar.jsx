@@ -72,7 +72,7 @@ export const Navbar = () => {
 
             {/* Desktop Navigation */}
             {isAuthenticated && (
-              <div className="hidden md:flex items-center space-x-8">
+              <div className="hidden md:flex items-center space-x-6">
                 <Link
                   to={ROUTES.FEED}
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -109,21 +109,7 @@ export const Navbar = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="hidden md:flex"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
-
+          <div className="flex items-center space-x-3">
             {isAuthenticated ? (
               <>
                 {/* Create Button */}
@@ -135,20 +121,6 @@ export const Navbar = () => {
                 >
                   <Plus className="h-4 w-4" />
                   <span>Create</span>
-                </Button>
-
-                {/* Mobile menu button */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="md:hidden"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                >
-                  {isMobileMenuOpen ? (
-                    <X className="h-4 w-4" />
-                  ) : (
-                    <Menu className="h-4 w-4" />
-                  )}
                 </Button>
 
                 {/* Notifications */}
@@ -165,6 +137,30 @@ export const Navbar = () => {
                   >
                     3
                   </Badge>
+                </Button>
+
+                {/* Messages */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden md:flex"
+                  onClick={() => navigate("/messages")}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </Button>
+
+                {/* Mobile menu button */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  {isMobileMenuOpen ? (
+                    <X className="h-4 w-4" />
+                  ) : (
+                    <Menu className="h-4 w-4" />
+                  )}
                 </Button>
 
                 {/* User Menu */}
@@ -210,28 +206,21 @@ export const Navbar = () => {
                         Profile
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to={ROUTES.HELP}>
-                        <HelpCircle className="mr-2 h-4 w-4" />
-                        Help
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => navigate("/notifications")}
-                    >
-                      <Bell className="mr-2 h-4 w-4" />
-                      <span>Notifications</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate("/messages")}>
-                      <MessageCircle className="mr-2 h-4 w-4" />
-                      <span>Messages</span>
-                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/community")}>
                       <Users className="mr-2 h-4 w-4" />
                       <span>Community</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={toggleTheme}>
+                      {theme === "dark" ? (
+                        <Sun className="mr-2 h-4 w-4" />
+                      ) : (
+                        <Moon className="mr-2 h-4 w-4" />
+                      )}
+                      <span>
+                        {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                      </span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={logout}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Log out</span>
@@ -271,13 +260,6 @@ export const Navbar = () => {
                 Explore
               </Link>
               <Link
-                to="/community"
-                className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Community
-              </Link>
-              <Link
                 to="/daily-drip"
                 className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -308,20 +290,14 @@ export const Navbar = () => {
               </Button>
               <Button
                 variant="ghost"
-                onClick={toggleTheme}
                 className="justify-start"
+                onClick={() => {
+                  navigate("/messages");
+                  setIsMobileMenuOpen(false);
+                }}
               >
-                {theme === "dark" ? (
-                  <>
-                    <Sun className="mr-2 h-4 w-4" />
-                    Light Mode
-                  </>
-                ) : (
-                  <>
-                    <Moon className="mr-2 h-4 w-4" />
-                    Dark Mode
-                  </>
-                )}
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Messages
               </Button>
             </div>
           </div>
