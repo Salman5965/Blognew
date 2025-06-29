@@ -19,6 +19,7 @@ import bookmarkRoutes from "./routes/bookmarks.js";
 import uploadRoutes from "./routes/uploads.js";
 import notificationRoutes from "./routes/notifications.js";
 import forumRoutes from "./routes/forum.js";
+import dailyDripRoutes from "./routes/dailyDrip.js";
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
