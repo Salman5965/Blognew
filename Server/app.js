@@ -137,6 +137,7 @@ app.use("/api/bookmarks", bookmarkRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/forum", forumRoutes);
+app.use("/api/daily-drip", dailyDripRoutes);
 
 // Welcome route
 app.get("/", (req, res) => {
