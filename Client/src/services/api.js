@@ -46,19 +46,15 @@ class ApiService {
             config: {
               url: error.config?.url,
               method: error.config?.method,
-              timeout: error.config?.timeout,
-            },
+              timeout: error.config?.timeout
+            }
           });
 
           let errorMessage = "Network connection failed";
-          if (
-            error.code === "ECONNABORTED" ||
-            error.message.includes("timeout")
-          ) {
+          if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
             errorMessage = "Request timed out. Please try again.";
-          } else if (error.message.includes("Network Error")) {
-            errorMessage =
-              "Unable to connect to server. Please check your internet connection.";
+          } else if (error.message.includes('Network Error')) {
+            errorMessage = "Unable to connect to server. Please check your internet connection.";
           }
 
           const networkError = new Error(errorMessage);
@@ -261,13 +257,37 @@ class ApiService {
       const response = await this.instance.delete(url, config);
       return response.data;
     } catch (error) {
-      // Handle network errors gracefully
-      if (error.isNetworkError || !error.response) {
-        throw new Error("Failed to delete data");
+      if (error.response?.status === 404) {
+        // Handle 404 gracefully for delete operations
+        return { status: "success", message: "Resource not found or already deleted" };
       }
       throw error;
     }
-    return response.data;
+  }
+
+  // Retry utility for network operations
+  async withRetry(operation, maxRetries = 2, baseDelay = 1000) {
+    let lastError;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+
+        // Only retry network errors
+        if (error.isNetworkError && attempt < maxRetries) {
+          const delay = baseDelay * Math.pow(2, attempt);
+          console.warn(`Operation failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+          break;
+        }
+      }
+    }
+
+    throw lastError;
+  }
   }
 
   async delete(url, config) {
