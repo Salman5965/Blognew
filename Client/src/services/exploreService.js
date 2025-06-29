@@ -168,6 +168,7 @@ class ExploreService {
             likes: 567,
             comments: 89,
           },
+          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
           featuredAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
           tags: ["accessibility", "webdev", "inclusive"],
         },
