@@ -36,6 +36,7 @@ const Stories = () => {
   const [playingAudio, setPlayingAudio] = useState(null);
   const { user, isAuthenticated } = useAuthContext();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     loadStories();
