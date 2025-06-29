@@ -137,6 +137,15 @@ class ApiService {
 
       return response.data;
     } catch (error) {
+      // Handle 404 errors first before any other processing
+      if (error.response?.status === 404) {
+        return {
+          _isError: true,
+          status: 404,
+          message: "Not Found",
+          data: null,
+        };
+      }
       // Debug error response
       debugApiResponse(url, null, error);
 
@@ -178,16 +187,6 @@ class ApiService {
           timeout: this.instance.defaults.timeout,
         };
         throw networkError;
-      }
-
-      // For 404 errors, return a special response instead of throwing
-      if (error.response?.status === 404) {
-        return {
-          _isError: true,
-          status: 404,
-          message: "Not Found",
-          data: null,
-        };
       }
 
       throw error;
