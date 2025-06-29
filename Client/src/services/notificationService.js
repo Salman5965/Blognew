@@ -23,7 +23,10 @@ class NotificationService {
         },
       };
     } catch (error) {
-      console.error("Error fetching notifications:", error);
+      // Silently handle 404s since the endpoint might not exist
+      if (error.response?.status !== 404) {
+        console.error("Error fetching notifications:", error);
+      }
       return {
         success: false,
         data: {
@@ -51,7 +54,9 @@ class NotificationService {
         data: response?.data || {},
       };
     } catch (error) {
-      console.error("Error marking notification as read:", error);
+      if (error.response?.status !== 404) {
+        console.error("Error marking notification as read:", error);
+      }
       return {
         success: false,
         error:
@@ -70,7 +75,9 @@ class NotificationService {
         data: response || {},
       };
     } catch (error) {
-      console.error("Error marking all notifications as read:", error);
+      if (error.response?.status !== 404) {
+        console.error("Error marking all notifications as read:", error);
+      }
       return {
         success: false,
         error:
@@ -89,7 +96,9 @@ class NotificationService {
         data: response || {},
       };
     } catch (error) {
-      console.error("Error deleting notification:", error);
+      if (error.response?.status !== 404) {
+        console.error("Error deleting notification:", error);
+      }
       return {
         success: false,
         error: error.response?.data?.message || "Failed to delete notification",
@@ -106,7 +115,9 @@ class NotificationService {
         data: response || {},
       };
     } catch (error) {
-      console.error("Error clearing notifications:", error);
+      if (error.response?.status !== 404) {
+        console.error("Error clearing notifications:", error);
+      }
       return {
         success: false,
         error: error.response?.data?.message || "Failed to clear notifications",
@@ -123,7 +134,10 @@ class NotificationService {
         count: response?.data?.count || response?.count || 0,
       };
     } catch (error) {
-      console.error("Error fetching unread count:", error);
+      // Silently handle 404s since the endpoint might not exist
+      if (error.response?.status !== 404) {
+        console.error("Error fetching unread count:", error);
+      }
       return {
         success: false,
         count: 0,
@@ -146,7 +160,9 @@ class NotificationService {
         data: response?.data || preferences,
       };
     } catch (error) {
-      console.error("Error updating preferences:", error);
+      if (error.response?.status !== 404) {
+        console.error("Error updating preferences:", error);
+      }
       return {
         success: false,
         error: error.response?.data?.message || "Failed to update preferences",
@@ -160,7 +176,10 @@ class NotificationService {
       const response = await api.get("/notifications/preferences");
       return {
         success: true,
-        data: response?.data?.data || response?.data || this.getDefaultPreferences(),
+        data:
+          response?.data?.data ||
+          response?.data ||
+          this.getDefaultPreferences(),
       };
     } catch (error) {
       // Silently handle 404s since the endpoint might not exist
@@ -170,12 +189,9 @@ class NotificationService {
       return {
         success: true, // Return success with defaults for 404s
         data: this.getDefaultPreferences(),
-        error: error.response?.status === 404
-          ? null
-          : error.response?.data?.message || "Failed to fetch preferences",
-      };
-    }
-  }
+        error:
+          error.response?.status === 404
+            ? null
             : error.response?.data?.message || "Failed to fetch preferences",
       };
     }

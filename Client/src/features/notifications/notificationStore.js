@@ -16,82 +16,78 @@ const useNotificationStore = create((set, get) => ({
     totalCount: 0,
   },
   preferences: null,
-    isPreferencesLoading: false,
+  isPreferencesLoading: false,
 
-    // Actions
+  // Actions
 
-    // Fetch notifications
-    fetchNotifications: async (
-      page = 1,
-      limit = 20,
-      unreadOnly = false,
-      append = false,
-    ) => {
-      set({ isLoading: true, error: null });
+  // Fetch notifications
+  fetchNotifications: async (
+    page = 1,
+    limit = 20,
+    unreadOnly = false,
+    append = false,
+  ) => {
+    set({ isLoading: true, error: null });
 
-      try {
-        const result = await notificationService.getNotifications(
-          page,
-          limit,
-          unreadOnly,
-        );
+    try {
+      const result = await notificationService.getNotifications(
+        page,
+        limit,
+        unreadOnly,
+      );
 
-        if (result.success) {
-          const newNotifications = result.data.notifications || [];
-          set((state) => ({
-            notifications: append
-              ? [...(state.notifications || []), ...newNotifications]
-              : newNotifications,
-            pagination: result.pagination,
-            isLoading: false,
-          }));
-        } else {
-          set({
-            notifications: [],
-            isLoading: false,
-            error: result.error || "Failed to fetch notifications"
-          });
-        }
-          });
-        }
-      } catch (error) {
-        // Silently handle 404s and use defaults
-        if (error.response?.status !== 404) {
-          console.error("Error fetching preferences:", error);
-        }
-        set({
-          preferences: notificationService.getDefaultPreferences(),
-          error: "Failed to fetch notifications",
+      if (result.success) {
+        const newNotifications = result.data.notifications || [];
+        set((state) => ({
+          notifications: append
+            ? [...(state.notifications || []), ...newNotifications]
+            : newNotifications,
+          pagination: result.data,
           isLoading: false,
+          error: null,
+        }));
+      } else {
+        set({
+          notifications: [],
+          isLoading: false,
+          error: result.error || "Failed to fetch notifications",
         });
       }
-    },
+    } catch (error) {
+      set({
+        notifications: [],
+        error: "Failed to fetch notifications",
+        isLoading: false,
+      });
+    }
+  },
 
-    // Fetch unread count
-    fetchUnreadCount: async () => {
-      try {
-        const result = await notificationService.getUnreadCount();
-        if (result.success) {
-          set({ unreadCount: result.count });
-        } else {
-          set({ unreadCount: 0 });
-        }
-      } catch (error) {
-        // Silently handle 404s
-        if (error.response?.status !== 404) {
-          console.error("Error fetching unread count:", error);
-        }
-        console.error("Failed to fetch unread count:", error);
+  // Fetch unread count
+  fetchUnreadCount: async () => {
+    try {
+      const result = await notificationService.getUnreadCount();
+      if (result.success) {
+        set({ unreadCount: result.count });
+      } else {
+        set({ unreadCount: 0 });
       }
-    },
+    } catch (error) {
+      // Silently handle 404s
+      if (error.response?.status !== 404) {
+        console.error("Error fetching unread count:", error);
+      }
+      set({ unreadCount: 0 });
+    }
+  },
 
-    // Mark notification as read
-    markAsRead: async (notificationId) => {
+  // Mark notification as read
+  markAsRead: async (notificationId) => {
+    try {
       const result = await notificationService.markAsRead(notificationId);
 
       if (result.success) {
         set((state) => ({
-          notifications: state.notifications.map((notification) =>
+          notifications: (state.notifications || []).map((notification) =>
             notification._id === notificationId
               ? { ...notification, isRead: true }
               : notification,
@@ -99,189 +95,138 @@ const useNotificationStore = create((set, get) => ({
           unreadCount: Math.max(0, state.unreadCount - 1),
         }));
       }
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  },
 
-      return result;
-    },
-
-    // Mark all notifications as read
-    markAllAsRead: async () => {
+  // Mark all notifications as read
+  markAllAsRead: async () => {
+    try {
       const result = await notificationService.markAllAsRead();
 
       if (result.success) {
         set((state) => ({
-          notifications: state.notifications.map((notification) => ({
+          notifications: (state.notifications || []).map((notification) => ({
             ...notification,
             isRead: true,
           })),
           unreadCount: 0,
         }));
       }
+    } catch (error) {
+      console.error("Error marking all notifications as read:", error);
+    }
+  },
 
-      return result;
-    },
-
-    // Delete notification
-    deleteNotification: async (notificationId) => {
+  // Delete notification
+  deleteNotification: async (notificationId) => {
+    try {
       const result =
         await notificationService.deleteNotification(notificationId);
 
       if (result.success) {
-        set((state) => {
-          const notification = state.notifications.find(
-            (n) => n._id === notificationId,
-          );
-          const wasUnread = notification && !notification.isRead;
+        set((state) => ({
+          notifications: (state.notifications || []).filter(
+            (notification) => notification._id !== notificationId,
+          ),
+        }));
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    }
+  },
 
-          return {
-            notifications: state.notifications.filter(
-              (n) => n._id !== notificationId,
-            ),
-            unreadCount: wasUnread
-              ? Math.max(0, state.unreadCount - 1)
-              : state.unreadCount,
-          };
+  // Clear all notifications
+  clearNotifications: async () => {
+    try {
+      const result = await notificationService.clearAllNotifications();
+
+      if (result.success) {
+        set({
+          notifications: [],
+          unreadCount: 0,
         });
       }
+    } catch (error) {
+      console.error("Error clearing notifications:", error);
+    }
+  },
 
-      return result;
-    },
+  // Fetch preferences
+  fetchPreferences: async () => {
+    set({ isPreferencesLoading: true });
 
-    // Add new notification (for real-time updates)
-    addNotification: (notification) => {
-      set((state) => ({
-        notifications: [notification, ...state.notifications],
-        unreadCount: notification.isRead
-          ? state.unreadCount
-          : state.unreadCount + 1,
-      }));
-
-      // Show browser notification if preferences allow
-      const { preferences } = get();
-      if (preferences?.push?.[notification.type]) {
-        notificationService.showBrowserNotification(notification.title, {
-          body: notification.message,
-          tag: notification._id,
+    try {
+      const result = await notificationService.getPreferences();
+      if (result.success) {
+        set({
+          preferences: result.data,
+          isPreferencesLoading: false,
         });
-      }
-    },
-
-    // Update notification
-    updateNotification: (notificationId, updates) => {
-      set((state) => ({
-        notifications: state.notifications.map((notification) =>
-          notification._id === notificationId
-            ? { ...notification, ...updates }
-            : notification,
-        ),
-      }));
-    },
-
-    // Fetch preferences
-    fetchPreferences: async () => {
-      set({ isPreferencesLoading: true });
-
-      try {
-        const result = await notificationService.getPreferences();
-        if (result.success) {
-          set({
-            preferences: result.data,
-            isPreferencesLoading: false,
-          });
-        } else {
-          // Use default preferences on failure
-          set({
-            preferences: notificationService.getDefaultPreferences(),
-            isPreferencesLoading: false,
-          });
-        }
-      } catch (error) {
+      } else {
+        // Use default preferences on failure
         set({
           preferences: notificationService.getDefaultPreferences(),
           isPreferencesLoading: false,
         });
       }
-    },
-
-    // Update preferences
-    updatePreferences: async (newPreferences) => {
-      set({ isPreferencesLoading: true });
-
-      try {
-        const result =
-          await notificationService.updatePreferences(newPreferences);
-
-        if (result.success) {
-          set({
-            preferences: result.data,
-            isPreferencesLoading: false,
-          });
-        } else {
-          set({ isPreferencesLoading: false });
-        }
-
-        return result;
-      } catch (error) {
-        set({ isPreferencesLoading: false });
-        return { success: false, error: "Failed to update preferences" };
+    } catch (error) {
+      // Silently handle 404s and use defaults
+      if (error.response?.status !== 404) {
+        console.error("Error fetching preferences:", error);
       }
-    },
-
-    // Filter notifications by type
-    getNotificationsByType: (type) => {
-      return get().notifications.filter(
-        (notification) => notification.type === type,
-      );
-    },
-
-    // Get unread notifications
-    getUnreadNotifications: () => {
-      return get().notifications.filter((notification) => !notification.isRead);
-    },
-
-    // Clear all notifications (local only)
-    clearNotifications: () => {
       set({
-        notifications: [],
-        unreadCount: 0,
-        pagination: {
-          currentPage: 1,
-          totalPages: 1,
-          totalNotifications: 0,
-          hasNext: false,
-          hasPrev: false,
-        },
+        preferences: notificationService.getDefaultPreferences(),
+        isPreferencesLoading: false,
       });
-    },
-
-    // Clear error
-    clearError: () => {
-      set({ error: null });
-    },
-
-    // Initialize notifications (call on app start)
-    initialize: async () => {
-      await Promise.all([
-        get().fetchNotifications(1, 20),
-        get().fetchUnreadCount(),
-        get().fetchPreferences(),
-      ]);
-    },
-  })),
-);
-
-// Subscribe to notification changes for browser notifications
-useNotificationStore.subscribe(
-  (state) => state.notifications,
-  (notifications, previousNotifications) => {
-    // Check if a new notification was added
-    if (notifications.length > previousNotifications.length) {
-      const newNotification = notifications[0];
-      if (newNotification && !newNotification.isRead) {
-        // Request permission if not already granted
-        notificationService.requestNotificationPermission();
-      }
     }
   },
-);
+
+  // Update preferences
+  updatePreferences: async (newPreferences) => {
+    set({ isPreferencesLoading: true });
+
+    try {
+      const result =
+        await notificationService.updatePreferences(newPreferences);
+
+      if (result.success) {
+        set({
+          preferences: result.data,
+          isPreferencesLoading: false,
+        });
+      } else {
+        set({ isPreferencesLoading: false });
+      }
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+      set({ isPreferencesLoading: false });
+    }
+  },
+
+  // Real-time notification handling
+  addNotification: (notification) => {
+    set((state) => ({
+      notifications: [notification, ...(state.notifications || [])],
+      unreadCount: state.unreadCount + 1,
+    }));
+  },
+
+  // Initialize store
+  initialize: async () => {
+    const { fetchNotifications, fetchUnreadCount, fetchPreferences } = get();
+
+    try {
+      await Promise.all([
+        fetchNotifications(),
+        fetchUnreadCount(),
+        fetchPreferences(),
+      ]);
+    } catch (error) {
+      console.error("Error initializing notification store:", error);
+    }
+  },
+}));
 
 export default useNotificationStore;
