@@ -73,22 +73,61 @@ const Stories = () => {
   };
 
   const handleShare = async (story) => {
+    const shareUrl =
+      window.location.origin + `/stories/${story.id || story._id}`;
+
     try {
-      if (navigator.share) {
+      // Check if Web Share API is available and can be used
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({
+          title: story.title,
+          text: story.excerpt || story.title,
+          url: shareUrl,
+        })
+      ) {
         await navigator.share({
           title: story.title,
-          text: story.excerpt,
-          url: window.location.origin + `/stories/${story.id}`,
+          text: story.excerpt || story.title,
+          url: shareUrl,
         });
-      } else {
-        // Fallback: copy to clipboard
-        await navigator.clipboard.writeText(
-          window.location.origin + `/stories/${story.id}`,
-        );
-        // You could show a toast here
+        return;
       }
-    } catch (error) {
-      console.error("Failed to share story:", error);
+    } catch (shareError) {
+      console.warn(
+        "Web Share API failed, falling back to clipboard:",
+        shareError,
+      );
+    }
+
+    // Fallback: copy to clipboard
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl);
+        // Show success message
+        if (window.alert) {
+          alert("Story link copied to clipboard!");
+        }
+      } else {
+        // Last resort: try to select text for manual copy
+        const textArea = document.createElement("textarea");
+        textArea.value = shareUrl;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        if (window.alert) {
+          alert("Story link copied to clipboard!");
+        }
+      }
+    } catch (clipboardError) {
+      console.error("Failed to copy to clipboard:", clipboardError);
+      // Final fallback: show the URL for manual copy
+      if (window.prompt) {
+        window.prompt("Copy this link to share:", shareUrl);
+      }
     }
   };
 
