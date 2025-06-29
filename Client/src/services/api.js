@@ -11,7 +11,7 @@ class ApiService {
   constructor() {
     this.instance = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 10000,
+      timeout: 30000, // Increased to 30 seconds
       headers: {
         "Content-Type": "application/json",
       },
@@ -39,10 +39,31 @@ class ApiService {
       (error) => {
         // Handle network errors gracefully
         if (!error.response) {
-          // Network error, server down, etc.
-          console.error("Network error:", error.message);
-          const networkError = new Error("Network connection failed");
+          // Network error, server down, timeout, etc.
+          console.error("Network error:", {
+            message: error.message,
+            code: error.code,
+            config: {
+              url: error.config?.url,
+              method: error.config?.method,
+              timeout: error.config?.timeout,
+            },
+          });
+
+          let errorMessage = "Network connection failed";
+          if (
+            error.code === "ECONNABORTED" ||
+            error.message.includes("timeout")
+          ) {
+            errorMessage = "Request timed out. Please try again.";
+          } else if (error.message.includes("Network Error")) {
+            errorMessage =
+              "Unable to connect to server. Please check your internet connection.";
+          }
+
+          const networkError = new Error(errorMessage);
           networkError.isNetworkError = true;
+          networkError.originalError = error;
           return Promise.reject(networkError);
         }
 
