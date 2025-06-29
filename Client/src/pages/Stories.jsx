@@ -126,34 +126,82 @@ const Stories = () => {
     }
 
     // Fallback: copy to clipboard
+    let copySuccess = false;
+
+    // Try modern Clipboard API first
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(shareUrl);
-        toast({
-          title: "Link copied!",
-          description: "Story link has been copied to your clipboard.",
-        });
-      } else {
-        // Last resort: try to select text for manual copy
-        const textArea = document.createElement("textarea");
-        textArea.value = shareUrl;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textArea);
-
+        copySuccess = true;
         toast({
           title: "Link copied!",
           description: "Story link has been copied to your clipboard.",
         });
       }
     } catch (clipboardError) {
-      console.error("Failed to copy to clipboard:", clipboardError);
-      // Final fallback: show the URL for manual copy
+      console.warn("Modern clipboard API failed:", clipboardError.message);
+      // Continue to fallback methods
+    }
+
+    // If modern API failed, try legacy method
+    if (!copySuccess) {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = shareUrl;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        const successful = document.execCommand("copy");
+        document.body.removeChild(textArea);
+
+        if (successful) {
+          copySuccess = true;
+          toast({
+            title: "Link copied!",
+            description: "Story link has been copied to your clipboard.",
+          });
+        }
+      } catch (legacyError) {
+        console.warn("Legacy copy method failed:", legacyError.message);
+      }
+    }
+
+    // If all copy methods failed, show manual copy option
+    if (!copySuccess) {
       toast({
-        title: "Share manually",
-        description: `Copy this link: ${shareUrl}`,
-        variant: "destructive",
+        title: "Copy link manually",
+        description: shareUrl,
+        duration: 10000,
+        action: {
+          label: "Select All",
+          onClick: () => {
+            // Create a temporary text area for easy selection
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = shareUrl;
+            tempTextArea.style.position = "fixed";
+            tempTextArea.style.left = "50%";
+            tempTextArea.style.top = "50%";
+            tempTextArea.style.transform = "translate(-50%, -50%)";
+            tempTextArea.style.zIndex = "9999";
+            tempTextArea.style.padding = "10px";
+            tempTextArea.style.border = "2px solid #007bff";
+            tempTextArea.style.borderRadius = "4px";
+            document.body.appendChild(tempTextArea);
+            tempTextArea.focus();
+            tempTextArea.select();
+
+            // Remove after 5 seconds
+            setTimeout(() => {
+              if (document.body.contains(tempTextArea)) {
+                document.body.removeChild(tempTextArea);
+              }
+            }, 5000);
+          },
+        },
       });
     }
   };
