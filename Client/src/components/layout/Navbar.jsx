@@ -101,12 +101,7 @@ export const Navbar = () => {
               >
                 Explore
               </Link>
-              <Link
-                to="/community"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Community
-              </Link>
+
               <Link
                 to="/daily-drip"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
