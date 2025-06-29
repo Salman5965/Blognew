@@ -1,15 +1,14 @@
+import { apiService } from "./api";
 import { PAGINATION } from "@/utils/constant";
-import apiService from "./api";
 
 class ExploreService {
+  // Get trending authors with proper error handling
   async getTrendingAuthors(options = {}) {
     try {
       const params = new URLSearchParams();
       params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
       params.append("limit", String(options.limit || 12));
-
-      if (options.timeframe) params.append("timeframe", options.timeframe);
-      if (options.category) params.append("category", options.category);
+      params.append("timeframe", options.timeframe || "week");
 
       const response = await apiService.get(
         `/explore/trending-authors?${params}`,
@@ -19,76 +18,16 @@ class ExploreService {
         return response.data;
       }
     } catch (error) {
-      // Always handle errors silently and provide mock data
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn("Explore API not available, using mock data");
-      } else {
-        console.warn(
-          "Error fetching trending authors, using mock data:",
-          error.message,
-        );
-      }
+      console.warn("Error fetching trending authors:", error.message);
     }
 
-    // Return mock trending authors data
+    // Return empty data structure instead of mock data
     return {
-      authors: [
-        {
-          _id: "507f1f77bcf86cd799439011",
-          username: "alice_writes",
-          firstName: "Alice",
-          lastName: "Johnson",
-          avatar:
-            "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-          bio: "Tech writer and blogger passionate about AI and machine learning",
-          stats: {
-            followersCount: 2847,
-            blogsCount: 94,
-            totalViews: 125000,
-          },
-          isFollowing: false,
-          trending: true,
-        },
-        {
-          _id: "507f1f77bcf86cd799439012",
-          username: "dev_chronicles",
-          firstName: "Bob",
-          lastName: "Smith",
-          avatar:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
-          bio: "Full-stack developer sharing coding tips and best practices",
-          stats: {
-            followersCount: 1923,
-            blogsCount: 67,
-            totalViews: 89000,
-          },
-          isFollowing: false,
-          trending: true,
-        },
-        {
-          _id: "507f1f77bcf86cd799439013",
-          username: "design_guru",
-          firstName: "Sarah",
-          lastName: "Davis",
-          avatar:
-            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-          bio: "UX/UI designer creating beautiful and functional experiences",
-          stats: {
-            followersCount: 3245,
-            blogsCount: 52,
-            totalViews: 156000,
-          },
-          isFollowing: true,
-          trending: true,
-        },
-      ],
+      authors: [],
       pagination: {
         currentPage: options.page || 1,
-        totalPages: 1,
-        totalAuthors: 3,
+        totalPages: 0,
+        totalAuthors: 0,
         hasNextPage: false,
         hasPrevPage: false,
         limit: options.limit || 12,
@@ -96,6 +35,7 @@ class ExploreService {
     };
   }
 
+  // Get featured content with proper error handling
   async getFeaturedContent(options = {}) {
     try {
       const params = new URLSearchParams();
@@ -112,71 +52,16 @@ class ExploreService {
         return response.data;
       }
     } catch (error) {
-      // Always handle errors silently and provide mock data
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn("Explore API not available, using mock data");
-      } else {
-        console.warn(
-          "Error fetching featured content, using mock data:",
-          error.message,
-        );
-      }
+      console.warn("Error fetching featured content:", error.message);
     }
 
+    // Return empty data structure instead of mock data
     return {
-      content: [
-        {
-          _id: "featured1",
-          title: "The Future of Web Development: What's Next?",
-          excerpt:
-            "Exploring upcoming trends and technologies that will shape the future of web development.",
-          type: "blog",
-          author: {
-            username: "tech_visionary",
-            firstName: "Alex",
-            lastName: "Chen",
-            avatar:
-              "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-          },
-          stats: {
-            views: 15420,
-            likes: 892,
-            comments: 127,
-          },
-          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-          featuredAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-          tags: ["webdev", "future", "technology"],
-        },
-        {
-          _id: "featured2",
-          title: "Building Accessible Applications: A Complete Guide",
-          excerpt:
-            "Learn how to create web applications that are accessible to everyone, including users with disabilities.",
-          type: "blog",
-          author: {
-            username: "accessibility_advocate",
-            firstName: "Maya",
-            lastName: "Patel",
-            avatar:
-              "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-          },
-          stats: {
-            views: 8934,
-            likes: 567,
-            comments: 89,
-          },
-          createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-          featuredAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-          tags: ["accessibility", "webdev", "inclusive"],
-        },
-      ],
+      content: [],
       pagination: {
         currentPage: options.page || 1,
-        totalPages: 1,
-        totalContent: 2,
+        totalPages: 0,
+        totalContent: 0,
         hasNextPage: false,
         hasPrevPage: false,
         limit: options.limit || 6,
@@ -184,6 +69,7 @@ class ExploreService {
     };
   }
 
+  // Get popular tags with proper error handling
   async getPopularTags(limit = 20) {
     try {
       const response = await apiService.get(
@@ -194,36 +80,17 @@ class ExploreService {
         return response.data;
       }
     } catch (error) {
-      // Always handle errors silently and provide mock data
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn("Explore API not available, using mock data");
-      } else {
-        console.warn(
-          "Error fetching popular tags, using mock data:",
-          error.message,
-        );
-      }
+      console.warn("Error fetching popular tags:", error.message);
     }
 
+    // Return empty data structure instead of mock data
     return {
-      tags: [
-        { name: "javascript", count: 2847, trending: true },
-        { name: "react", count: 1923, trending: true },
-        { name: "webdev", count: 1654, trending: false },
-        { name: "tutorial", count: 1234, trending: false },
-        { name: "programming", count: 1156, trending: true },
-        { name: "css", count: 987, trending: false },
-        { name: "nodejs", count: 845, trending: false },
-        { name: "python", count: 789, trending: true },
-        { name: "design", count: 567, trending: false },
-        { name: "career", count: 456, trending: false },
-      ].slice(0, limit),
+      tags: [],
+      total: 0,
     };
   }
 
+  // Get recommended users with proper error handling
   async getRecommendedUsers(options = {}) {
     try {
       const params = new URLSearchParams();
@@ -238,57 +105,16 @@ class ExploreService {
         return response.data;
       }
     } catch (error) {
-      // Always handle errors silently and provide mock data
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn("Explore API not available, using mock data");
-      } else {
-        console.warn(
-          "Error fetching recommended users, using mock data:",
-          error.message,
-        );
-      }
+      console.warn("Error fetching recommended users:", error.message);
     }
 
+    // Return empty data structure instead of mock data
     return {
-      users: [
-        {
-          _id: "507f1f77bcf86cd799439021",
-          username: "code_ninja",
-          firstName: "Kevin",
-          lastName: "Wong",
-          avatar:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-          bio: "Software engineer passionate about clean code",
-          stats: {
-            followersCount: 1456,
-            blogsCount: 34,
-          },
-          isFollowing: false,
-          mutualConnections: 5,
-        },
-        {
-          _id: "507f1f77bcf86cd799439022",
-          username: "data_scientist",
-          firstName: "Emma",
-          lastName: "Rodriguez",
-          avatar:
-            "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-          bio: "Data scientist exploring AI and ML",
-          stats: {
-            followersCount: 2234,
-            blogsCount: 67,
-          },
-          isFollowing: false,
-          mutualConnections: 3,
-        },
-      ],
+      users: [],
       pagination: {
         currentPage: options.page || 1,
-        totalPages: 1,
-        totalUsers: 2,
+        totalPages: 0,
+        totalUsers: 0,
         hasNextPage: false,
         hasPrevPage: false,
         limit: options.limit || 8,
@@ -296,6 +122,7 @@ class ExploreService {
     };
   }
 
+  // Get trending topics with proper error handling
   async getTrendingTopics(limit = 10) {
     try {
       const response = await apiService.get(
@@ -306,63 +133,169 @@ class ExploreService {
         return response.data;
       }
     } catch (error) {
-      // Always handle errors silently and provide mock data
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn("Explore API not available, using mock data");
-      } else {
-        console.warn(
-          "Error fetching trending topics, using mock data:",
-          error.message,
-        );
-      }
+      console.warn("Error fetching trending topics:", error.message);
     }
 
+    // Return empty data structure instead of mock data
     return {
-      topics: [
-        { name: "Web Development", count: 234, growth: "+15%" },
-        { name: "Machine Learning", count: 189, growth: "+28%" },
-        { name: "React.js", count: 156, growth: "+12%" },
-        { name: "JavaScript", count: 145, growth: "+8%" },
-        { name: "UI/UX Design", count: 134, growth: "+22%" },
-        { name: "Node.js", count: 98, growth: "+5%" },
-        { name: "Python", count: 87, growth: "+18%" },
-        { name: "Career Advice", count: 76, growth: "+25%" },
-        { name: "CSS", count: 65, growth: "+7%" },
-        { name: "DevOps", count: 54, growth: "+30%" },
-      ].slice(0, limit),
+      topics: [],
+      total: 0,
     };
   }
 
+  // Get explore page statistics with proper error handling
   async getExploreStats() {
     try {
-      const response = await apiService.get(`/explore/stats`);
+      const response = await apiService.get("/explore/stats");
 
       if (response?.status === "success") {
         return response.data;
       }
     } catch (error) {
-      // Always handle errors silently and provide mock data
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn("Explore API not available, using mock data");
-      } else {
-        console.warn(
-          "Error fetching explore stats, using mock data:",
-          error.message,
-        );
-      }
+      console.warn("Error fetching explore stats:", error.message);
     }
 
+    // Return empty data structure instead of mock data
     return {
-      totalAuthors: 15420,
-      totalBlogs: 47892,
-      activeUsers: 8934,
-      popularTopics: 234,
+      totalUsers: 0,
+      totalBlogs: 0,
+      totalComments: 0,
+      activeUsers: 0,
+      growth: {
+        users: 0,
+        blogs: 0,
+        comments: 0,
+      },
+    };
+  }
+
+  // Search across all content types
+  async searchAll(query, options = {}) {
+    try {
+      const params = new URLSearchParams();
+      params.append("q", query);
+      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
+      params.append("limit", String(options.limit || 10));
+
+      if (options.type) params.append("type", options.type);
+      if (options.category) params.append("category", options.category);
+      if (options.sortBy) params.append("sortBy", options.sortBy);
+      if (options.timeframe) params.append("timeframe", options.timeframe);
+
+      const response = await apiService.get(`/explore/search?${params}`);
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn("Error searching content:", error.message);
+    }
+
+    // Return empty search results
+    return {
+      results: [],
+      pagination: {
+        currentPage: options.page || 1,
+        totalPages: 0,
+        totalResults: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: options.limit || 10,
+      },
+      filters: {
+        types: [],
+        categories: [],
+        tags: [],
+      },
+    };
+  }
+
+  // Get category-specific content
+  async getContentByCategory(category, options = {}) {
+    try {
+      const params = new URLSearchParams();
+      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
+      params.append("limit", String(options.limit || 10));
+      params.append("sortBy", options.sortBy || "popularity");
+
+      const response = await apiService.get(
+        `/explore/categories/${encodeURIComponent(category)}?${params}`,
+      );
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn(
+        `Error fetching content for category ${category}:`,
+        error.message,
+      );
+    }
+
+    // Return empty data structure
+    return {
+      content: [],
+      category,
+      pagination: {
+        currentPage: options.page || 1,
+        totalPages: 0,
+        totalContent: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: options.limit || 10,
+      },
+    };
+  }
+
+  // Get related content for a specific item
+  async getRelatedContent(contentId, contentType = "blog", limit = 5) {
+    try {
+      const response = await apiService.get(
+        `/explore/related/${contentType}/${contentId}?limit=${limit}`,
+      );
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn(
+        `Error fetching related content for ${contentType} ${contentId}:`,
+        error.message,
+      );
+    }
+
+    // Return empty related content
+    return {
+      relatedContent: [],
+      total: 0,
+    };
+  }
+
+  // Get content analytics/insights
+  async getContentInsights(timeframe = "week") {
+    try {
+      const response = await apiService.get(
+        `/explore/insights?timeframe=${timeframe}`,
+      );
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn("Error fetching content insights:", error.message);
+    }
+
+    // Return empty insights
+    return {
+      topPerformingContent: [],
+      emergingTopics: [],
+      userEngagement: {
+        totalViews: 0,
+        totalLikes: 0,
+        totalComments: 0,
+        averageReadTime: 0,
+      },
+      categoryDistribution: [],
     };
   }
 }
