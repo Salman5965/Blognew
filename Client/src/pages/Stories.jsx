@@ -230,7 +230,9 @@ const Stories = () => {
                             <Avatar className="w-6 h-6">
                               <AvatarImage src={story.author.avatar} />
                               <AvatarFallback>
-                                {story.author.name.charAt(0)}
+                                {story.author?.name?.charAt(0) ||
+                                  story.author?.username?.charAt(0) ||
+                                  "?"}
                               </AvatarFallback>
                             </Avatar>
                             <span className="text-sm text-muted-foreground">
@@ -353,7 +355,9 @@ const Stories = () => {
                               <Avatar className="w-6 h-6">
                                 <AvatarImage src={story.author.avatar} />
                                 <AvatarFallback>
-                                  {story.author.name.charAt(0)}
+                                  {story.author?.name?.charAt(0) ||
+                                    story.author?.username?.charAt(0) ||
+                                    "?"}
                                 </AvatarFallback>
                               </Avatar>
                               <span className="text-sm text-muted-foreground">
