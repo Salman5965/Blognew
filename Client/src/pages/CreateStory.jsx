@@ -198,6 +198,9 @@ const CreateStory = () => {
         storyData.excerpt = formData.excerpt.trim();
       }
 
+      console.log("CreateStory: Sending story data:", storyData);
+      console.log("CreateStory: Original form data:", formData);
+
       await storiesService.createStory(storyData);
 
       toast({
