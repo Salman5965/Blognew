@@ -73,9 +73,9 @@ export const getChannelById = async (req, res) => {
 
     if (channel) {
       channel = await ForumChannel.findById(channel._id)
-        .populate("createdBy", "username firstName lastName avatar");
+        .populate("createdBy", "username firstName lastName avatar")
+        .populate("moderators", "username firstName lastName avatar");
     }
-      .populate("moderators", "username firstName lastName avatar");
 
     if (!channel) {
       return res.status(404).json({
