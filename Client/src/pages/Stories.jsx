@@ -189,7 +189,7 @@ const Stories = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {featuredStories.slice(0, 2).map((story) => (
                     <Card
-                      key={story.id}
+                      key={story.id || story._id}
                       className="hover:shadow-lg transition-shadow cursor-pointer group"
                     >
                       <div className="relative">
@@ -298,7 +298,7 @@ const Stories = () => {
               ) : (
                 stories.map((story) => (
                   <Card
-                    key={story.id}
+                    key={story.id || story._id}
                     className="hover:shadow-md transition-shadow group"
                   >
                     <CardContent className="p-6">
