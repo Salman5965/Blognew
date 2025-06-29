@@ -145,11 +145,11 @@ const DailyDrip = () => {
       if (response.success && response.data?.blogs?.length > 0) {
         setPosts(response.data.blogs);
       } else {
-        setPosts(mockPosts);
+        setPosts([]); // Use empty array instead of mock data
       }
     } catch (error) {
       console.error("Error loading daily drip posts:", error);
-      setPosts(mockPosts);
+      setPosts([]); // Use empty array instead of mock data
     } finally {
       setLoading(false);
     }
