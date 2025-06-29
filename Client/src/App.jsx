@@ -198,6 +198,10 @@ const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
 const DailyDrip = React.lazy(() => import("./pages/DailyDrip"));
+const Stories = React.lazy(() => import("./pages/Stories"));
+const CreateStory = React.lazy(() => import("./pages/CreateStory"));
+const Explore = React.lazy(() => import("./pages/Explore"));
+const Messages = React.lazy(() => import("./pages/Messages"));
 
 // Loading component for suspense
 const PageLoader = () => (
