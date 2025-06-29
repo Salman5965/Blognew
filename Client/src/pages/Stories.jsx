@@ -216,7 +216,10 @@ const Stories = () => {
                         )}
                       </div>
                       <CardContent className="p-6">
-                        <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors">
+                        <h3
+                          className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors cursor-pointer"
+                          onClick={() => navigate(`/stories/${story.id}`)}
+                        >
                           {story.title}
                         </h3>
                         <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
@@ -334,7 +337,10 @@ const Stories = () => {
                             </span>
                           </div>
 
-                          <h3 className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors cursor-pointer">
+                          <h3
+                            className="font-semibold text-lg mb-2 group-hover:text-primary transition-colors cursor-pointer"
+                            onClick={() => navigate(`/stories/${story.id}`)}
+                          >
                             {story.title}
                           </h3>
 

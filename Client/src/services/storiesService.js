@@ -5,9 +5,6 @@ class StoriesService {
   async getStories(filters = {}) {
     try {
       const params = new URLSearchParams();
-      if (filters.category && filters.category !== "all") {
-        params.append("category", filters.category);
-      }
       if (filters.search) {
         params.append("search", filters.search);
       }
@@ -31,7 +28,6 @@ class StoriesService {
             excerpt:
               "Growing up in a household where children were seen but not heard, I struggled for years to find my voice. This is the story of how I learned to speak up for myself and others.",
             content: "Full story content here...",
-            category: "Overcoming Challenges",
             author: {
               id: "user1",
               name: "Sarah Mitchell",
@@ -55,7 +51,6 @@ class StoriesService {
             excerpt:
               "At 45, I realized I was living someone else's dream. Here's how I found the courage to start over and build the life I actually wanted.",
             content: "Full story content here...",
-            category: "Career Journey",
             author: {
               id: "user2",
               name: "Michael Chen",
@@ -79,7 +74,6 @@ class StoriesService {
             excerpt:
               "When I was diagnosed with an autoimmune condition, I thought my life was over. Instead, it became the beginning of truly learning to care for myself.",
             content: "Full story content here...",
-            category: "Health & Wellness",
             author: {
               id: "user3",
               name: "Elena Rodriguez",
@@ -103,7 +97,6 @@ class StoriesService {
             excerpt:
               "Living in my car at 19 with nothing but determination, I never imagined I'd one day walk across Harvard's graduation stage.",
             content: "Full story content here...",
-            category: "Overcoming Challenges",
             author: {
               id: "user4",
               name: "David Thompson",
@@ -127,7 +120,6 @@ class StoriesService {
             excerpt:
               "After 15 years of silence, I finally wrote the letter I always wanted to send. I never mailed it, but writing it changed everything.",
             content: "Full story content here...",
-            category: "Family & Relationships",
             author: {
               id: "user5",
               name: "Jessica Park",
@@ -168,29 +160,6 @@ class StoriesService {
       const allStories = await this.getStories();
       return {
         stories: allStories.stories.filter((story) => story.isFeatured),
-      };
-    }
-  }
-
-  // Get story categories
-  async getCategories() {
-    try {
-      const response = await apiService.get("/stories/categories");
-      return response;
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
-      // Return fallback data
-      return {
-        categories: [
-          { id: "overcoming-challenges", name: "Overcoming Challenges" },
-          { id: "family-relationships", name: "Family & Relationships" },
-          { id: "career-journey", name: "Career Journey" },
-          { id: "health-wellness", name: "Health & Wellness" },
-          { id: "travel-adventure", name: "Travel & Adventure" },
-          { id: "education", name: "Education" },
-          { id: "creativity", name: "Creativity & Arts" },
-          { id: "community", name: "Community & Service" },
-        ],
       };
     }
   }
