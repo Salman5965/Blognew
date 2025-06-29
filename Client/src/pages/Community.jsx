@@ -142,25 +142,25 @@ const Community = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
               <div className="text-center">
                 <div className="text-2xl font-bold text-primary">
-                  {communityStats.totalMembers.toLocaleString()}
+                  {(communityStats?.totalMembers || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground">Members</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
-                  {communityStats.onlineMembers.toLocaleString()}
+                  {(communityStats?.onlineMembers || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground">Online</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">
-                  {communityStats.totalPosts.toLocaleString()}
+                  {(communityStats?.totalPosts || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground">Posts</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
-                  {communityStats.totalDiscussions.toLocaleString()}
+                  {(communityStats?.totalDiscussions || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground">Discussions</div>
               </div>
