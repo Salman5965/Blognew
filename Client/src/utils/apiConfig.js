@@ -52,35 +52,45 @@ export const debugApiConfig = () => {
   console.log("Computed API_BASE_URL:", API_BASE_URL);
 
   // Test API connectivity with proper error handling
-  fetch(getApiUrl("/health"))
-    .then((response) => {
-      console.log("API Health Check:", response.status, response.statusText);
+  try {
+    fetch(getApiUrl("/health"))
+      .then((response) => {
+        console.log("API Health Check:", response.status, response.statusText);
 
-      // Handle rate limiting gracefully
-      if (response.status === 429) {
-        console.warn("API Health Check: Rate limited, skipping body parsing");
-        return { status: response.status, message: "Rate limited" };
-      }
+        // Handle rate limiting gracefully
+        if (response.status === 429) {
+          console.warn("API Health Check: Rate limited, skipping body parsing");
+          return { status: response.status, message: "Rate limited" };
+        }
 
-      // Clone response before reading body to avoid "body stream already read" error
-      if (
-        response.ok &&
-        response.headers.get("content-type")?.includes("application/json")
-      ) {
-        return response.clone().json();
-      } else {
-        return response
-          .clone()
-          .text()
-          .then((text) => ({ message: text || "OK", status: response.status }));
-      }
-    })
-    .then((data) => {
-      console.log("API Health Data:", data);
-    })
-    .catch((error) => {
-      console.warn("API Health Check Failed:", error.message || error);
-    });
+        // Clone response before reading body to avoid "body stream already read" error
+        if (
+          response.ok &&
+          response.headers.get("content-type")?.includes("application/json")
+        ) {
+          return response.clone().json();
+        } else {
+          return response
+            .clone()
+            .text()
+            .then((text) => ({
+              message: text || "OK",
+              status: response.status,
+            }));
+        }
+      })
+      .then((data) => {
+        console.log("API Health Data:", data);
+      })
+      .catch((error) => {
+        console.warn("API Health Check Failed:", error.message || error);
+      });
+  } catch (error) {
+    console.warn(
+      "API Health Check initialization failed:",
+      error.message || error,
+    );
+  }
 };
 
 export default {
