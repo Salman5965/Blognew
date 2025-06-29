@@ -132,43 +132,46 @@ class NotificationService {
     }
   }
 
-  // Get notification preferences
-  async getPreferences() {
+  // Get all notifications
+  async getNotifications(page = 1, limit = 20, filter = "all") {
     try {
-      const response = await api.get("/notifications/preferences");
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        filter,
+      });
+
+      const response = await api.get(`/notifications?${params}`);
       return {
         success: true,
-        data:
-          response?.data?.data ||
-          response?.data ||
-          this.getDefaultPreferences(),
+        data: {
+          notifications: response?.notifications || [],
+          totalCount: response?.totalCount || 0,
+          currentPage: response?.currentPage || page,
+          totalPages: response?.totalPages || 1,
+          hasNext: response?.hasNext || false,
+          hasPrev: response?.hasPrev || false,
+        },
       };
     } catch (error) {
-      console.error("Error fetching notification preferences:", error);
+      console.error("Error fetching notifications:", error);
       return {
         success: false,
-        data: this.getDefaultPreferences(),
+        data: {
+          notifications: [],
+          totalCount: 0,
+          currentPage: page,
+          totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
+        },
         error:
           error.response?.status === 404
             ? null
-            : error.response?.data?.message || "Failed to fetch preferences",
+            : error.response?.data?.message || "Failed to fetch notifications",
       };
     }
   }
-
-  // Mock data for fallback
-  getMockNotifications(page = 1, limit = 20, unreadOnly = false) {
-    const allNotifications = [
-      {
-        _id: "1",
-        type: "like",
-        title: "New Like",
-        message: 'John Doe liked your blog post "Introduction to React"',
-        isRead: false,
-        createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-        relatedUser: {
-          _id: "user1",
-          username: "johndoe",
           firstName: "John",
           lastName: "Doe",
           avatar:
