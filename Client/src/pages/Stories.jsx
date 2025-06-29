@@ -94,6 +94,10 @@ const Stories = () => {
           text: story.excerpt || story.title,
           url: shareUrl,
         });
+        toast({
+          title: "Story shared!",
+          description: "Thanks for sharing this story.",
+        });
         return;
       }
     } catch (shareError) {
@@ -107,10 +111,10 @@ const Stories = () => {
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(shareUrl);
-        // Show success message
-        if (window.alert) {
-          alert("Story link copied to clipboard!");
-        }
+        toast({
+          title: "Link copied!",
+          description: "Story link has been copied to your clipboard.",
+        });
       } else {
         // Last resort: try to select text for manual copy
         const textArea = document.createElement("textarea");
@@ -120,16 +124,19 @@ const Stories = () => {
         document.execCommand("copy");
         document.body.removeChild(textArea);
 
-        if (window.alert) {
-          alert("Story link copied to clipboard!");
-        }
+        toast({
+          title: "Link copied!",
+          description: "Story link has been copied to your clipboard.",
+        });
       }
     } catch (clipboardError) {
       console.error("Failed to copy to clipboard:", clipboardError);
       // Final fallback: show the URL for manual copy
-      if (window.prompt) {
-        window.prompt("Copy this link to share:", shareUrl);
-      }
+      toast({
+        title: "Share manually",
+        description: `Copy this link: ${shareUrl}`,
+        variant: "destructive",
+      });
     }
   };
 
