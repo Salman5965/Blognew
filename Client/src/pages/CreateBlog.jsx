@@ -185,14 +185,24 @@ export const CreateBlog = () => {
       }
 
       const blogData = {
-        title,
-        content,
-        excerpt,
-        tags,
-        category,
-        featuredImage: coverImage,
+        title: title.trim(),
+        content: content.trim(),
+        excerpt: excerpt.trim() || undefined,
+        tags: tags.length > 0 ? tags : undefined,
+        category: category.trim(),
         status: publish ? "published" : "draft",
       };
+
+      // Only include featuredImage if it's a valid URL
+      if (coverImage && coverImage.trim()) {
+        try {
+          new URL(coverImage.trim());
+          blogData.featuredImage = coverImage.trim();
+        } catch (e) {
+          // Skip invalid URLs
+          console.warn("Invalid featured image URL, skipping:", coverImage);
+        }
+      }
 
       console.log("Sending blog data:", blogData); // Debug log
 
