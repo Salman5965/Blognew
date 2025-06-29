@@ -165,17 +165,20 @@ const CommunityForum = () => {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          <ErrorBoundary fallbackMessage="Something went wrong with the chat. Please try refreshing the page.">
+          <ErrorBoundary fallbackMessage="Something went wrong with the forum. Please try refreshing the page.">
             {selectedChannel ? (
               <ForumChat
                 channel={selectedChannel}
                 onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
+                isConnected={isConnected}
+                connectionStatus={connectionStatus}
               />
             ) : (
               <ForumWelcome
                 stats={forumStats}
                 onChannelSelect={setSelectedChannel}
                 onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
+                isLoading={isLoadingStats}
               />
             )}
           </ErrorBoundary>

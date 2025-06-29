@@ -20,7 +20,12 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-const ForumWelcome = ({ stats, onChannelSelect, onToggleSidebar }) => {
+const ForumWelcome = ({
+  stats,
+  onChannelSelect,
+  onToggleSidebar,
+  isLoading = false,
+}) => {
   const popularChannels = [
     {
       id: "general-chat",
