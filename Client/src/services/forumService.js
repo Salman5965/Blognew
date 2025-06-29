@@ -76,16 +76,17 @@ class ForumService {
             unread: 1,
           },
         ],
-        total: 2,
+        pagination: {
+          currentPage: 1,
+          totalPages: 1,
+          totalChannels: 10,
+        },
         page: 1,
         hasMore: false,
+        },
       };
     }
   }
-
-  // Get channel by ID
-  async getChannelById(channelId) {
-    try {
       const response = await api.get(`/forum/channels/${channelId}`);
       return response;
     } catch (error) {
