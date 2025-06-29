@@ -30,7 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 import blogService from "@/services/blogService";
-import LikeButton from "@/components/shared/LikeButton";
+import { LikeButton } from "@/components/shared/LikeButton";
 import BookmarkButton from "@/components/shared/BookmarkButton";
 
 const DailyDrip = () => {
