@@ -203,12 +203,13 @@ export const Navbar = () => {
                       <HelpCircle className="mr-2 h-4 w-4" />
                       Help
                     </Link>
-                    <DropdownMenuItem
-                      onClick={() => navigate("/notifications")}
-                    >
-                      <Bell className="mr-2 h-4 w-4" />
-                      <span>Notifications</span>
-                    </DropdownMenuItem>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => navigate("/notifications")}
+                  >
+                    <Bell className="mr-2 h-4 w-4" />
+                    <span>Notifications</span>
+                  </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/messages")}>
                       <MessageCircle className="mr-2 h-4 w-4" />
                       <span>Messages</span>
