@@ -46,15 +46,19 @@ class ApiService {
             config: {
               url: error.config?.url,
               method: error.config?.method,
-              timeout: error.config?.timeout
-            }
+              timeout: error.config?.timeout,
+            },
           });
 
           let errorMessage = "Network connection failed";
-          if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+          if (
+            error.code === "ECONNABORTED" ||
+            error.message.includes("timeout")
+          ) {
             errorMessage = "Request timed out. Please try again.";
-          } else if (error.message.includes('Network Error')) {
-            errorMessage = "Unable to connect to server. Please check your internet connection.";
+          } else if (error.message.includes("Network Error")) {
+            errorMessage =
+              "Unable to connect to server. Please check your internet connection.";
           }
 
           const networkError = new Error(errorMessage);
@@ -259,7 +263,10 @@ class ApiService {
     } catch (error) {
       if (error.response?.status === 404) {
         // Handle 404 gracefully for delete operations
-        return { status: "success", message: "Resource not found or already deleted" };
+        return {
+          status: "success",
+          message: "Resource not found or already deleted",
+        };
       }
       throw error;
     }
@@ -278,8 +285,10 @@ class ApiService {
         // Only retry network errors
         if (error.isNetworkError && attempt < maxRetries) {
           const delay = baseDelay * Math.pow(2, attempt);
-          console.warn(`Operation failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          console.warn(
+            `Operation failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
         } else {
           break;
         }
@@ -287,12 +296,6 @@ class ApiService {
     }
 
     throw lastError;
-  }
-  }
-
-  async delete(url, config) {
-    const response = await this.instance.delete(url, config);
-    return response.data;
   }
 
   setAuthToken(token) {
