@@ -15,8 +15,7 @@ const useNotificationStore = create((set, get) => ({
     hasPrev: false,
     totalCount: 0,
   },
-    },
-    preferences: null,
+  preferences: null,
     isPreferencesLoading: false,
 
     // Actions
