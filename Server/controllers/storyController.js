@@ -147,6 +147,7 @@ export const getStoryById = async (req, res, next) => {
     // Add user-specific like status
     const storyWithLikeStatus = {
       ...story.toObject(),
+      id: story._id.toString(), // Add id field for React keys
       author: story.author
         ? {
             ...story.author.toObject(),
