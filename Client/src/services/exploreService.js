@@ -146,6 +146,7 @@ class ExploreService {
             likes: 892,
             comments: 127,
           },
+          createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
           featuredAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
           tags: ["webdev", "future", "technology"],
         },
