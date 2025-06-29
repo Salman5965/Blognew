@@ -37,7 +37,7 @@ class ExploreService {
     return {
       authors: [
         {
-          _id: "author1",
+          _id: "507f1f77bcf86cd799439011",
           username: "alice_writes",
           firstName: "Alice",
           lastName: "Johnson",
@@ -53,7 +53,7 @@ class ExploreService {
           trending: true,
         },
         {
-          _id: "author2",
+          _id: "507f1f77bcf86cd799439012",
           username: "dev_chronicles",
           firstName: "Bob",
           lastName: "Smith",
@@ -69,7 +69,7 @@ class ExploreService {
           trending: true,
         },
         {
-          _id: "author3",
+          _id: "507f1f77bcf86cd799439013",
           username: "design_guru",
           firstName: "Sarah",
           lastName: "Davis",
