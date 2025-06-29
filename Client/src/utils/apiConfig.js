@@ -23,9 +23,8 @@ const getApiBaseUrl = () => {
     currentUrl.includes(".vercel.app") ||
     currentUrl.includes(".netlify.app")
   ) {
-    // For deployed environments, try to detect backend URL
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/api`;
+    // For deployed environments, use relative path for proxy or same-origin backend
+    return "/api";
   }
 
   // Fallback - use relative path with proxy

@@ -1,4 +1,3 @@
-
 import axios from "axios";
 import { API_BASE_URL, LOCAL_STORAGE_KEYS } from "@/utils/constant";
 import { ApiCache } from "@/utils/cache";
@@ -85,10 +84,15 @@ class ApiService {
         }
 
         if (error.response?.status === 401) {
-          // Clear auth data on unauthorized
-          localStorage.removeItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
-          localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_DATA);
-          window.location.href = "/login";
+          // Only clear auth data and redirect if this is not a login/register attempt
+          const isAuthEndpoint =
+            error.config?.url?.includes("/auth/login") ||
+            error.config?.url?.includes("/auth/register");
+          if (!isAuthEndpoint) {
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_DATA);
+            window.location.href = "/login";
+          }
         }
 
         return Promise.reject(error);
@@ -133,31 +137,43 @@ class ApiService {
 
       return response.data;
     } catch (error) {
+      // Handle 404 errors first before any other processing
+      if (error.response?.status === 404) {
+        return {
+          _isError: true,
+          status: 404,
+          message: "Not Found",
+          data: null,
+        };
+      }
       // Debug error response
       debugApiResponse(url, null, error);
 
-      // Log the error for debugging with proper serialization
-      const errorDetails = {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        isNetworkError: error.isNetworkError,
-        code: error.code,
-        baseURL: this.instance.defaults.baseURL,
-        url: url,
-        timestamp: new Date().toISOString(),
-      };
-      console.error(
-        `API Error for ${url}:`,
-        JSON.stringify(errorDetails, null, 2),
-      );
-
-      // Also log response data if available
-      if (error.response?.data) {
+      // Only log errors that aren't expected 404s
+      if (error.response?.status !== 404) {
+        // Log the error for debugging with proper serialization
+        const errorDetails = {
+          message: error.message,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          isNetworkError: error.isNetworkError,
+          code: error.code,
+          baseURL: this.instance.defaults.baseURL,
+          url: url,
+          timestamp: new Date().toISOString(),
+        };
         console.error(
-          "Error response data:",
-          JSON.stringify(error.response.data, null, 2),
+          `API Error for ${url}:`,
+          JSON.stringify(errorDetails, null, 2),
         );
+
+        // Also log response data if available
+        if (error.response?.data) {
+          console.error(
+            "Error response data:",
+            JSON.stringify(error.response.data, null, 2),
+          );
+        }
       }
 
       // Handle network errors gracefully
@@ -172,6 +188,7 @@ class ApiService {
         };
         throw networkError;
       }
+
       throw error;
     }
   }

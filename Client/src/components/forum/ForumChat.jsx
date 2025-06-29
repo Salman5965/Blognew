@@ -19,6 +19,8 @@ import {
   User,
   Code,
   Image as ImageIcon,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +29,8 @@ import { Badge } from "@/components/ui/badge";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 import EmojiPicker from "@/components/shared/EmojiPicker";
+import socketService from "@/services/socketService";
+import forumService from "@/services/forumService";
 
 const ForumChat = ({ channel, onToggleSidebar }) => {
   const [message, setMessage] = useState("");
@@ -34,114 +38,105 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [typingUsers, setTypingUsers] = useState([]);
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const messagesEndRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
   const { user } = useAuthContext();
 
-  // Mock messages for the channel
+  // Initialize real-time chat functionality
   useEffect(() => {
-    const mockMessages = [
-      {
-        id: 1,
-        user: {
-          id: "user1",
-          name: "Alex Chen",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-          role: "Moderator",
-          isOnline: true,
-        },
-        content: `Welcome to #${channel.name}! 🎉 This is where we discuss ${channel.description.toLowerCase()}. Feel free to ask questions and share your knowledge!`,
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-        reactions: [
-          { emoji: "👋", count: 12, users: ["user2", "user3"] },
-          { emoji: "🎉", count: 8, users: ["user4"] },
-        ],
-        isPinned: true,
-      },
-      {
-        id: 2,
-        user: {
-          id: "user2",
-          name: "Sarah Johnson",
-          avatar:
-            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
-          role: "Developer",
-          isOnline: true,
-        },
-        content:
-          "Hey everyone! Just wanted to share this awesome article I found about React performance optimization. Has anyone tried these techniques?",
-        timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-        reactions: [
-          { emoji: "👍", count: 5, users: ["user1"] },
-          { emoji: "🔥", count: 3, users: ["user3"] },
-        ],
-      },
-      {
-        id: 3,
-        user: {
-          id: "user3",
-          name: "Mike Torres",
-          avatar:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-          role: "Senior Dev",
-          isOnline: false,
-        },
-        content:
-          "Sarah that article is fantastic! I've been using some of those techniques in production and saw a 40% performance improvement. Especially the memo() and useMemo() optimizations.",
-        timestamp: new Date(Date.now() - 1000 * 60 * 25), // 25 minutes ago
-        reactions: [{ emoji: "💯", count: 7, users: ["user1", "user2"] }],
-      },
-      {
-        id: 4,
-        user: {
-          id: "user4",
-          name: "Emma Wilson",
-          avatar:
-            "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=40&h=40&fit=crop&crop=face",
-          role: "Designer",
-          isOnline: true,
-        },
-        content:
-          "This is super helpful! I'm working on a React project and was wondering about performance. Does anyone have experience with React.lazy() for code splitting?",
-        timestamp: new Date(Date.now() - 1000 * 60 * 20), // 20 minutes ago
-        reactions: [],
-      },
-      {
-        id: 5,
-        user: {
-          id: "user1",
-          name: "Alex Chen",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-          role: "Moderator",
-          isOnline: true,
-        },
-        content:
-          "Emma, React.lazy() is amazing for code splitting! Here's a quick example:\n\n```jsx\nconst LazyComponent = React.lazy(() => import('./Component'));\n\nfunction App() {\n  return (\n    <Suspense fallback={<div>Loading...</div>}>\n      <LazyComponent />\n    </Suspense>\n  );\n}\n```\n\nIt really helps with initial bundle size!",
-        timestamp: new Date(Date.now() - 1000 * 60 * 15), // 15 minutes ago
-        reactions: [
-          { emoji: "🙌", count: 6, users: ["user4"] },
-          { emoji: "❤️", count: 4, users: ["user2", "user3"] },
-        ],
-      },
-      {
-        id: 6,
-        user: {
-          id: "user5",
-          name: "David Kim",
-          avatar:
-            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face",
-          role: "Student",
-          isOnline: true,
-        },
-        content:
-          "Thank you Alex! That's exactly what I needed. Quick question - what's the best way to handle error boundaries with lazy loading?",
-        timestamp: new Date(Date.now() - 1000 * 60 * 10), // 10 minutes ago
-        reactions: [],
-      },
-    ];
-    setMessages(mockMessages);
-  }, [channel]);
+    if (!channel || !user) return;
+
+    setIsLoading(true);
+
+    // Connect to socket if not connected
+    if (!socketService.connected) {
+      socketService.connect();
+    }
+
+    // Load initial messages
+    const loadMessages = async () => {
+      try {
+        const data = await forumService.getChannelMessages(
+          channel.id || channel._id,
+        );
+        setMessages(data.messages || []);
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+        setMessages([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMessages();
+
+    // Join the channel
+    socketService.joinChannel(channel.id || channel._id);
+
+    // Socket event listeners
+    const handleNewMessage = (newMessage) => {
+      setMessages((prev) => [...prev, newMessage]);
+    };
+
+    const handleMessageReaction = (data) => {
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === data.messageId || msg._id === data.messageId
+            ? { ...msg, reactions: data.reactions }
+            : msg,
+        ),
+      );
+    };
+
+    const handleUserTyping = (data) => {
+      if (
+        data.userId !== user.id &&
+        data.channelId === (channel.id || channel._id)
+      ) {
+        setTypingUsers((prev) =>
+          prev.includes(data.username) ? prev : [...prev, data.username],
+        );
+      }
+    };
+
+    const handleUserStoppedTyping = (data) => {
+      if (data.channelId === (channel.id || channel._id)) {
+        setTypingUsers((prev) =>
+          prev.filter((username) => username !== data.username),
+        );
+      }
+    };
+
+    const handleConnectionStatus = (status) => {
+      setSocketConnected(status === "connected");
+    };
+
+    // Register socket listeners
+    socketService.on("new_message", handleNewMessage);
+    socketService.on("message_reaction", handleMessageReaction);
+    socketService.on("user_typing", handleUserTyping);
+    socketService.on("user_stopped_typing", handleUserStoppedTyping);
+    socketService.on("connectionStatusChanged", handleConnectionStatus);
+
+    // Check initial connection status
+    setSocketConnected(socketService.connected);
+
+    // Cleanup
+    return () => {
+      socketService.off("new_message", handleNewMessage);
+      socketService.off("message_reaction", handleMessageReaction);
+      socketService.off("user_typing", handleUserTyping);
+      socketService.off("user_stopped_typing", handleUserStoppedTyping);
+      socketService.off("connectionStatusChanged", handleConnectionStatus);
+      socketService.leaveChannel(channel.id || channel._id);
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, [channel, user]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -151,26 +146,57 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (!message.trim()) return;
+  const handleSendMessage = async () => {
+    if (!message.trim() || !socketConnected) return;
 
-    const newMessage = {
-      id: Date.now(),
-      user: {
-        id: user.id,
-        name: user.firstName + " " + user.lastName,
-        avatar: user.avatar,
-        role: "Member",
-        isOnline: true,
-      },
+    const messageData = {
       content: message,
-      timestamp: new Date(),
-      reactions: [],
+      type: "text",
+      channelId: channel.id || channel._id,
     };
 
-    setMessages((prev) => [...prev, newMessage]);
-    setMessage("");
-    setShowEmojiPicker(false);
+    try {
+      // Send via socket for real-time
+      socketService.sendMessage(channel.id || channel._id, messageData);
+
+      // Also send via API for persistence
+      await forumService.sendMessage(channel.id || channel._id, messageData);
+
+      // Clear message input
+      setMessage("");
+      setShowEmojiPicker(false);
+
+      // Stop typing indicator
+      socketService.stopTyping(channel.id || channel._id);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    } catch (error) {
+      console.error("Failed to send message:", error);
+
+      // Fallback: add message locally if socket/API fails
+      const fallbackMessage = {
+        id: Date.now(),
+        user: {
+          id: user.id || user._id,
+          name:
+            `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+            user.username ||
+            "User",
+          avatar: user.avatar,
+          role: "Member",
+          isOnline: true,
+        },
+        content: message,
+        timestamp: new Date(),
+        reactions: [],
+        isLocal: true, // Mark as local message
+      };
+
+      setMessages((prev) => [...prev, fallbackMessage]);
+      setMessage("");
+      setShowEmojiPicker(false);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -180,53 +206,104 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
     }
   };
 
-  const addReaction = (messageId, emoji) => {
-    setMessages((prev) =>
-      prev.map((msg) => {
-        if (msg.id === messageId) {
-          const existingReaction = msg.reactions.find((r) => r.emoji === emoji);
-          if (existingReaction) {
-            if (existingReaction.users.includes(user.id)) {
-              // Remove reaction
-              return {
-                ...msg,
-                reactions: msg.reactions
-                  .map((r) =>
+  const handleTyping = (e) => {
+    setMessage(e.target.value);
+
+    if (!socketConnected) return;
+
+    // Start typing indicator
+    if (e.target.value.length > 0 && !isTyping) {
+      setIsTyping(true);
+      socketService.startTyping(channel.id || channel._id);
+    }
+
+    // Reset typing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    // Stop typing after 2 seconds of inactivity
+    typingTimeoutRef.current = setTimeout(() => {
+      setIsTyping(false);
+      socketService.stopTyping(channel.id || channel._id);
+    }, 2000);
+
+    // Stop typing immediately if message is empty
+    if (e.target.value.length === 0 && isTyping) {
+      setIsTyping(false);
+      socketService.stopTyping(channel.id || channel._id);
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    }
+  };
+
+  const addReaction = async (messageId, emoji) => {
+    try {
+      // Send reaction via socket for real-time update
+      socketService.addReaction(messageId, emoji);
+
+      // Also send via API for persistence
+      await forumService.addReaction(messageId, emoji);
+    } catch (error) {
+      console.error("Failed to add reaction:", error);
+
+      // Fallback: update locally
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.id === messageId || msg._id === messageId) {
+            const userId = user.id || user._id;
+            const existingReaction = msg.reactions?.find(
+              (r) => r.emoji === emoji,
+            );
+
+            if (existingReaction) {
+              if (existingReaction.users.includes(userId)) {
+                // Remove reaction
+                return {
+                  ...msg,
+                  reactions: msg.reactions
+                    .map((r) =>
+                      r.emoji === emoji
+                        ? {
+                            ...r,
+                            count: r.count - 1,
+                            users: r.users.filter((u) => u !== userId),
+                          }
+                        : r,
+                    )
+                    .filter((r) => r.count > 0),
+                };
+              } else {
+                // Add reaction
+                return {
+                  ...msg,
+                  reactions: msg.reactions.map((r) =>
                     r.emoji === emoji
                       ? {
                           ...r,
-                          count: r.count - 1,
-                          users: r.users.filter((u) => u !== user.id),
+                          count: r.count + 1,
+                          users: [...r.users, userId],
                         }
                       : r,
-                  )
-                  .filter((r) => r.count > 0),
-              };
+                  ),
+                };
+              }
             } else {
-              // Add reaction
+              // New reaction
               return {
                 ...msg,
-                reactions: msg.reactions.map((r) =>
-                  r.emoji === emoji
-                    ? { ...r, count: r.count + 1, users: [...r.users, user.id] }
-                    : r,
-                ),
+                reactions: [
+                  ...(msg.reactions || []),
+                  { emoji, count: 1, users: [userId] },
+                ],
               };
             }
-          } else {
-            // New reaction
-            return {
-              ...msg,
-              reactions: [
-                ...msg.reactions,
-                { emoji, count: 1, users: [user.id] },
-              ],
-            };
           }
-        }
-        return msg;
-      }),
-    );
+          return msg;
+        }),
+      );
+    }
   };
 
   const formatMessageContent = (content) => {
@@ -267,7 +344,17 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
           </Button>
           <Icon className="h-5 w-5 text-muted-foreground" />
           <div>
-            <h2 className="font-semibold">{channel.name}</h2>
+            <div className="flex items-center space-x-2">
+              <h2 className="font-semibold">{channel.name}</h2>
+              {socketConnected ? (
+                <Wifi className="h-4 w-4 text-green-500" title="Connected" />
+              ) : (
+                <WifiOff
+                  className="h-4 w-4 text-red-500"
+                  title="Disconnected"
+                />
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {channel.description}
             </p>
@@ -290,123 +377,135 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((msg, index) => {
-          const showAvatar =
-            index === 0 || messages[index - 1].user.id !== msg.user.id;
-          const timeDiff =
-            index > 0 ? msg.timestamp - messages[index - 1].timestamp : 0;
-          const showTimestamp = timeDiff > 5 * 60 * 1000; // 5 minutes
+        {isLoading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+              <p className="text-sm text-muted-foreground">
+                Loading messages...
+              </p>
+            </div>
+          </div>
+        ) : null}
 
-          return (
-            <div key={msg.id} className="group">
-              {showTimestamp && (
-                <div className="text-center text-xs text-muted-foreground my-4">
-                  {formatDistanceToNow(msg.timestamp, { addSuffix: true })}
-                </div>
-              )}
+        {!isLoading &&
+          messages.map((msg, index) => {
+            const showAvatar =
+              index === 0 || messages[index - 1].user.id !== msg.user.id;
+            const timeDiff =
+              index > 0 ? msg.timestamp - messages[index - 1].timestamp : 0;
+            const showTimestamp = timeDiff > 5 * 60 * 1000; // 5 minutes
 
-              <div className={`flex space-x-3 ${!showAvatar ? "ml-12" : ""}`}>
-                {showAvatar && (
-                  <div className="relative">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={msg.user.avatar} />
-                      <AvatarFallback>
-                        {msg.user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    {msg.user.isOnline && (
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
-                    )}
+            return (
+              <div key={msg.id} className="group">
+                {showTimestamp && (
+                  <div className="text-center text-xs text-muted-foreground my-4">
+                    {formatDistanceToNow(msg.timestamp, { addSuffix: true })}
                   </div>
                 )}
 
-                <div className="flex-1 min-w-0">
+                <div className={`flex space-x-3 ${!showAvatar ? "ml-12" : ""}`}>
                   {showAvatar && (
-                    <div className="flex items-center space-x-2 mb-1">
-                      <span className="font-medium text-sm">
-                        {msg.user.name}
-                      </span>
-                      <Badge variant="outline" className="text-xs">
-                        {msg.user.role}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(msg.timestamp, {
-                          addSuffix: true,
-                        })}
-                      </span>
-                      {msg.isPinned && (
-                        <Pin className="h-3 w-3 text-yellow-500" />
+                    <div className="relative">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={msg.user.avatar} />
+                        <AvatarFallback>
+                          {msg.user.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      {msg.user.isOnline && (
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full" />
                       )}
                     </div>
                   )}
 
-                  <div className="text-sm leading-relaxed">
-                    {formatMessageContent(msg.content)}
-                  </div>
-
-                  {/* Reactions */}
-                  {msg.reactions.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {msg.reactions.map((reaction, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => addReaction(msg.id, reaction.emoji)}
-                          className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-colors ${
-                            reaction.users.includes(user.id)
-                              ? "bg-primary/20 text-primary"
-                              : "bg-muted hover:bg-muted/80"
-                          }`}
-                        >
-                          <span>{reaction.emoji}</span>
-                          <span>{reaction.count}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Message Actions */}
-                  <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => addReaction(msg.id, "👍")}
-                      className="h-6 w-6 p-0"
-                    >
-                      <Heart className="h-3 w-3" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                      <Reply className="h-3 w-3" />
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                      <Share className="h-3 w-3" />
-                    </Button>
-                    {msg.user.id === user.id && (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                        >
-                          <Edit className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      </>
+                  <div className="flex-1 min-w-0">
+                    {showAvatar && (
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-medium text-sm">
+                          {msg.user.name}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {msg.user.role}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(msg.timestamp, {
+                            addSuffix: true,
+                          })}
+                        </span>
+                        {msg.isPinned && (
+                          <Pin className="h-3 w-3 text-yellow-500" />
+                        )}
+                      </div>
                     )}
+
+                    <div className="text-sm leading-relaxed">
+                      {formatMessageContent(msg.content)}
+                    </div>
+
+                    {/* Reactions */}
+                    {msg.reactions.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {msg.reactions.map((reaction, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => addReaction(msg.id, reaction.emoji)}
+                            className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs transition-colors ${
+                              reaction.users.includes(user.id)
+                                ? "bg-primary/20 text-primary"
+                                : "bg-muted hover:bg-muted/80"
+                            }`}
+                          >
+                            <span>{reaction.emoji}</span>
+                            <span>{reaction.count}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Message Actions */}
+                    <div className="flex items-center space-x-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => addReaction(msg.id, "👍")}
+                        className="h-6 w-6 p-0"
+                      >
+                        <Heart className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Reply className="h-3 w-3" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                        <Share className="h-3 w-3" />
+                      </Button>
+                      {msg.user.id === user.id && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
         {/* Typing Indicator */}
         {typingUsers.length > 0 && (
@@ -438,10 +537,11 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
           <div className="flex-1 relative">
             <Input
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleTyping}
               onKeyPress={handleKeyPress}
               placeholder={`Message #${channel.name}`}
               className="pr-20"
+              disabled={!socketConnected}
             />
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
               <Button
@@ -473,7 +573,15 @@ const ForumChat = ({ channel, onToggleSidebar }) => {
             )}
           </div>
 
-          <Button onClick={handleSendMessage} disabled={!message.trim()}>
+          <Button
+            onClick={handleSendMessage}
+            disabled={!message.trim() || !socketConnected}
+            title={
+              !socketConnected
+                ? "Disconnected - cannot send messages"
+                : "Send message"
+            }
+          >
             <Send className="h-4 w-4" />
           </Button>
         </div>

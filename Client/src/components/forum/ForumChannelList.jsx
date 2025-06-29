@@ -16,10 +16,13 @@ import {
   ChevronRight,
   Volume2,
   VolumeX,
+  Loader2,
+  Pin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import forumService from "@/services/forumService";
 
 const ForumChannelList = ({
   selectedChannel,
@@ -30,52 +33,117 @@ const ForumChannelList = ({
     new Set(["general", "development"]),
   );
   const [notifications, setNotifications] = useState(true);
+  const [channels, setChannels] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const channelCategories = [
+  // Load channels from API
+  useEffect(() => {
+    const loadChannels = async () => {
+      try {
+        setIsLoading(true);
+        const response = await forumService.getChannels();
+        setChannels(response.channels || []);
+        setError(null);
+      } catch (err) {
+        console.error("Failed to load channels:", err);
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadChannels();
+  }, []);
+
+  // Helper functions
+  const getChannelIcon = (channelName) => {
+    if (channelName.includes("welcome") || channelName.includes("intro"))
+      return Users;
+    if (channelName.includes("dev") || channelName.includes("code"))
+      return Code;
+    if (channelName.includes("help") || channelName.includes("support"))
+      return HelpCircle;
+    if (channelName.includes("job") || channelName.includes("career"))
+      return Briefcase;
+    if (channelName.includes("random") || channelName.includes("off-topic"))
+      return Coffee;
+    if (channelName.includes("game")) return Gamepad2;
+    if (channelName.includes("music")) return Music;
+    if (channelName.includes("photo") || channelName.includes("design"))
+      return Camera;
+    if (channelName.includes("book") || channelName.includes("learn"))
+      return Book;
+    return Hash;
+  };
+
+  const getCategoryDisplayName = (categoryId) => {
+    const displayNames = {
+      general: "General",
+      development: "Development",
+      help: "Help & Support",
+      career: "Career",
+      offtopic: "Off Topic",
+    };
+    return (
+      displayNames[categoryId] ||
+      categoryId.charAt(0).toUpperCase() + categoryId.slice(1)
+    );
+  };
+
+  // Organize channels by category with dynamic data
+  const organizeChannelsByCategory = () => {
+    const categories = {};
+
+    // Group channels by category
+    channels.forEach((channel) => {
+      const category = channel.category || "general";
+      if (!categories[category]) {
+        categories[category] = [];
+      }
+      categories[category].push({
+        ...channel,
+        icon: getChannelIcon(channel.name),
+        messageCount: channel.messageCount || 0,
+        onlineCount: channel.onlineCount || 0,
+        lastActivity: channel.lastActivity || "No activity",
+        unread: channel.unread || 0,
+      });
+    });
+
+    return Object.entries(categories).map(([id, channels]) => ({
+      id,
+      name: getCategoryDisplayName(id),
+      channels,
+    }));
+  };
+
+  // Fallback categories if no channels are loaded
+  const getFallbackCategories = () => [
     {
       id: "general",
       name: "General",
       channels: [
         {
-          id: "welcome",
-          name: "welcome",
-          description: "Welcome new members!",
-          icon: Users,
-          messageCount: 1234,
-          onlineCount: 45,
-          lastActivity: "2 min ago",
+          id: "general-discussion",
+          name: "General Discussion",
+          description: "General conversations and announcements",
+          icon: Hash,
+          messageCount: 1247,
+          onlineCount: 89,
+          lastActivity: "2 minutes ago",
           unread: 3,
         },
         {
-          id: "announcements",
-          name: "announcements",
-          description: "Important updates",
-          icon: Hash,
+          id: "welcome",
+          name: "Welcome",
+          description: "Welcome new members!",
+          icon: Users,
           messageCount: 567,
-          onlineCount: 89,
-          lastActivity: "5 min ago",
+          onlineCount: 34,
+          lastActivity: "5 minutes ago",
           unread: 0,
           pinned: true,
-        },
-        {
-          id: "general-chat",
-          name: "general-chat",
-          description: "General discussions",
-          icon: Hash,
-          messageCount: 8934,
-          onlineCount: 123,
-          lastActivity: "1 min ago",
-          unread: 12,
-        },
-        {
-          id: "introductions",
-          name: "introductions",
-          description: "Introduce yourself",
-          icon: Users,
-          messageCount: 2341,
-          onlineCount: 34,
-          lastActivity: "3 min ago",
-          unread: 5,
         },
       ],
     },
@@ -84,166 +152,32 @@ const ForumChannelList = ({
       name: "Development",
       channels: [
         {
-          id: "frontend",
-          name: "frontend",
-          description: "React, Vue, Angular discussions",
+          id: "development",
+          name: "Development",
+          description: "Programming and development discussions",
           icon: Code,
-          messageCount: 4567,
-          onlineCount: 67,
-          lastActivity: "30 sec ago",
-          unread: 8,
-        },
-        {
-          id: "backend",
-          name: "backend",
-          description: "Node.js, Python, Java",
-          icon: Code,
-          messageCount: 3456,
-          onlineCount: 54,
-          lastActivity: "2 min ago",
-          unread: 4,
-        },
-        {
-          id: "mobile-dev",
-          name: "mobile-dev",
-          description: "iOS, Android, React Native",
-          icon: Code,
-          messageCount: 2345,
-          onlineCount: 32,
-          lastActivity: "4 min ago",
-          unread: 0,
-        },
-        {
-          id: "devops",
-          name: "devops",
-          description: "CI/CD, Docker, Cloud",
-          icon: Code,
-          messageCount: 1876,
-          onlineCount: 28,
-          lastActivity: "6 min ago",
-          unread: 2,
-        },
-      ],
-    },
-    {
-      id: "help",
-      name: "Help & Support",
-      channels: [
-        {
-          id: "help-general",
-          name: "help-general",
-          description: "General help and questions",
-          icon: HelpCircle,
-          messageCount: 3456,
-          onlineCount: 78,
-          lastActivity: "1 min ago",
-          unread: 15,
-        },
-        {
-          id: "code-review",
-          name: "code-review",
-          description: "Get your code reviewed",
-          icon: Code,
-          messageCount: 1234,
-          onlineCount: 23,
-          lastActivity: "8 min ago",
-          unread: 0,
-        },
-        {
-          id: "debugging",
-          name: "debugging",
-          description: "Debug together",
-          icon: Code,
-          messageCount: 987,
-          onlineCount: 19,
-          lastActivity: "12 min ago",
-          unread: 1,
-        },
-      ],
-    },
-    {
-      id: "career",
-      name: "Career",
-      channels: [
-        {
-          id: "job-postings",
-          name: "job-postings",
-          description: "Job opportunities",
-          icon: Briefcase,
-          messageCount: 567,
+          messageCount: 892,
           onlineCount: 45,
-          lastActivity: "15 min ago",
-          unread: 3,
-        },
-        {
-          id: "interviews",
-          name: "interviews",
-          description: "Interview prep and experiences",
-          icon: Briefcase,
-          messageCount: 789,
-          onlineCount: 23,
-          lastActivity: "20 min ago",
-          unread: 0,
-        },
-        {
-          id: "freelancing",
-          name: "freelancing",
-          description: "Freelance discussions",
-          icon: Briefcase,
-          messageCount: 345,
-          onlineCount: 12,
-          lastActivity: "25 min ago",
-          unread: 2,
-        },
-      ],
-    },
-    {
-      id: "offtopic",
-      name: "Off Topic",
-      channels: [
-        {
-          id: "random",
-          name: "random",
-          description: "Random conversations",
-          icon: Coffee,
-          messageCount: 5678,
-          onlineCount: 89,
-          lastActivity: "30 sec ago",
-          unread: 23,
-        },
-        {
-          id: "gaming",
-          name: "gaming",
-          description: "Gaming discussions",
-          icon: Gamepad2,
-          messageCount: 2345,
-          onlineCount: 34,
-          lastActivity: "2 min ago",
-          unread: 5,
-        },
-        {
-          id: "music",
-          name: "music",
-          description: "Share your favorite music",
-          icon: Music,
-          messageCount: 1234,
-          onlineCount: 23,
-          lastActivity: "5 min ago",
-          unread: 0,
-        },
-        {
-          id: "photography",
-          name: "photography",
-          description: "Photography and visual arts",
-          icon: Camera,
-          messageCount: 876,
-          onlineCount: 15,
-          lastActivity: "10 min ago",
+          lastActivity: "5 minutes ago",
           unread: 1,
+        },
+        {
+          id: "help-support",
+          name: "Help & Support",
+          description: "Get help from the community",
+          icon: HelpCircle,
+          messageCount: 234,
+          onlineCount: 23,
+          lastActivity: "8 minutes ago",
+          unread: 0,
         },
       ],
     },
   ];
+
+  const channelCategories = organizeChannelsByCategory();
+  const displayCategories =
+    channelCategories.length > 0 ? channelCategories : getFallbackCategories();
 
   const toggleCategory = (categoryId) => {
     const newExpanded = new Set(expandedCategories);
@@ -255,13 +189,15 @@ const ForumChannelList = ({
     setExpandedCategories(newExpanded);
   };
 
-  const filteredCategories = channelCategories
+  const filteredCategories = displayCategories
     .map((category) => ({
       ...category,
       channels: category.channels.filter(
         (channel) =>
           channel.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          channel.description.toLowerCase().includes(searchQuery.toLowerCase()),
+          channel.description
+            ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()),
       ),
     }))
     .filter((category) => category.channels.length > 0 || !searchQuery);
@@ -291,8 +227,31 @@ const ForumChannelList = ({
         </div>
       </div>
 
-      {/* Channel List */}
+      {/* Content */}
       <div className="flex-1 overflow-y-auto">
+        {isLoading ? (
+          <div className="flex items-center justify-center p-8">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-muted-foreground">
+              Loading channels...
+            </span>
+          </div>
+        ) : error ? (
+          <div className="p-4 text-center text-muted-foreground">
+            <p>Failed to load channels</p>
+            <p className="text-sm">{error}</p>
+            <p className="text-xs mt-2">Using fallback channels</p>
+          </div>
+        ) : filteredCategories.length === 0 ? (
+          <div className="p-4 text-center text-muted-foreground">
+            <p>No channels found</p>
+            {searchQuery && (
+              <p className="text-sm">Try adjusting your search</p>
+            )}
+          </div>
+        ) : null}
+
+        {/* Channel Categories */}
         {filteredCategories.map((category) => (
           <div key={category.id} className="mb-2">
             <button

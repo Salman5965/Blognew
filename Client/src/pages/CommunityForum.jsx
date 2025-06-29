@@ -13,6 +13,8 @@ import {
   Heart,
   MessageCircle,
   Plus,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,19 +25,45 @@ import { Link } from "react-router-dom";
 import ForumChannelList from "@/components/forum/ForumChannelList";
 import ForumChat from "@/components/forum/ForumChat";
 import ForumWelcome from "@/components/forum/ForumWelcome";
+import { useForumConnection } from "@/hooks/useForumConnection";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import forumService from "@/services/forumService";
 
 const CommunityForum = () => {
   const [selectedChannel, setSelectedChannel] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isChannelListOpen, setIsChannelListOpen] = useState(true);
+  const [forumStats, setForumStats] = useState({
+    totalMembers: 0,
+    onlineMembers: 0,
+    totalMessages: 0,
+    channelsCount: 0,
+  });
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
   const { user, isAuthenticated } = useAuthContext();
+  const { isConnected, connectionStatus, retry } = useForumConnection();
 
-  const forumStats = {
-    totalMembers: 12453,
-    onlineMembers: 342,
-    totalMessages: 89234,
-    channelsCount: 28,
-  };
+  // Load forum stats
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const stats = await forumService.getStats();
+        setForumStats({
+          totalMembers: stats?.totalMembers || 0,
+          onlineMembers: stats?.onlineMembers || 0,
+          totalMessages: stats?.totalMessages || 0,
+          channelsCount: stats?.channelsCount || 0,
+        });
+      } catch (error) {
+        console.error("Failed to load forum stats:", error);
+        // Keep default initialized stats on error
+      } finally {
+        setIsLoadingStats(false);
+      }
+    };
+
+    loadStats();
+  }, []);
 
   if (!isAuthenticated) {
     return (
@@ -75,13 +103,28 @@ const CommunityForum = () => {
               </div>
               <div className="hidden md:flex items-center space-x-4 text-sm text-muted-foreground">
                 <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>
-                    {forumStats.onlineMembers.toLocaleString()} online
+                  {isConnected ? (
+                    <Wifi className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <WifiOff className="h-3 w-3 text-red-500" />
+                  )}
+                  <span
+                    className={isConnected ? "text-green-600" : "text-red-600"}
+                  >
+                    {connectionStatus}
                   </span>
                 </div>
                 <span>•</span>
-                <span>{forumStats.totalMembers.toLocaleString()} members</span>
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>
+                    {(forumStats?.onlineMembers || 0).toLocaleString()} online
+                  </span>
+                </div>
+                <span>•</span>
+                <span>
+                  {(forumStats?.totalMembers || 0).toLocaleString()} members
+                </span>
               </div>
             </div>
 
@@ -98,6 +141,11 @@ const CommunityForum = () => {
               <Button variant="outline" size="sm">
                 <Filter className="h-4 w-4" />
               </Button>
+              {!isConnected && connectionStatus === "error" && (
+                <Button variant="outline" size="sm" onClick={retry}>
+                  Retry Connection
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -117,18 +165,20 @@ const CommunityForum = () => {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
-          {selectedChannel ? (
-            <ForumChat
-              channel={selectedChannel}
-              onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
-            />
-          ) : (
-            <ForumWelcome
-              stats={forumStats}
-              onChannelSelect={setSelectedChannel}
-              onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
-            />
-          )}
+          <ErrorBoundary fallbackMessage="Something went wrong with the chat. Please try refreshing the page.">
+            {selectedChannel ? (
+              <ForumChat
+                channel={selectedChannel}
+                onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
+              />
+            ) : (
+              <ForumWelcome
+                stats={forumStats}
+                onChannelSelect={setSelectedChannel}
+                onToggleSidebar={() => setIsChannelListOpen(!isChannelListOpen)}
+              />
+            )}
+          </ErrorBoundary>
         </div>
       </div>
     </div>

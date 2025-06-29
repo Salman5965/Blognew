@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -208,8 +207,6 @@ export const Login = () => {
 
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {/* Removed old error alert to rely on toast */}
-
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input

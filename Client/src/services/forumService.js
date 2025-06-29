@@ -5,18 +5,15 @@ class ForumService {
   async getStats() {
     try {
       const response = await api.get("/forum/stats");
-      if (response.status === "success") {
-        return response.data;
-      }
-      throw new Error(response.message || "Failed to fetch forum stats");
+      return response;
     } catch (error) {
       console.error("Error fetching forum stats:", error);
-      // Return mock data as fallback
+      // Return fallback data for better UX
       return {
-        totalMembers: 12453,
-        onlineMembers: 342,
-        totalMessages: 89234,
-        channelsCount: 28,
+        totalMembers: 2847,
+        onlineMembers: 234,
+        totalMessages: 15892,
+        channelsCount: 12,
       };
     }
   }
@@ -33,23 +30,36 @@ class ForumService {
       });
 
       const response = await api.get(`/forum/channels?${params}`);
-      if (response.status === "success") {
-        return response.data;
-      }
-      throw new Error(response.message || "Failed to fetch channels");
+      return response;
     } catch (error) {
       console.error("Error fetching channels:", error);
-
-      // Return mock data as fallback
+      // Return fallback channels for better UX
       return {
-        channels: this.getMockChannels(),
-        pagination: {
-          currentPage: page,
-          totalPages: 2,
-          totalChannels: 25,
-          hasNextPage: false,
-          hasPrevPage: false,
-        },
+        channels: [
+          {
+            id: "general",
+            name: "General Discussion",
+            description: "General conversations and announcements",
+            category: "general",
+            memberCount: 1247,
+            onlineCount: 89,
+            lastActivity: "2 minutes ago",
+            unread: 3,
+          },
+          {
+            id: "development",
+            name: "Development",
+            description: "Programming and development discussions",
+            category: "development",
+            memberCount: 892,
+            onlineCount: 45,
+            lastActivity: "5 minutes ago",
+            unread: 1,
+          },
+        ],
+        total: 2,
+        page: 1,
+        hasMore: false,
       };
     }
   }
@@ -58,16 +68,10 @@ class ForumService {
   async getChannelById(channelId) {
     try {
       const response = await api.get(`/forum/channels/${channelId}`);
-      if (response.status === "success") {
-        return response.data;
-      }
-      throw new Error(response.message || "Failed to fetch channel");
+      return response;
     } catch (error) {
       console.error("Error fetching channel:", error);
-
-      // Return mock channel
-      const mockChannels = this.getMockChannels();
-      return mockChannels.find((c) => c.id === channelId) || mockChannels[0];
+      throw error;
     }
   }
 
@@ -84,16 +88,14 @@ class ForumService {
       const response = await api.get(
         `/forum/channels/${channelId}/messages?${params}`,
       );
-      if (response.status === "success") {
-        return response.data;
-      }
-      throw new Error(response.message || "Failed to fetch messages");
+      return response;
     } catch (error) {
       console.error("Error fetching channel messages:", error);
-
-      // Return mock messages
+      // Return fallback messages for better UX
       return {
-        messages: this.getMockMessages(),
+        messages: [],
+        total: 0,
+        page: 1,
         hasMore: false,
       };
     }
@@ -106,10 +108,7 @@ class ForumService {
         `/forum/channels/${channelId}/messages`,
         messageData,
       );
-      if (response.status === "success") {
-        return response.data;
-      }
-      throw new Error(response.message || "Failed to send message");
+      return response;
     } catch (error) {
       console.error("Error sending message:", error);
       throw error;
@@ -178,102 +177,6 @@ class ForumService {
       console.error("Error deleting message:", error);
       throw error;
     }
-  }
-
-  // Mock data methods
-  getMockChannels() {
-    return [
-      {
-        _id: "welcome",
-        name: "welcome",
-        description: "Welcome new members!",
-        category: "general",
-        icon: "Users",
-        messageCount: 1234,
-        memberCount: 500,
-        onlineCount: 45,
-        lastActivity: "2 min ago",
-        isPinned: true,
-        unreadCount: 3,
-      },
-      {
-        _id: "general-chat",
-        name: "general-chat",
-        description: "General discussions",
-        category: "general",
-        icon: "Hash",
-        messageCount: 8934,
-        memberCount: 1200,
-        onlineCount: 123,
-        lastActivity: "1 min ago",
-        unreadCount: 12,
-      },
-      {
-        _id: "frontend",
-        name: "frontend",
-        description: "React, Vue, Angular discussions",
-        category: "development",
-        icon: "Code",
-        messageCount: 4567,
-        memberCount: 800,
-        onlineCount: 67,
-        lastActivity: "30 sec ago",
-        unreadCount: 8,
-      },
-      {
-        _id: "help-general",
-        name: "help-general",
-        description: "General help and questions",
-        category: "help",
-        icon: "HelpCircle",
-        messageCount: 3456,
-        memberCount: 600,
-        onlineCount: 78,
-        lastActivity: "1 min ago",
-        unreadCount: 15,
-      },
-    ];
-  }
-
-  getMockMessages() {
-    return [
-      {
-        _id: 1,
-        content:
-          "Welcome to the community! Feel free to introduce yourself and ask questions.",
-        author: {
-          _id: "user1",
-          username: "moderator",
-          firstName: "Community",
-          lastName: "Moderator",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
-          role: "moderator",
-        },
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
-        reactions: [
-          { emoji: "👋", count: 12, users: ["user2"] },
-          { emoji: "🎉", count: 8, users: ["user3"] },
-        ],
-        isPinned: true,
-      },
-      {
-        _id: 2,
-        content:
-          "Hey everyone! Just wanted to share this awesome React tutorial I found.",
-        author: {
-          _id: "user2",
-          username: "developer",
-          firstName: "John",
-          lastName: "Developer",
-          avatar:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face",
-          role: "member",
-        },
-        createdAt: new Date(Date.now() - 1000 * 60 * 30),
-        reactions: [{ emoji: "👍", count: 5, users: ["user1"] }],
-      },
-    ];
   }
 }
 

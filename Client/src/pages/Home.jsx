@@ -1,5 +1,5 @@
-
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { BlogList } from "@/components/blog/BlogList";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 
 export const Home = () => {
+  const navigate = useNavigate();
   const [viewMode, setViewMode] = useState("grid");
   const [showFilters, setShowFilters] = useState(false);
   const { isAuthenticated } = useAuthContext();
@@ -233,7 +234,7 @@ export const Home = () => {
                     </p>
                     <div className="space-y-2">
                       <Button
-                        onClick={() => (window.location.href = ROUTES.DISCOVER)}
+                        onClick={() => navigate(ROUTES.EXPLORE)}
                         className="w-full"
                         size="sm"
                       >

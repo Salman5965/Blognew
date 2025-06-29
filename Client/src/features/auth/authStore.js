@@ -15,13 +15,16 @@ export const useAuthStore = create(
       login: async (credentials) => {
         try {
           set({ isLoading: true, error: null });
-          const { user } = await authService.login(credentials);
+          const { user, token } = await authService.login(credentials);
+
           set({
             user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           });
+
+          return { user, token };
         } catch (error) {
           // Enhanced error handling
           let errorMessage = "Login failed";
@@ -36,7 +39,8 @@ export const useAuthStore = create(
           } else if (error.response?.status >= 500) {
             errorMessage = "Server error. Please try again later.";
           } else if (error.isNetworkError || !error.response) {
-            errorMessage = "Network connection failed.";
+            errorMessage =
+              "Network connection failed. Please check your internet connection.";
           }
 
           set({

@@ -35,16 +35,32 @@ class BlogService {
         error.status === 429 ||
         error.message?.includes("Too many requests")
       ) {
-        console.warn("Rate limited, using mock data fallback");
+        console.warn("Rate limited, returning empty data");
         return {
-          status: "success",
-          data: this.getMockBlogs(),
+          blogs: [],
           pagination: {
-            currentPage: 1,
-            totalPages: 1,
-            totalBlogs: 3,
+            currentPage: query.page || 1,
+            totalPages: 0,
+            totalBlogs: 0,
             hasNextPage: false,
             hasPrevPage: false,
+            limit: query.limit || PAGINATION.BLOG_LIMIT,
+          },
+        };
+      }
+
+      // Handle 500 server errors gracefully
+      if (error.status === 500 || error.response?.status === 500) {
+        console.warn("Server error, returning empty data");
+        return {
+          blogs: [],
+          pagination: {
+            currentPage: query.page || 1,
+            totalPages: 0,
+            totalBlogs: 0,
+            hasNextPage: false,
+            hasPrevPage: false,
+            limit: query.limit || PAGINATION.BLOG_LIMIT,
           },
         };
       }
@@ -372,84 +388,6 @@ class BlogService {
 
       throw error;
     }
-  }
-
-  // Mock blogs for fallback when API is unavailable or rate limited
-  getMockBlogs() {
-    return [
-      {
-        _id: "1",
-        title: "Getting Started with React Development",
-        content:
-          "Learn the fundamentals of React including components, state, and props...",
-        excerpt: "A comprehensive guide to starting your React journey",
-        author: {
-          _id: "author1",
-          username: "developer",
-          firstName: "John",
-          lastName: "Doe",
-          avatar:
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
-        },
-        tags: ["react", "javascript", "frontend", "tutorial"],
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-        updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
-        status: "published",
-        likesCount: 42,
-        commentsCount: 8,
-        viewsCount: 156,
-        isLiked: false,
-        slug: "getting-started-with-react",
-      },
-      {
-        _id: "2",
-        title: "Advanced Node.js Patterns and Best Practices",
-        content:
-          "Explore advanced patterns in Node.js development including async patterns, error handling...",
-        excerpt: "Deep dive into professional Node.js development techniques",
-        author: {
-          _id: "author2",
-          username: "backend_dev",
-          firstName: "Jane",
-          lastName: "Smith",
-          avatar:
-            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face",
-        },
-        tags: ["nodejs", "backend", "javascript", "performance"],
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 48),
-        updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 48),
-        status: "published",
-        likesCount: 28,
-        commentsCount: 5,
-        viewsCount: 89,
-        isLiked: false,
-        slug: "advanced-nodejs-patterns",
-      },
-      {
-        _id: "3",
-        title: "Building Modern UIs with Tailwind CSS",
-        content:
-          "Discover how to create beautiful, responsive UIs with Tailwind CSS utility classes...",
-        excerpt: "Master modern CSS with the utility-first approach",
-        author: {
-          _id: "author3",
-          username: "ui_designer",
-          firstName: "Alex",
-          lastName: "Johnson",
-          avatar:
-            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face",
-        },
-        tags: ["css", "tailwind", "design", "frontend", "ui"],
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 72),
-        updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 72),
-        status: "published",
-        likesCount: 67,
-        commentsCount: 12,
-        viewsCount: 234,
-        isLiked: true,
-        slug: "building-modern-uis-with-tailwind-css",
-      },
-    ];
   }
 }
 

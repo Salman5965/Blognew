@@ -47,8 +47,8 @@ const Notifications = () => {
     return <Navigate to="/auth/signin" replace />;
   }
 
-  // Filter notifications
-  const filteredNotifications = notifications.filter((notification) => {
+  // Filter notifications - ensure notifications is an array
+  const filteredNotifications = (notifications || []).filter((notification) => {
     const matchesReadFilter =
       filter === "all" ||
       (filter === "unread" && !notification.isRead) ||
@@ -103,10 +103,10 @@ const Notifications = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Bell className="h-6 w-6 text-blue-400" />
+            <Bell className="h-6 w-6 text-primary" />
             <div>
-              <h1 className="text-2xl font-bold text-white">Notifications</h1>
-              <p className="text-slate-400">
+              <h1 className="text-2xl font-bold">Notifications</h1>
+              <p className="text-muted-foreground">
                 {unreadCount > 0
                   ? `${unreadCount} unread notifications`
                   : "All caught up!"}
@@ -120,7 +120,6 @@ const Notifications = () => {
               size="sm"
               onClick={handleRefresh}
               disabled={isLoading}
-              className="text-slate-300 border-slate-600"
             >
               <RefreshCw
                 className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
@@ -129,12 +128,7 @@ const Notifications = () => {
             </Button>
 
             {unreadCount > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleMarkAllAsRead}
-                className="text-blue-400 border-blue-600 hover:bg-blue-600/10"
-              >
+              <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
                 <CheckCheck className="h-4 w-4 mr-2" />
                 Mark all read
               </Button>
@@ -144,7 +138,6 @@ const Notifications = () => {
               variant="outline"
               size="sm"
               onClick={() => setShowSettings(!showSettings)}
-              className="text-slate-300 border-slate-600"
             >
               <Settings className="h-4 w-4 mr-2" />
               Settings
@@ -248,45 +241,52 @@ const Notifications = () => {
         </Card>
 
         {/* Notifications List */}
-        <Card className="bg-slate-900 border-slate-700">
+        <Card className="bg-card border">
           {error && (
             <div className="p-6 text-center">
-              <p className="text-red-400 mb-4">Failed to load notifications</p>
-              <Button
-                variant="outline"
-                onClick={handleRefresh}
-                className="text-slate-300 border-slate-600"
-              >
+              <p className="text-destructive mb-4">
+                Failed to load notifications
+              </p>
+              <Button variant="outline" onClick={handleRefresh}>
                 Try again
               </Button>
             </div>
           )}
 
           {!error && filteredNotifications.length === 0 && !isLoading && (
-            <div className="p-6 text-center">
-              <Bell className="h-12 w-12 text-slate-600 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">
+            <div className="p-8 text-center">
+              <Bell className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+              <h3 className="text-lg font-medium mb-2">
                 {filter === "unread"
                   ? "No unread notifications"
                   : typeFilter !== "all"
                     ? `No ${typeFilter} notifications`
                     : "No notifications yet"}
               </h3>
-              <p className="text-slate-400">
+              <p className="text-muted-foreground mb-4">
                 {filter === "all"
-                  ? "When you get notifications, they'll show up here."
-                  : "Try changing your filter settings."}
+                  ? "You'll receive notifications when people interact with your content or follow you."
+                  : "Try changing your filter settings to see different types of notifications."}
               </p>
+              {filter === "all" && (
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <p>• Get notified when someone likes your posts</p>
+                  <p>• See when people comment on your blogs</p>
+                  <p>• Know when new followers join your network</p>
+                </div>
+              )}
             </div>
           )}
 
-          <NotificationList
-            notifications={filteredNotifications}
-            isLoading={isLoading}
-            hasMore={pagination.hasNext}
-            onLoadMore={handleLoadMore}
-            className="divide-y divide-slate-700"
-          />
+          {(filteredNotifications.length > 0 || isLoading) && (
+            <NotificationList
+              notifications={filteredNotifications}
+              isLoading={isLoading}
+              hasMore={pagination.hasNext}
+              onLoadMore={handleLoadMore}
+              className="divide-y divide-border"
+            />
+          )}
         </Card>
       </div>
     </div>

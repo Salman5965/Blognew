@@ -15,6 +15,8 @@ export const ROUTES = {
   USER_PROFILE: "/users",
   FOLLOWERS: "/users/:userId/followers",
   FOLLOWING: "/users/:userId/following",
+  DISCOVER: "/explore",
+  EXPLORE: "/explore",
 
   ABOUT: "/about",
   CONTACT: "/contact",
