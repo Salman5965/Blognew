@@ -69,7 +69,7 @@ export const useExplore = (options = {}) => {
             : prevData.featuredContent,
         popularTags:
           tagsResult.status === "fulfilled"
-            ? tagsResult.value || []
+            ? tagsResult.value.tags || []
             : prevData.popularTags,
         recommendedUsers:
           usersResult.status === "fulfilled"
