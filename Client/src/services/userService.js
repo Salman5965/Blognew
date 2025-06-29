@@ -41,24 +41,9 @@ class UserService {
     } catch (error) {
       console.error("Error fetching user activity:", error);
 
-      // Return mock data for missing endpoints
+      // Return empty array for missing endpoints
       if (error.response?.status === 404 || error.status === 404) {
-        return [
-          {
-            id: 1,
-            type: "blog_created",
-            message: "Created a new blog post",
-            timestamp: new Date(Date.now() - 1000 * 60 * 30),
-            data: { title: "Recent Blog Post" },
-          },
-          {
-            id: 2,
-            type: "blog_liked",
-            message: "Liked a blog post",
-            timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2),
-            data: { title: "Interesting Article" },
-          },
-        ].slice(0, limit);
+        return [];
       }
 
       return [];

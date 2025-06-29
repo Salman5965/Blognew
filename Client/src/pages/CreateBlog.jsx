@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -183,9 +182,8 @@ export const CreateBlog = () => {
         excerpt,
         tags,
         category,
-        coverImage,
-        status: isPublished ? "published" : "draft",
-        visibility,
+        featuredImage: coverImage,
+        status: publish ? "published" : "draft",
       };
 
       const createdBlog = await createBlog(blogData);
