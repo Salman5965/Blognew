@@ -62,30 +62,31 @@ const Stories = () => {
   const handleLike = async (storyId) => {
     try {
       await storiesService.likeStory(storyId);
-      setStories((prev) =>
-        prev.map((story) =>
-          (story.id || story._id) === storyId
-            ? {
-                ...story,
-                likes: Array.isArray(story.likes)
-                  ? story.isLiked
-                    ? story.likes.length - 1
-                    : story.likes.length + 1
-                  : story.isLiked
-                    ? (story.likes || 0) - 1
-                    : (story.likes || 0) + 1,
-                likeCount: Array.isArray(story.likes)
-                  ? story.isLiked
-                    ? story.likes.length - 1
-                    : story.likes.length + 1
-                  : story.isLiked
-                    ? (story.likeCount || 0) - 1
-                    : (story.likeCount || 0) + 1,
-                isLiked: !story.isLiked,
-              }
-            : story,
-        ),
-      );
+      // Update both stories and featured stories
+      const updateStoryLikes = (story) =>
+        (story.id || story._id) === storyId
+          ? {
+              ...story,
+              likes: Array.isArray(story.likes)
+                ? story.isLiked
+                  ? story.likes.length - 1
+                  : story.likes.length + 1
+                : story.isLiked
+                  ? (story.likes || 0) - 1
+                  : (story.likes || 0) + 1,
+              likeCount: Array.isArray(story.likes)
+                ? story.isLiked
+                  ? story.likes.length - 1
+                  : story.likes.length + 1
+                : story.isLiked
+                  ? (story.likeCount || 0) - 1
+                  : (story.likeCount || 0) + 1,
+              isLiked: !story.isLiked,
+            }
+          : story;
+
+      setStories((prev) => prev.map(updateStoryLikes));
+      setFeaturedStories((prev) => prev.map(updateStoryLikes));
     } catch (error) {
       console.error("Failed to like story:", error);
     }
