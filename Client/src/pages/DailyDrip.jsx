@@ -406,9 +406,8 @@ const DailyDrip = () => {
                   <div className="flex items-center gap-4">
                     <LikeButton
                       blogId={post._id}
-                      initialLikes={post.likes}
-                      initialIsLiked={post.isLiked}
-                      disabled={!isAuthenticated}
+                      likeCount={post.likes}
+                      isLiked={post.isLiked}
                     />
                     <Button
                       variant="ghost"
