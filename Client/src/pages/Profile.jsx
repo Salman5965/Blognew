@@ -294,7 +294,17 @@ const Profile = () => {
   };
 
   const getInitials = (firstName, lastName) => {
-    return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`.toUpperCase();
+    const firstInitial =
+      firstName && typeof firstName === "string" && firstName.length > 0
+        ? firstName.charAt(0)
+        : "";
+    const lastInitial =
+      lastName && typeof lastName === "string" && lastName.length > 0
+        ? lastName.charAt(0)
+        : "";
+
+    const initials = `${firstInitial}${lastInitial}`.toUpperCase();
+    return initials || "U";
   };
 
   if (!user) {
