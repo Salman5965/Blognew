@@ -255,80 +255,78 @@ const Explore = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {(Array.isArray(trendingAuthors) ? trendingAuthors : []).map(
-                  (author, index) => (
-                    <Card
-                      key={author._id || author.id}
-                      className="hover:shadow-lg transition-shadow"
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start space-x-3 mb-4">
-                          <div className="relative">
-                            <Avatar className="h-12 w-12">
-                              <AvatarImage
-                                src={author.avatar}
-                                alt={author.username}
-                              />
-                              <AvatarFallback>
-                                {(
-                                  author.firstName?.[0] ||
-                                  author.username?.[0] ||
-                                  "U"
-                                ).toUpperCase()}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="absolute -top-1 -right-1">
-                              {getAuthorRankIcon(index + 1)}
-                            </div>
-                          </div>
-
-                          <div className="flex-1 min-w-0">
-                            <Link
-                              to={`/users/${author._id || author.id}`}
-                              className="font-semibold hover:text-primary transition-colors truncate block"
-                            >
-                              {author.firstName && author.lastName
-                                ? `${author.firstName} ${author.lastName}`
-                                : author.username || "Unknown User"}
-                            </Link>
-                            <p className="text-sm text-muted-foreground truncate">
-                              @{author.username}
-                            </p>
+                {safeTrendingAuthors.map((author, index) => (
+                  <Card
+                    key={author._id || author.id}
+                    className="hover:shadow-lg transition-shadow"
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3 mb-4">
+                        <div className="relative">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage
+                              src={author.avatar}
+                              alt={author.username}
+                            />
+                            <AvatarFallback>
+                              {(
+                                author.firstName?.[0] ||
+                                author.username?.[0] ||
+                                "U"
+                              ).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="absolute -top-1 -right-1">
+                            {getAuthorRankIcon(index + 1)}
                           </div>
                         </div>
 
-                        {author.bio && (
-                          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                            {author.bio}
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            to={`/users/${author._id || author.id}`}
+                            className="font-semibold hover:text-primary transition-colors truncate block"
+                          >
+                            {author.firstName && author.lastName
+                              ? `${author.firstName} ${author.lastName}`
+                              : author.username || "Unknown User"}
+                          </Link>
+                          <p className="text-sm text-muted-foreground truncate">
+                            @{author.username}
                           </p>
-                        )}
-
-                        <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
-                          <div className="flex items-center space-x-3">
-                            <span className="flex items-center space-x-1">
-                              <BookOpen className="h-3 w-3" />
-                              <span>{author.blogsCount || 0}</span>
-                            </span>
-                            <span className="flex items-center space-x-1">
-                              <Users className="h-3 w-3" />
-                              <span>{author.followersCount || 0}</span>
-                            </span>
-                            <span className="flex items-center space-x-1">
-                              <Heart className="h-3 w-3" />
-                              <span>{author.likesCount || 0}</span>
-                            </span>
-                          </div>
                         </div>
+                      </div>
 
-                        <FollowButton
-                          userId={author._id || author.id}
-                          className="w-full"
-                          size="sm"
-                        />
-                      </CardContent>
-                    </Card>
-                  ),
-                )}
+                      {author.bio && (
+                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                          {author.bio}
+                        </p>
+                      )}
+
+                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
+                        <div className="flex items-center space-x-3">
+                          <span className="flex items-center space-x-1">
+                            <BookOpen className="h-3 w-3" />
+                            <span>{author.blogsCount || 0}</span>
+                          </span>
+                          <span className="flex items-center space-x-1">
+                            <Users className="h-3 w-3" />
+                            <span>{author.followersCount || 0}</span>
+                          </span>
+                          <span className="flex items-center space-x-1">
+                            <Heart className="h-3 w-3" />
+                            <span>{author.likesCount || 0}</span>
+                          </span>
+                        </div>
+                      </div>
+
+                      <FollowButton
+                        userId={author._id || author.id}
+                        className="w-full"
+                        size="sm"
+                      />
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             )}
           </CardContent>
