@@ -460,7 +460,7 @@ const Explore = () => {
                       </div>
                     ))}
                   </div>
-                ) : !recommendedUsers || recommendedUsers.length === 0 ? (
+                ) : safeRecommendedUsers.length === 0 ? (
                   <div className="text-center py-8">
                     <UserPlus className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">
