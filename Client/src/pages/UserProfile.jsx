@@ -93,10 +93,30 @@ export const UserProfile = () => {
 
   const getInitials = () => {
     if (!user) return "";
-    if (user.firstName && user.lastName) {
+
+    // Check if both firstName and lastName exist and are not empty
+    if (
+      user.firstName &&
+      user.lastName &&
+      typeof user.firstName === "string" &&
+      typeof user.lastName === "string" &&
+      user.firstName.length > 0 &&
+      user.lastName.length > 0
+    ) {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
     }
-    return user.username.charAt(0).toUpperCase();
+
+    // Fallback to username if available
+    if (
+      user.username &&
+      typeof user.username === "string" &&
+      user.username.length > 0
+    ) {
+      return user.username.charAt(0).toUpperCase();
+    }
+
+    // Final fallback
+    return "U";
   };
 
   const getDisplayName = () => {
