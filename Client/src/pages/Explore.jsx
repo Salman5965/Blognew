@@ -192,21 +192,19 @@ const Explore = () => {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {(Array.isArray(trendingTopics) ? trendingTopics : [])
-                  .slice(0, 10)
-                  .map((topic, index) => (
-                    <Badge
-                      key={topic.id || index}
-                      variant="secondary"
-                      className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                    >
-                      <Hash className="h-3 w-3 mr-1" />
-                      {topic.name || topic}
-                      {topic.count && (
-                        <span className="ml-1 opacity-70">({topic.count})</span>
-                      )}
-                    </Badge>
-                  ))}
+                {safeTrendingTopics.slice(0, 10).map((topic, index) => (
+                  <Badge
+                    key={topic.id || index}
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                  >
+                    <Hash className="h-3 w-3 mr-1" />
+                    {topic.name || topic}
+                    {topic.count && (
+                      <span className="ml-1 opacity-70">({topic.count})</span>
+                    )}
+                  </Badge>
+                ))}
               </div>
             )}
           </CardContent>
