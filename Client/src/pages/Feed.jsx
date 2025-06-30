@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -191,9 +190,15 @@ const Feed = () => {
   };
 
   const getInitials = (name) => {
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
+      return "?";
+    }
+
     return (
       name
-        ?.split(" ")
+        .trim()
+        .split(" ")
+        .filter((n) => n.length > 0) // Filter out empty strings
         .map((n) => n[0])
         .join("")
         .toUpperCase() || "?"
