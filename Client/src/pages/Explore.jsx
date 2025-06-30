@@ -525,20 +525,22 @@ const Explore = () => {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {(popularTags || []).map((tag, index) => (
-                  <Badge
-                    key={tag.id || index}
-                    variant="outline"
-                    className="cursor-pointer hover:bg-muted transition-colors"
-                  >
-                    {tag.name || tag}
-                    {tag.count && (
-                      <span className="ml-1 text-xs opacity-70">
-                        ({tag.count})
-                      </span>
-                    )}
-                  </Badge>
-                ))}
+                {(Array.isArray(popularTags) ? popularTags : []).map(
+                  (tag, index) => (
+                    <Badge
+                      key={tag.id || index}
+                      variant="outline"
+                      className="cursor-pointer hover:bg-muted transition-colors"
+                    >
+                      {tag.name || tag}
+                      {tag.count && (
+                        <span className="ml-1 text-xs opacity-70">
+                          ({tag.count})
+                        </span>
+                      )}
+                    </Badge>
+                  ),
+                )}
               </div>
             )}
           </CardContent>
