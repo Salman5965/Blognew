@@ -228,7 +228,7 @@ const Explore = () => {
                   </Card>
                 ))}
               </div>
-            ) : trendingAuthors.length === 0 ? (
+            ) : !trendingAuthors || trendingAuthors.length === 0 ? (
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
@@ -240,7 +240,7 @@ const Explore = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {trendingAuthors.map((author, index) => (
+                {(trendingAuthors || []).map((author, index) => (
                   <Card
                     key={author._id || author.id}
                     className="hover:shadow-lg transition-shadow"
