@@ -445,7 +445,7 @@ const Explore = () => {
                       </div>
                     ))}
                   </div>
-                ) : recommendedUsers.length === 0 ? (
+                ) : !recommendedUsers || recommendedUsers.length === 0 ? (
                   <div className="text-center py-8">
                     <UserPlus className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">
@@ -454,7 +454,7 @@ const Explore = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {recommendedUsers.slice(0, 6).map((user) => (
+                    {(recommendedUsers || []).slice(0, 6).map((user) => (
                       <div
                         key={user._id || user.id}
                         className="flex items-center space-x-3"
