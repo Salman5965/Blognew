@@ -458,43 +458,48 @@ const Explore = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(recommendedUsers || []).slice(0, 6).map((user) => (
-                      <div
-                        key={user._id || user.id}
-                        className="flex items-center space-x-3"
-                      >
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={user.avatar} alt={user.username} />
-                          <AvatarFallback>
-                            {(
-                              user.firstName?.[0] ||
-                              user.username?.[0] ||
-                              "U"
-                            ).toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
+                    {(Array.isArray(recommendedUsers) ? recommendedUsers : [])
+                      .slice(0, 6)
+                      .map((user) => (
+                        <div
+                          key={user._id || user.id}
+                          className="flex items-center space-x-3"
+                        >
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage
+                              src={user.avatar}
+                              alt={user.username}
+                            />
+                            <AvatarFallback>
+                              {(
+                                user.firstName?.[0] ||
+                                user.username?.[0] ||
+                                "U"
+                              ).toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
 
-                        <div className="flex-1 min-w-0">
-                          <Link
-                            to={`/users/${user._id || user.id}`}
-                            className="font-medium hover:text-primary transition-colors truncate block"
-                          >
-                            {user.firstName && user.lastName
-                              ? `${user.firstName} ${user.lastName}`
-                              : user.username || "Unknown User"}
-                          </Link>
-                          <p className="text-xs text-muted-foreground truncate">
-                            {user.followersCount || 0} followers
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <Link
+                              to={`/users/${user._id || user.id}`}
+                              className="font-medium hover:text-primary transition-colors truncate block"
+                            >
+                              {user.firstName && user.lastName
+                                ? `${user.firstName} ${user.lastName}`
+                                : user.username || "Unknown User"}
+                            </Link>
+                            <p className="text-xs text-muted-foreground truncate">
+                              {user.followersCount || 0} followers
+                            </p>
+                          </div>
+
+                          <FollowButton
+                            userId={user._id || user.id}
+                            size="sm"
+                            showText={false}
+                          />
                         </div>
-
-                        <FollowButton
-                          userId={user._id || user.id}
-                          size="sm"
-                          showText={false}
-                        />
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 )}
               </CardContent>
