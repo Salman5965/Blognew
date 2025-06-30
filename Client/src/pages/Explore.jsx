@@ -47,13 +47,13 @@ const Explore = () => {
   });
 
   const {
-    trendingAuthors,
-    featuredContent,
-    popularTags,
-    recommendedUsers,
-    trendingTopics,
-    exploreStats,
-  } = data;
+    trendingAuthors = [],
+    featuredContent = [],
+    popularTags = [],
+    recommendedUsers = [],
+    trendingTopics = [],
+    exploreStats = {},
+  } = data || {};
 
   const {
     authors: isLoadingAuthors,
