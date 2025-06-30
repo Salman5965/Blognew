@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:fullstack": "concurrently \"npm run dev\" \"npm run dev:server\"",
-    "dev:server": "cd ../Server && npm run dev",
+    "dev:server": "cd ../Server && node server.js",
     "build": "vite build",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
