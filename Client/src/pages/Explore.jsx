@@ -369,70 +369,68 @@ const Explore = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {(Array.isArray(featuredContent) ? featuredContent : [])
-                      .slice(0, 5)
-                      .map((content) => (
-                        <div
-                          key={content._id || content.id}
-                          className="flex space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                          {content.coverImage && (
-                            <img
-                              src={content.coverImage}
-                              alt={content.title}
-                              className="h-16 w-16 object-cover rounded"
-                            />
-                          )}
-                          <div className="flex-1">
-                            <Link
-                              to={`/blog/${content.slug || content._id}`}
-                              className="font-semibold hover:text-primary transition-colors line-clamp-2"
-                            >
-                              {content.title}
-                            </Link>
-                            <p className="text-sm text-muted-foreground mb-2">
-                              by{" "}
-                              {content.author?.firstName &&
-                              content.author?.lastName
-                                ? `${content.author.firstName} ${content.author.lastName}`
-                                : content.author?.username || "Unknown Author"}
-                            </p>
-                            <div className="flex items-center space-x-3 text-xs text-muted-foreground">
-                              <span className="flex items-center space-x-1">
-                                <Eye className="h-3 w-3" />
-                                <span>{content.viewsCount || 0}</span>
+                    {safeFeaturedContent.slice(0, 5).map((content) => (
+                      <div
+                        key={content._id || content.id}
+                        className="flex space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        {content.coverImage && (
+                          <img
+                            src={content.coverImage}
+                            alt={content.title}
+                            className="h-16 w-16 object-cover rounded"
+                          />
+                        )}
+                        <div className="flex-1">
+                          <Link
+                            to={`/blog/${content.slug || content._id}`}
+                            className="font-semibold hover:text-primary transition-colors line-clamp-2"
+                          >
+                            {content.title}
+                          </Link>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            by{" "}
+                            {content.author?.firstName &&
+                            content.author?.lastName
+                              ? `${content.author.firstName} ${content.author.lastName}`
+                              : content.author?.username || "Unknown Author"}
+                          </p>
+                          <div className="flex items-center space-x-3 text-xs text-muted-foreground">
+                            <span className="flex items-center space-x-1">
+                              <Eye className="h-3 w-3" />
+                              <span>{content.viewsCount || 0}</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <Heart className="h-3 w-3" />
+                              <span>{content.likesCount || 0}</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <MessageCircle className="h-3 w-3" />
+                              <span>{content.commentsCount || 0}</span>
+                            </span>
+                            <span className="flex items-center space-x-1">
+                              <Clock className="h-3 w-3" />
+                              <span>
+                                {(() => {
+                                  try {
+                                    const date = content.createdAt
+                                      ? new Date(content.createdAt)
+                                      : new Date();
+                                    return isNaN(date.getTime())
+                                      ? "Recently"
+                                      : formatDistanceToNow(date, {
+                                          addSuffix: true,
+                                        });
+                                  } catch (error) {
+                                    return "Recently";
+                                  }
+                                })()}
                               </span>
-                              <span className="flex items-center space-x-1">
-                                <Heart className="h-3 w-3" />
-                                <span>{content.likesCount || 0}</span>
-                              </span>
-                              <span className="flex items-center space-x-1">
-                                <MessageCircle className="h-3 w-3" />
-                                <span>{content.commentsCount || 0}</span>
-                              </span>
-                              <span className="flex items-center space-x-1">
-                                <Clock className="h-3 w-3" />
-                                <span>
-                                  {(() => {
-                                    try {
-                                      const date = content.createdAt
-                                        ? new Date(content.createdAt)
-                                        : new Date();
-                                      return isNaN(date.getTime())
-                                        ? "Recently"
-                                        : formatDistanceToNow(date, {
-                                            addSuffix: true,
-                                          });
-                                    } catch (error) {
-                                      return "Recently";
-                                    }
-                                  })()}
-                                </span>
-                              </span>
-                            </div>
+                            </span>
                           </div>
                         </div>
-                      ))}
+                      </div>
+                    ))}
                   </div>
                 )}
               </CardContent>
