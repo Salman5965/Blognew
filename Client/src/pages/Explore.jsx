@@ -243,7 +243,7 @@ const Explore = () => {
                   </Card>
                 ))}
               </div>
-            ) : !trendingAuthors || trendingAuthors.length === 0 ? (
+            ) : safeTrendingAuthors.length === 0 ? (
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
