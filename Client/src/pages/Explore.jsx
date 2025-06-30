@@ -357,7 +357,7 @@ const Explore = () => {
                       </div>
                     ))}
                   </div>
-                ) : !featuredContent || featuredContent.length === 0 ? (
+                ) : safeFeaturedContent.length === 0 ? (
                   <div className="text-center py-8">
                     <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
