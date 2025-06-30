@@ -342,7 +342,7 @@ const Explore = () => {
                       </div>
                     ))}
                   </div>
-                ) : featuredContent.length === 0 ? (
+                ) : !featuredContent || featuredContent.length === 0 ? (
                   <div className="text-center py-8">
                     <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
@@ -354,7 +354,7 @@ const Explore = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {featuredContent.slice(0, 5).map((content) => (
+                    {(featuredContent || []).slice(0, 5).map((content) => (
                       <div
                         key={content._id || content.id}
                         className="flex space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
