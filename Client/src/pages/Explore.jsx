@@ -55,6 +55,21 @@ const Explore = () => {
     exploreStats = {},
   } = data || {};
 
+  // Ensure all arrays are actually arrays to prevent map errors
+  const safeTrendingAuthors = Array.isArray(trendingAuthors)
+    ? trendingAuthors
+    : [];
+  const safeFeaturedContent = Array.isArray(featuredContent)
+    ? featuredContent
+    : [];
+  const safePopularTags = Array.isArray(popularTags) ? popularTags : [];
+  const safeRecommendedUsers = Array.isArray(recommendedUsers)
+    ? recommendedUsers
+    : [];
+  const safeTrendingTopics = Array.isArray(trendingTopics)
+    ? trendingTopics
+    : [];
+
   const {
     authors: isLoadingAuthors,
     content: isLoadingContent,
