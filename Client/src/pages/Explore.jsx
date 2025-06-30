@@ -537,7 +537,7 @@ const Explore = () => {
                   <Skeleton key={i} className="h-8 w-16" />
                 ))}
               </div>
-            ) : !popularTags || popularTags.length === 0 ? (
+            ) : safePopularTags.length === 0 ? (
               <div className="text-center py-8">
                 <Hash className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
