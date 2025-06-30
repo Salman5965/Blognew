@@ -89,10 +89,30 @@ export const FollowingPage = () => {
 
   const getDisplayName = () => {
     if (!user) return "";
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+
+    // Check if both firstName and lastName exist and are not empty
+    if (
+      user.firstName &&
+      user.lastName &&
+      typeof user.firstName === "string" &&
+      typeof user.lastName === "string" &&
+      user.firstName.trim().length > 0 &&
+      user.lastName.trim().length > 0
+    ) {
+      return `${user.firstName.trim()} ${user.lastName.trim()}`;
     }
-    return user.username;
+
+    // Fallback to username if available
+    if (
+      user.username &&
+      typeof user.username === "string" &&
+      user.username.trim().length > 0
+    ) {
+      return user.username.trim();
+    }
+
+    // Final fallback
+    return "Anonymous User";
   };
 
   if (loading) {
