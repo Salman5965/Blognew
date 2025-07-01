@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Smile } from "lucide-react";
 
 const EMOJI_CATEGORIES = {
@@ -122,15 +122,15 @@ const EmojiPicker = ({ onEmojiSelect, children }) => {
   const [activeCategory, setActiveCategory] = useState("😀");
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         {children || (
           <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
             <Smile className="h-4 w-4" />
           </Button>
         )}
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" side="top" align="end">
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-80 p-0" side="top" align="end">
         <div className="bg-card border rounded-lg shadow-lg">
           {/* Category tabs */}
           <div className="flex border-b p-2 gap-1">
@@ -164,8 +164,8 @@ const EmojiPicker = ({ onEmojiSelect, children }) => {
             </div>
           </div>
         </div>
-      </PopoverContent>
-    </Popover>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

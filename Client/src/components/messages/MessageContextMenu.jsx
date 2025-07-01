@@ -1,10 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Copy, Reply, Edit, Trash2, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,8 +30,8 @@ const MessageContextMenu = ({
   };
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         {children || (
           <Button
             variant="ghost"
@@ -39,65 +41,42 @@ const MessageContextMenu = ({
             <MoreHorizontal className="h-3 w-3" />
           </Button>
         )}
-      </PopoverTrigger>
-      <PopoverContent className="w-48 p-1" side="top" align="center">
-        <div className="space-y-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start"
-            onClick={() => onReact("❤️")}
-          >
-            <Heart className="h-4 w-4 mr-2" />
-            React
-          </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-48" side="top" align="center">
+        <DropdownMenuItem onClick={() => onReact("❤️")}>
+          <Heart className="h-4 w-4 mr-2" />
+          React
+        </DropdownMenuItem>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start"
-            onClick={() => onReply(message)}
-          >
-            <Reply className="h-4 w-4 mr-2" />
-            Reply
-          </Button>
+        <DropdownMenuItem onClick={() => onReply(message)}>
+          <Reply className="h-4 w-4 mr-2" />
+          Reply
+        </DropdownMenuItem>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full justify-start"
-            onClick={handleCopy}
-          >
-            <Copy className="h-4 w-4 mr-2" />
-            Copy
-          </Button>
+        <DropdownMenuItem onClick={handleCopy}>
+          <Copy className="h-4 w-4 mr-2" />
+          Copy
+        </DropdownMenuItem>
 
-          {isOwn && (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start"
-                onClick={() => onEdit(message)}
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
+        {isOwn && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => onEdit(message)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </DropdownMenuItem>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start text-destructive hover:text-destructive"
-                onClick={() => onDelete(message)}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
-            </>
-          )}
-        </div>
-      </PopoverContent>
-    </Popover>
+            <DropdownMenuItem
+              onClick={() => onDelete(message)}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </DropdownMenuItem>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

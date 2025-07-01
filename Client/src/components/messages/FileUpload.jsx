@@ -1,10 +1,11 @@
 import React, { useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { Paperclip, Image as ImageIcon, FileText, Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -51,8 +52,8 @@ const FileUpload = ({ onFileSelect, children, disabled = false }) => {
 
   return (
     <>
-      <Popover>
-        <PopoverTrigger asChild>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           {children || (
             <Button
               variant="ghost"
@@ -63,42 +64,30 @@ const FileUpload = ({ onFileSelect, children, disabled = false }) => {
               <Paperclip className="h-5 w-5" />
             </Button>
           )}
-        </PopoverTrigger>
-        <PopoverContent className="w-56 p-2" side="top" align="start">
-          <div className="space-y-1">
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => handleFileSelect("image")}
-            >
-              <ImageIcon className="h-4 w-4 mr-2" />
-              Photo
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => handleFileSelect("file")}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Document
-            </Button>
-            <Button
-              variant="ghost"
-              className="w-full justify-start"
-              onClick={() => {
-                // For future implementation - camera access
-                toast({
-                  title: "Camera",
-                  description: "Camera feature coming soon!",
-                });
-              }}
-            >
-              <Camera className="h-4 w-4 mr-2" />
-              Camera
-            </Button>
-          </div>
-        </PopoverContent>
-      </Popover>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" side="top" align="start">
+          <DropdownMenuItem onClick={() => handleFileSelect("image")}>
+            <ImageIcon className="h-4 w-4 mr-2" />
+            Photo
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleFileSelect("file")}>
+            <FileText className="h-4 w-4 mr-2" />
+            Document
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => {
+              // For future implementation - camera access
+              toast({
+                title: "Camera",
+                description: "Camera feature coming soon!",
+              });
+            }}
+          >
+            <Camera className="h-4 w-4 mr-2" />
+            Camera
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {/* Hidden file inputs */}
       <input
