@@ -26,6 +26,17 @@ router.get(
 );
 
 /**
+ * @route   GET /api/explore/community-impact
+ * @desc    Get community impact statistics
+ * @access  Public
+ */
+router.get(
+  "/community-impact",
+  rateLimiter("communityImpact", 60, 60),
+  getCommunityImpact,
+);
+
+/**
  * @route   GET /api/explore/trending-authors
  * @desc    Get trending authors
  * @access  Public
