@@ -149,7 +149,7 @@ export const UserCard = ({
               </div>
 
               {/* Follow Button */}
-              {showFollowButton && (
+              {showFollowButton && user?._id && (
                 <div className="ml-4">
                   <FollowButton
                     userId={user._id}
