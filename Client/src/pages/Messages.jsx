@@ -84,7 +84,7 @@ const Messages = () => {
       setIsLoading(true);
       const data = await messagingService.getConversations();
 
-      // Ensure all conversations have both id and _id fields
+      // Ensure all conversations have both id and _id fields and remove duplicates
       const normalizedConversations = (data.conversations || []).map(
         (conv) => ({
           ...conv,
@@ -93,7 +93,14 @@ const Messages = () => {
         }),
       );
 
-      setConversations(normalizedConversations);
+      // Remove duplicates based on ID
+      const uniqueConversations = normalizedConversations.filter(
+        (conv, index, arr) =>
+          arr.findIndex((c) => c.id === conv.id || c._id === conv._id) ===
+          index,
+      );
+
+      setConversations(uniqueConversations);
     } catch (error) {
       console.error("Failed to load conversations:", error);
       toast({
