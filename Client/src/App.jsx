@@ -265,9 +265,6 @@ const App = () => (
               <Footer />
             </div>
 
-            {/* Chat Panel - Available globally for authenticated users */}
-            <ChatPanel />
-
             <Toaster />
             <Sonner />
           </BrowserRouter>
