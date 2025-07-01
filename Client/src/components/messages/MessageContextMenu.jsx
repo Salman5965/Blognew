@@ -33,13 +33,13 @@ const MessageContextMenu = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {children || (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+          <div
+            role="button"
+            tabIndex={0}
+            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded hover:bg-muted flex items-center justify-center"
           >
             <MoreHorizontal className="h-3 w-3" />
-          </Button>
+          </div>
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48" side="top" align="center">
