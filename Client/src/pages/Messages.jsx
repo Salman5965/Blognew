@@ -766,6 +766,40 @@ const Messages = () => {
               </div>
 
               <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() =>
+                    toast({
+                      title: "Voice call",
+                      description: "Voice call feature coming soon!",
+                    })
+                  }
+                >
+                  <Phone className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() =>
+                    toast({
+                      title: "Video call",
+                      description: "Video call feature coming soon!",
+                    })
+                  }
+                >
+                  <Video className="h-5 w-5" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() => handleDeleteConversation(selectedChat)}
+                >
+                  <Trash2 className="h-5 w-5" />
+                </Button>
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Info className="h-5 w-5" />
                 </Button>
@@ -802,43 +836,77 @@ const Messages = () => {
                     <div
                       key={`message-${message.id || message._id || index}`}
                       className={cn(
-                        "flex items-end gap-2",
+                        "group flex items-end gap-2",
                         isOwn ? "justify-end" : "justify-start",
                       )}
                     >
                       {!isOwn && showAvatar && (
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={selectedChat.participantAvatar} />
-                          <AvatarFallback className="text-xs">
-                            {selectedChat.participantName?.[0]?.toUpperCase() ||
-                              "U"}
-                          </AvatarFallback>
-                        </Avatar>
+                        <button
+                          onClick={() =>
+                            navigate(`/profile/${selectedChat.participantId}`)
+                          }
+                          className="hover:opacity-80 transition-opacity"
+                        >
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={selectedChat.participantAvatar} />
+                            <AvatarFallback className="text-xs">
+                              {selectedChat.participantName?.[0]?.toUpperCase() ||
+                                "U"}
+                            </AvatarFallback>
+                          </Avatar>
+                        </button>
                       )}
                       {!isOwn && !showAvatar && <div className="w-6" />}
 
-                      <div
-                        className={cn(
-                          "max-w-xs lg:max-w-md px-4 py-2 rounded-2xl break-words",
-                          isOwn
-                            ? "bg-primary text-primary-foreground rounded-br-md"
-                            : "bg-muted rounded-bl-md",
-                        )}
-                      >
-                        <p className="text-sm">{message.content}</p>
+                      <div className="flex items-center gap-1">
                         <div
                           className={cn(
-                            "flex items-center justify-end mt-1 gap-1",
+                            "max-w-xs lg:max-w-md px-4 py-2 rounded-2xl break-words relative",
                             isOwn
-                              ? "text-primary-foreground/70"
-                              : "text-muted-foreground",
+                              ? "bg-primary text-primary-foreground rounded-br-md"
+                              : "bg-muted rounded-bl-md",
                           )}
                         >
-                          <span className="text-xs">
-                            {formatMessageTime(message.createdAt)}
-                          </span>
-                          {getMessageStatus(message)}
+                          {/* Reply indicator */}
+                          {message.replyTo && (
+                            <div
+                              className={cn(
+                                "text-xs opacity-70 mb-1 p-2 rounded border-l-2",
+                                isOwn
+                                  ? "border-primary-foreground/30"
+                                  : "border-muted-foreground/30",
+                              )}
+                            >
+                              Replying to:{" "}
+                              {message.replyTo.content?.substring(0, 50)}...
+                            </div>
+                          )}
+
+                          <p className="text-sm">{message.content}</p>
+                          <div
+                            className={cn(
+                              "flex items-center justify-end mt-1 gap-1",
+                              isOwn
+                                ? "text-primary-foreground/70"
+                                : "text-muted-foreground",
+                            )}
+                          >
+                            <span className="text-xs">
+                              {formatMessageTime(message.createdAt)}
+                            </span>
+                            {getMessageStatus(message)}
+                          </div>
                         </div>
+
+                        {/* Message actions */}
+                        <MessageContextMenu
+                          message={message}
+                          isOwn={isOwn}
+                          onDelete={handleDeleteMessage}
+                          onEdit={handleEditMessage}
+                          onReply={handleReplyToMessage}
+                          onReact={handleReactToMessage}
+                        />
                       </div>
                     </div>
                   );
@@ -849,36 +917,53 @@ const Messages = () => {
 
             {/* Message Input */}
             <div className="p-4 border-t bg-card">
+              {/* Reply indicator */}
+              {replyToMessage && (
+                <div className="mb-3 p-3 bg-muted/50 rounded-lg flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">Replying to</p>
+                    <p className="text-sm truncate">{replyToMessage.content}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => setReplyToMessage(null)}
+                  >
+                    ×
+                  </Button>
+                </div>
+              )}
+
               <div className="flex items-end gap-3">
-                <Button variant="ghost" size="icon" className="rounded-full">
-                  <Paperclip className="h-5 w-5" />
-                </Button>
+                <FileUpload
+                  onFileSelect={handleFileSelect}
+                  disabled={uploadingFile || isSending}
+                />
 
                 <div className="flex-1 bg-muted rounded-full flex items-center px-4 py-2">
                   <Input
-                    placeholder="Message..."
+                    placeholder={
+                      editingMessage ? "Edit message..." : "Message..."
+                    }
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    disabled={isSending}
+                    disabled={isSending || uploadingFile}
                     className="border-0 bg-transparent p-0 text-sm focus-visible:ring-0"
                   />
                   <div className="flex items-center gap-2 ml-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 rounded-full"
-                    >
-                      <Smile className="h-4 w-4" />
-                    </Button>
-                    {!newMessage.trim() && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 rounded-full"
-                      >
-                        <ImageIcon className="h-4 w-4" />
-                      </Button>
+                    <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+                    {!newMessage.trim() && !uploadingFile && (
+                      <FileUpload onFileSelect={handleFileSelect}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 rounded-full"
+                        >
+                          <ImageIcon className="h-4 w-4" />
+                        </Button>
+                      </FileUpload>
                     )}
                   </div>
                 </div>
@@ -886,18 +971,31 @@ const Messages = () => {
                 {newMessage.trim() ? (
                   <Button
                     onClick={handleSendMessage}
-                    disabled={isSending}
+                    disabled={isSending || uploadingFile}
                     size="icon"
                     className="rounded-full"
                   >
                     <Send className="h-4 w-4" />
                   </Button>
                 ) : (
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full"
+                    onClick={() => handleSendMessageContent("❤️")}
+                    disabled={isSending || uploadingFile}
+                  >
                     <Heart className="h-5 w-5" />
                   </Button>
                 )}
               </div>
+
+              {uploadingFile && (
+                <div className="mt-2 text-xs text-muted-foreground flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-3 w-3 border-b border-primary"></div>
+                  Uploading file...
+                </div>
+              )}
             </div>
           </>
         ) : (
