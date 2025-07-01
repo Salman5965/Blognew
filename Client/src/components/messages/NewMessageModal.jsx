@@ -127,9 +127,9 @@ const NewMessageModal = ({ open, onOpenChange, onStartConversation }) => {
                 <h3 className="text-sm font-medium text-muted-foreground mb-2 px-2">
                   People
                 </h3>
-                {searchResults.map((user) => (
+                {searchResults.map((user, index) => (
                   <button
-                    key={user._id || user.id}
+                    key={`modal-user-${user._id || user.id || index}`}
                     onClick={() => handleUserSelect(user)}
                     className="w-full p-3 text-left hover:bg-muted/50 rounded-lg transition-colors flex items-center gap-3"
                   >
