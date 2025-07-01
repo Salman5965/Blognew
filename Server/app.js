@@ -21,6 +21,7 @@ import notificationRoutes from "./routes/notifications.js";
 import forumRoutes from "./routes/forum.js";
 import dailyDripRoutes from "./routes/dailyDrip.js";
 import storyRoutes from "./routes/stories.js";
+import exploreRoutes from "./routes/explore.js";
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
