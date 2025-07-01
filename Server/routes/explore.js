@@ -82,4 +82,16 @@ router.get(
   getTrendingTopics,
 );
 
+/**
+ * @route   GET /api/explore/search
+ * @desc    Search across content types (users, blogs, etc.)
+ * @access  Public
+ */
+router.get(
+  "/search",
+  rateLimiter("exploreSearch", 120, 60),
+  optionalAuth,
+  searchContent,
+);
+
 export default router;
