@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Blog from "../models/Blog.js";
 import Comment from "../models/Comment.js";
 import Follow from "../models/Follow.js";
+import Story from "../models/Story.js";
 import { validationResult } from "express-validator";
 
 // @desc    Get all users (admin only)
@@ -306,6 +307,45 @@ export const getUserStats = async (req, res, next) => {
       },
     ]);
 
+    // Get story statistics
+    const storyStats = await Story.aggregate([
+      { $match: { author: user._id, isPublished: true } },
+      {
+        $group: {
+          _id: null,
+          totalStories: { $sum: 1 },
+          totalViews: { $sum: "$views" },
+          totalLikes: { $sum: { $size: "$likes" } },
+          avgReadTime: { $avg: "$readTime" },
+        },
+      },
+    ]);
+
+    // Get comments on user's stories
+    const storyCommentStats = await Comment.aggregate([
+      {
+        $lookup: {
+          from: "stories",
+          localField: "contentId",
+          foreignField: "_id",
+          as: "story",
+        },
+      },
+      {
+        $match: {
+          "story.author": user._id,
+          "story.isPublished": true,
+          status: "active",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalStoryComments: { $sum: 1 },
+        },
+      },
+    ]);
+
     // Get monthly blog count for the last 12 months
     const monthlyStats = await Blog.aggregate([
       {
@@ -338,9 +378,18 @@ export const getUserStats = async (req, res, next) => {
         totalLikes: 0,
         avgReadTime: 0,
       },
-      comments: commentStats[0] || {
-        totalComments: 0,
-        totalCommentLikes: 0,
+      stories: storyStats[0] || {
+        totalStories: 0,
+        totalViews: 0,
+        totalLikes: 0,
+        avgReadTime: 0,
+      },
+      comments: {
+        ...(commentStats[0] || {
+          totalComments: 0,
+          totalCommentLikes: 0,
+        }),
+        totalStoryComments: storyCommentStats[0]?.totalStoryComments || 0,
       },
       monthlyStats,
       joinedDate: user.createdAt,
