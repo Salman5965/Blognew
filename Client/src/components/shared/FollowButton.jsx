@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { followService } from "@/services/followService";
 import { UserPlus, UserMinus, Loader2, UserCheck } from "lucide-react";
+import { isValidObjectId } from "@/utils/validation";
 
 export const FollowButton = ({
   userId,
@@ -31,8 +32,8 @@ export const FollowButton = ({
       if (!user || !userId || userId === "undefined" || user._id === userId)
         return;
 
-      // Skip check if userId is not a valid ObjectId format (24 hex characters)
-      if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+      // Skip check if userId is not a valid ObjectId format
+      if (!isValidObjectId(userId)) {
         console.warn("Invalid ObjectId format for userId:", userId);
         return;
       }
@@ -71,7 +72,7 @@ export const FollowButton = ({
     !userId ||
     userId === "undefined" ||
     userId === user._id ||
-    !userId.match(/^[0-9a-fA-F]{24}$/)
+    !isValidObjectId(userId)
   ) {
     return null;
   }
@@ -81,7 +82,7 @@ export const FollowButton = ({
       isLoading ||
       !userId ||
       userId === "undefined" ||
-      !userId.match(/^[0-9a-fA-F]{24}$/)
+      !isValidObjectId(userId)
     )
       return;
 
