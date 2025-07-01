@@ -93,7 +93,7 @@ const NotificationItem = ({ notification }) => {
               className="w-8 h-8 rounded-full object-cover"
             />
           ) : (
-            <div className="w-8 h-8 bg-slate-600 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
               {getNotificationIcon(notification.type)}
             </div>
           )}
