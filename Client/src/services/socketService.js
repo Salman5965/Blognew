@@ -22,11 +22,18 @@ class SocketService {
 
     // Default to backend server URL if not provided
     if (!serverUrl) {
-      // In development, connect to localhost:3001 (backend server)
-      // In production, this would be the same origin or configured backend URL
-      serverUrl = import.meta.env.DEV
-        ? "http://localhost:3001"
-        : window.location.origin;
+      // Check if we're in local development (localhost)
+      const isLocalDev =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+
+      if (isLocalDev) {
+        // In local development, connect to backend server on port 3001
+        serverUrl = "http://localhost:3001";
+      } else {
+        // In deployed environment, use same origin (backend and frontend on same server)
+        serverUrl = window.location.origin;
+      }
     }
 
     try {
