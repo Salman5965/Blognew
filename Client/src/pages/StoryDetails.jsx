@@ -22,6 +22,7 @@ import { formatDistanceToNow } from "date-fns";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { MessageButton } from "@/components/shared/MessageButton";
 import { isValidObjectId } from "@/utils/validation";
+import storyService from "@/services/storyService";
 
 const StoryDetails = () => {
   const { id } = useParams();
@@ -42,15 +43,28 @@ const StoryDetails = () => {
     try {
       setIsLoading(true);
 
-      // Simulate API call - replace with actual API call
-      // const response = await storyService.getStoryById(id);
+      // Try to fetch story from API
+      const storyData = await storyService.getStoryById(id);
+      setStory(storyData);
 
-      // For now, create a mock story object
+      // Check if user has liked/bookmarked this story
+      if (user) {
+        // In real implementation, these would be API calls:
+        // const likeStatus = await storyService.checkLikeStatus(id);
+        // const bookmarkStatus = await storyService.checkBookmarkStatus(id);
+        setIsLiked(storyData.isLikedByUser || false);
+        setIsBookmarked(storyData.isBookmarkedByUser || false);
+      }
+    } catch (error) {
+      console.error("Failed to load story:", error);
+
+      // If API fails, fall back to mock data for demo
       const mockStory = {
+        _id: id,
         id: id,
         title: "Sample Story Title",
         content:
-          "This is a sample story content. In a real implementation, this would be fetched from the API.",
+          "This is a sample story content. The API is not available, so this is mock data for demonstration purposes.\n\nIn a real implementation, this would be fetched from the backend API. The story would contain the actual content, author information, and metadata from the database.",
         author: {
           _id: "507f1f77bcf86cd799439011", // Valid ObjectId format
           username: "storyteller",
@@ -65,26 +79,19 @@ const StoryDetails = () => {
         viewsCount: 156,
         tags: ["fiction", "drama", "short-story"],
         isPublished: true,
+        isLikedByUser: false,
+        isBookmarkedByUser: false,
       };
 
       setStory(mockStory);
+      setIsLiked(false);
+      setIsBookmarked(false);
 
-      // Check if user has liked/bookmarked this story
-      if (user) {
-        // In real implementation, check user's like/bookmark status
-        setIsLiked(false);
-        setIsBookmarked(false);
-      }
-    } catch (error) {
-      console.error("Failed to load story:", error);
       toast({
-        title: "Error",
-        description: "Failed to load story. Please try again.",
-        variant: "destructive",
+        title: "Using Demo Data",
+        description: "Story API is not available. Showing demo content.",
+        variant: "default",
       });
-
-      // Redirect to stories list if story not found
-      navigate("/stories");
     } finally {
       setIsLoading(false);
     }
@@ -101,21 +108,33 @@ const StoryDetails = () => {
     }
 
     try {
-      // In real implementation, call API to like/unlike
-      setIsLiked(!isLiked);
+      // Optimistic update
+      const newLikedState = !isLiked;
+      setIsLiked(newLikedState);
       setStory((prev) => ({
         ...prev,
         likesCount: prev.likesCount + (isLiked ? -1 : 1),
       }));
 
+      // Try to update via API
+      await storyService.toggleLike(story._id || story.id);
+
       toast({
-        title: isLiked ? "Removed from likes" : "Added to likes",
-        description: isLiked
-          ? "Story removed from your likes"
-          : "Story added to your likes",
+        title: newLikedState ? "Added to likes" : "Removed from likes",
+        description: newLikedState
+          ? "Story added to your likes"
+          : "Story removed from your likes",
       });
     } catch (error) {
       console.error("Failed to like story:", error);
+
+      // Revert optimistic update on error
+      setIsLiked(isLiked);
+      setStory((prev) => ({
+        ...prev,
+        likesCount: prev.likesCount + (isLiked ? 1 : -1),
+      }));
+
       toast({
         title: "Error",
         description: "Failed to update like status",
@@ -135,17 +154,27 @@ const StoryDetails = () => {
     }
 
     try {
-      // In real implementation, call API to bookmark/unbookmark
-      setIsBookmarked(!isBookmarked);
+      // Optimistic update
+      const newBookmarkedState = !isBookmarked;
+      setIsBookmarked(newBookmarkedState);
+
+      // Try to update via API
+      await storyService.toggleBookmark(story._id || story.id);
 
       toast({
-        title: isBookmarked ? "Removed from bookmarks" : "Added to bookmarks",
-        description: isBookmarked
-          ? "Story removed from your bookmarks"
-          : "Story saved to your bookmarks",
+        title: newBookmarkedState
+          ? "Added to bookmarks"
+          : "Removed from bookmarks",
+        description: newBookmarkedState
+          ? "Story saved to your bookmarks"
+          : "Story removed from your bookmarks",
       });
     } catch (error) {
       console.error("Failed to bookmark story:", error);
+
+      // Revert optimistic update on error
+      setIsBookmarked(isBookmarked);
+
       toast({
         title: "Error",
         description: "Failed to update bookmark status",
