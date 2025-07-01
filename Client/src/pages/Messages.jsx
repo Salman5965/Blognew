@@ -518,10 +518,13 @@ const Messages = () => {
   };
 
   const scrollToBottom = () => {
-    if (messagesContainerRef.current && messagesEndRef.current) {
+    if (messagesContainerRef.current) {
       // Scroll within the messages container only, not the entire page
-      messagesContainerRef.current.scrollTop =
-        messagesContainerRef.current.scrollHeight;
+      const container = messagesContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
     }
   };
 
