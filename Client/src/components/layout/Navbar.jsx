@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -314,22 +314,32 @@ export const Navbar = () => {
                   onClick={() => navigate("/notifications")}
                 >
                   <Bell className="h-4 w-4" />
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
-                  >
-                    3
-                  </Badge>
+                  {unreadNotifications > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
+                    >
+                      {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                    </Badge>
+                  )}
                 </Button>
 
                 {/* Messages */}
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden md:flex"
+                  className="relative hidden md:flex"
                   onClick={() => navigate("/messages")}
                 >
                   <MessageCircle className="h-4 w-4" />
+                  {unreadMessages > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
+                    >
+                      {unreadMessages > 9 ? "9+" : unreadMessages}
+                    </Badge>
+                  )}
                 </Button>
 
                 {/* Mobile menu button */}
