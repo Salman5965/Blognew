@@ -83,7 +83,17 @@ const Messages = () => {
     try {
       setIsLoading(true);
       const data = await messagingService.getConversations();
-      setConversations(data.conversations || []);
+
+      // Ensure all conversations have both id and _id fields
+      const normalizedConversations = (data.conversations || []).map(
+        (conv) => ({
+          ...conv,
+          id: conv.id || conv._id,
+          _id: conv._id || conv.id,
+        }),
+      );
+
+      setConversations(normalizedConversations);
     } catch (error) {
       console.error("Failed to load conversations:", error);
       toast({
