@@ -184,7 +184,7 @@ export const Navbar = () => {
                             setShowSearchResults(false);
                             switch (result.type) {
                               case "user":
-                                navigate(`/profile/${result.id || result._id}`);
+                                navigate(`/users/${result.id || result._id}`);
                                 break;
                               case "blog":
                                 navigate(`/blog/${result.id || result._id}`);

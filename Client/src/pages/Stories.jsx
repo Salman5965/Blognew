@@ -325,7 +325,7 @@ const Stories = () => {
                             className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg cursor-pointer"
                             onClick={() => {
                               if (result.type === "people") {
-                                navigate(`/profile/${result.id || result._id}`);
+                                navigate(`/users/${result.id || result._id}`);
                               } else {
                                 navigate(`/stories/${result.id || result._id}`);
                               }
