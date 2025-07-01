@@ -220,10 +220,30 @@ const Messages = () => {
           socket.off("user_stopped_typing");
           socket.off("user_status_changed");
           socket.off("online_status_response");
+          socketService.off("connectionStatusChanged", handleConnectionStatus);
         };
       }
     }
   }, [user, selectedChat]);
+
+  // Polling fallback when Socket.IO is not available
+  const startPollingFallback = () => {
+    console.log("📡 Starting polling fallback for real-time features");
+
+    const pollingInterval = setInterval(() => {
+      if (selectedChat) {
+        const conversationId = selectedChat.id || selectedChat._id;
+        if (conversationId && !isSending) {
+          // Silently refresh messages
+          loadMessages(conversationId, true);
+        }
+      }
+      // Refresh conversations list for new message indicators
+      loadConversations(true);
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(pollingInterval);
+  };
 
   useEffect(() => {
     if (userIdToMessage && conversations.length > 0) {
