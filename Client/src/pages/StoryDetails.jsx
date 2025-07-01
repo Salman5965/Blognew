@@ -21,6 +21,7 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { MessageButton } from "@/components/shared/MessageButton";
+import { isValidObjectId } from "@/utils/validation";
 
 const StoryDetails = () => {
   const { id } = useParams();
@@ -264,7 +265,7 @@ const StoryDetails = () => {
 
                   {!isAuthor &&
                     story.author._id &&
-                    story.author._id.match(/^[0-9a-fA-F]{24}$/) && (
+                    isValidObjectId(story.author._id) && (
                       <div className="flex items-center gap-2">
                         <FollowButton userId={story.author._id} size="sm" />
                         <MessageButton user={story.author} size="sm" />
