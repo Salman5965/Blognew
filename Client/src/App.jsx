@@ -52,6 +52,16 @@ const Feed = React.lazy(() => import("./pages/Feed"));
 const Analytics = React.lazy(() =>
   import("./pages/Analytics").then((module) => ({ default: module.Analytics })),
 );
+const BlogAnalytics = React.lazy(() =>
+  import("./pages/BlogAnalytics").then((module) => ({
+    default: module.BlogAnalytics,
+  })),
+);
+const StoryAnalytics = React.lazy(() =>
+  import("./pages/StoryAnalytics").then((module) => ({
+    default: module.StoryAnalytics,
+  })),
+);
 const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 
@@ -186,6 +196,22 @@ const AppLayout = () => {
               element={
                 <PrivateRoute>
                   <Analytics />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/dashboard/blog-analytics"
+              element={
+                <PrivateRoute>
+                  <BlogAnalytics />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/dashboard/story-analytics"
+              element={
+                <PrivateRoute>
+                  <StoryAnalytics />
                 </PrivateRoute>
               }
             />
