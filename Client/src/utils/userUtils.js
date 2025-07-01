@@ -138,3 +138,7 @@ export const getUserShortName = (user) => {
   // Final fallback
   return "Anonymous";
 };
+
+// Aliases for backward compatibility
+export const getDisplayName = getUserDisplayName;
+export const getInitials = getUserInitials;
