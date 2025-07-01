@@ -52,6 +52,25 @@ export const Navbar = () => {
   const [isSearching, setIsSearching] = React.useState(false);
   const [showSearchResults, setShowSearchResults] = React.useState(false);
 
+  // Fetch unread counts when user is logged in
+  React.useEffect(() => {
+    if (!user) return;
+
+    const fetchCounts = async () => {
+      try {
+        // For now, simulate with random values
+        setUnreadNotifications(Math.floor(Math.random() * 5));
+        setUnreadMessages(Math.floor(Math.random() * 3));
+      } catch (error) {
+        console.error("Failed to fetch counts:", error);
+      }
+    };
+
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
+
   const [debouncedSearch] = useDebouncedCallback(async (value) => {
     setFilters((prev) => ({ ...prev, search: value }));
 
