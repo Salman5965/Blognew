@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -174,11 +173,13 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
                 <MessageCircle className="h-4 w-4 mr-1" />
                 Message
               </Button>
-              <FollowButton
-                userId={blog.author._id || blog.author.id}
-                size="sm"
-                showIcon={false}
-              />
+              {(blog.author?._id || blog.author?.id) && (
+                <FollowButton
+                  userId={blog.author._id || blog.author.id}
+                  size="sm"
+                  showIcon={false}
+                />
+              )}
             </div>
           )}
         </div>
@@ -235,11 +236,13 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Message
               </Button>
-              <FollowButton
-                userId={blog.author._id || blog.author.id}
-                size="sm"
-                showIcon={false}
-              />
+              {(blog.author?._id || blog.author?.id) && (
+                <FollowButton
+                  userId={blog.author._id || blog.author.id}
+                  size="sm"
+                  showIcon={false}
+                />
+              )}
             </div>
           )}
         </div>
