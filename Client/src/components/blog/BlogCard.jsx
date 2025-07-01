@@ -1,4 +1,3 @@
-
 import React, { memo, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -283,7 +282,7 @@ export const BlogCard = memo(
                   Your post
                 </Badge>
               )}
-              {!currentUser && (
+              {!currentUser && (blog.author?._id || blog.author?.id) && (
                 <FollowButton
                   userId={blog.author._id || blog.author.id}
                   size="sm"
