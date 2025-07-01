@@ -187,6 +187,19 @@ const Messages = () => {
           );
         });
 
+        // Request current online status for conversation participants
+        const participantIds = conversations
+          .map((conv) => conv.participantId)
+          .filter(Boolean);
+        if (participantIds.length > 0) {
+          socket.emit("get_online_status", participantIds);
+        }
+
+        // Listen for online status response
+        socket.on("online_status_response", (onlineUserIds) => {
+          setOnlineUsers(new Set(onlineUserIds));
+        });
+
         return () => {
           socket.off("newMessage");
           socket.off("messageRead");
