@@ -110,7 +110,8 @@ const Messages = () => {
     // Only scroll if new messages were added and user is near bottom
     if (
       messages.length > lastMessageCountRef.current &&
-      lastMessageCountRef.current > 0
+      lastMessageCountRef.current > 0 &&
+      selectedChat // Only scroll if a chat is selected
     ) {
       const container = messagesContainerRef.current;
       if (container) {
@@ -118,33 +119,33 @@ const Messages = () => {
           container.scrollHeight -
             container.scrollTop -
             container.clientHeight <
-          100;
+          150; // Increased threshold
+
         if (isNearBottom) {
-          setTimeout(() => scrollToBottom(), 100);
+          // Use requestAnimationFrame for smoother scrolling
+          requestAnimationFrame(() => {
+            scrollToBottom();
+          });
         }
       }
     }
     lastMessageCountRef.current = messages.length;
-  }, [messages]);
+  }, [messages, selectedChat]);
 
-  // Simulate online status for demo (in production, use WebSocket)
+  // Update online status based on conversation data
   useEffect(() => {
     const updateOnlineStatus = () => {
-      // Simulate random online users for demo
-      const mockOnlineUsers = new Set();
+      const onlineUserSet = new Set();
       conversations.forEach((conv) => {
-        if (Math.random() > 0.3) {
-          // 70% chance to be online
-          mockOnlineUsers.add(conv.participantId);
+        // Use actual isOnline status from conversation data
+        if (conv.isOnline || conv.participantStatus === "online") {
+          onlineUserSet.add(conv.participantId);
         }
       });
-      setOnlineUsers(mockOnlineUsers);
+      setOnlineUsers(onlineUserSet);
     };
 
     updateOnlineStatus();
-    const statusInterval = setInterval(updateOnlineStatus, 30000); // Update every 30s
-
-    return () => clearInterval(statusInterval);
   }, [conversations]);
 
   // Real-time message polling with better efficiency
@@ -337,13 +338,13 @@ const Messages = () => {
     if (!newMessage.trim() || !selectedChat || isSending) return;
 
     const content = newMessage.trim();
+    setNewMessage(""); // Clear input immediately
 
     if (editingMessage) {
       // Handle message editing
       await handleEditMessageContent(content);
     } else {
       // Handle new message
-      setNewMessage("");
       await handleSendMessageContent(content);
     }
   };
@@ -391,7 +392,14 @@ const Messages = () => {
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesEndRef.current && messagesContainerRef.current) {
+      // Scroll within the messages container only, not the whole page
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+        inline: "nearest",
+      });
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -554,21 +562,28 @@ const Messages = () => {
       return;
     }
 
+    const messageContent = content.trim();
+    let optimisticMessage;
+
     try {
       setIsSending(true);
 
       // Optimistically add message to UI
-      const optimisticMessage = {
-        id: `temp-${Date.now()}`,
-        content: content.trim(),
-        sender: { _id: user._id, username: user.username },
+      optimisticMessage = {
+        id: `temp-${Date.now()}-${Math.random()}`,
+        content: messageContent,
+        sender: {
+          _id: user._id,
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+        },
         createdAt: new Date().toISOString(),
         status: "sending",
         replyTo: replyToMessage,
       };
 
       setMessages((prev) => [...prev, optimisticMessage]);
-      const messageContent = content.trim();
 
       // Send message to backend
       const data = await messagingService.sendMessage(
@@ -577,29 +592,31 @@ const Messages = () => {
       );
 
       // Replace optimistic message with real one
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === optimisticMessage.id
-            ? { ...data.message, status: "sent" }
-            : msg,
-        ),
-      );
+      if (data && data.message) {
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === optimisticMessage.id
+              ? { ...data.message, status: "sent" }
+              : msg,
+          ),
+        );
 
-      // Update conversation last message
-      setConversations((prev) =>
-        prev.map((conv) =>
-          conv.id === conversationId || conv._id === conversationId
-            ? {
-                ...conv,
-                lastMessage: {
-                  content: messageContent,
-                  createdAt: new Date().toISOString(),
-                  sender: user._id,
-                },
-              }
-            : conv,
-        ),
-      );
+        // Update conversation last message
+        setConversations((prev) =>
+          prev.map((conv) =>
+            conv.id === conversationId || conv._id === conversationId
+              ? {
+                  ...conv,
+                  lastMessage: {
+                    content: messageContent,
+                    createdAt: new Date().toISOString(),
+                    sender: user._id,
+                  },
+                }
+              : conv,
+          ),
+        );
+      }
 
       // Clear reply state
       setReplyToMessage(null);
@@ -607,9 +624,11 @@ const Messages = () => {
       console.error("Failed to send message:", error);
 
       // Remove optimistic message on error
-      setMessages((prev) =>
-        prev.filter((msg) => msg.id !== optimisticMessage.id),
-      );
+      if (optimisticMessage) {
+        setMessages((prev) =>
+          prev.filter((msg) => msg.id !== optimisticMessage.id),
+        );
+      }
 
       toast({
         title: "Error",
@@ -1009,7 +1028,9 @@ const Messages = () => {
                           "U"}
                       </AvatarFallback>
                     </Avatar>
-                    {selectedChat.isOnline && (
+                    {(selectedChat.isOnline ||
+                      onlineUsers.has(selectedChat.participantId) ||
+                      selectedChat.participantStatus === "online") && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
                     )}
                   </div>
@@ -1019,7 +1040,11 @@ const Messages = () => {
                       {selectedChat.participantName || "Unknown User"}
                     </h2>
                     <p className="text-sm text-muted-foreground">
-                      {selectedChat.isOnline ? "Active now" : "Offline"}
+                      {selectedChat.isOnline ||
+                      onlineUsers.has(selectedChat.participantId) ||
+                      selectedChat.participantStatus === "online"
+                        ? "Active now"
+                        : "Offline"}
                     </p>
                   </div>
                 </button>
