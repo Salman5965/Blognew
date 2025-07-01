@@ -933,14 +933,6 @@ const Messages = () => {
                 >
                   <Video className="h-5 w-5" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full"
-                  onClick={() => handleDeleteConversation(selectedChat)}
-                >
-                  <Trash2 className="h-5 w-5" />
-                </Button>
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Info className="h-5 w-5" />
                 </Button>
