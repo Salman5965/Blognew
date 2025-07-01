@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Navbar } from "@/components/layout/Navbar";
@@ -98,175 +98,184 @@ const queryClient = new QueryClient({
   },
 });
 
+// AppLayout component that conditionally renders Footer
+const AppLayout = () => {
+  const location = useLocation();
+  const showFooter = location.pathname === ROUTES.HOME;
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-1">
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path={ROUTES.HOME} element={<Home />} />
+            <Route
+              path={`${ROUTES.BLOG_DETAILS}/:slug`}
+              element={<BlogDetails />}
+            />
+            <Route path={ROUTES.LOGIN} element={<Login />} />
+            <Route path={ROUTES.REGISTER} element={<Register />} />
+            <Route path={ROUTES.HELP} element={<Help />} />
+
+            {/* Public browsing routes */}
+            <Route path="/stories" element={<Stories />} />
+            <Route path="/stories/:id" element={<StoryDetails />} />
+            <Route path="/explore" element={<Explore />} />
+
+            {/* Static Pages */}
+            <Route path={ROUTES.ABOUT} element={<About />} />
+            <Route path={ROUTES.CONTACT} element={<Contact />} />
+            <Route path={ROUTES.PRIVACY} element={<Privacy />} />
+            <Route path={ROUTES.TERMS} element={<Terms />} />
+            <Route path={ROUTES.COOKIES} element={<Cookies />} />
+            <Route path={ROUTES.GDPR} element={<Gdpr />} />
+
+            {/* Protected Routes */}
+            <Route
+              path={ROUTES.FEED}
+              element={
+                <PrivateRoute>
+                  <Feed />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={ROUTES.CREATE_BLOG}
+              element={
+                <PrivateRoute>
+                  <CreateBlog />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={`${ROUTES.EDIT_BLOG}/:id`}
+              element={
+                <PrivateRoute>
+                  <EditBlog />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={ROUTES.DASHBOARD}
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={ROUTES.MY_BLOGS}
+              element={
+                <PrivateRoute>
+                  <MyBlogs />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={ROUTES.PROFILE}
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/dashboard/analytics"
+              element={
+                <PrivateRoute>
+                  <Analytics />
+                </PrivateRoute>
+              }
+            />
+
+            {/* User profile pages */}
+            <Route
+              path="/users/:userId"
+              element={
+                <PrivateRoute>
+                  <UserProfile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/users/:userId/followers"
+              element={
+                <PrivateRoute>
+                  <FollowersPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/users/:userId/following"
+              element={
+                <PrivateRoute>
+                  <FollowingPage />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Notifications */}
+            <Route
+              path="/notifications"
+              element={
+                <PrivateRoute>
+                  <Notifications />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Community Forum */}
+            <Route
+              path="/community"
+              element={
+                <PrivateRoute>
+                  <CommunityForum />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Daily Drip */}
+            <Route path="/daily-drip" element={<DailyDrip />} />
+
+            {/* Story creation - protected */}
+            <Route
+              path="/stories/create"
+              element={
+                <PrivateRoute>
+                  <CreateStory />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Messages - protected */}
+            <Route
+              path="/messages"
+              element={
+                <PrivateRoute>
+                  <Messages />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Catch-all route */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </main>
+      {showFooter && <Footer />}
+    </div>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <AuthProvider>
         <TooltipProvider>
           <BrowserRouter>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <main className="flex-1">
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    {/* Public Routes */}
-                    <Route path={ROUTES.HOME} element={<Home />} />
-                    <Route
-                      path={`${ROUTES.BLOG_DETAILS}/:slug`}
-                      element={<BlogDetails />}
-                    />
-                    <Route path={ROUTES.LOGIN} element={<Login />} />
-                    <Route path={ROUTES.REGISTER} element={<Register />} />
-                    <Route path={ROUTES.HELP} element={<Help />} />
-
-                    {/* Public browsing routes */}
-                    <Route path="/stories" element={<Stories />} />
-                    <Route path="/stories/:id" element={<StoryDetails />} />
-                    <Route path="/explore" element={<Explore />} />
-
-                    {/* Static Pages */}
-                    <Route path={ROUTES.ABOUT} element={<About />} />
-                    <Route path={ROUTES.CONTACT} element={<Contact />} />
-                    <Route path={ROUTES.PRIVACY} element={<Privacy />} />
-                    <Route path={ROUTES.TERMS} element={<Terms />} />
-                    <Route path={ROUTES.COOKIES} element={<Cookies />} />
-                    <Route path={ROUTES.GDPR} element={<Gdpr />} />
-
-                    {/* Protected Routes */}
-                    <Route
-                      path={ROUTES.FEED}
-                      element={
-                        <PrivateRoute>
-                          <Feed />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path={ROUTES.CREATE_BLOG}
-                      element={
-                        <PrivateRoute>
-                          <CreateBlog />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path={`${ROUTES.EDIT_BLOG}/:id`}
-                      element={
-                        <PrivateRoute>
-                          <EditBlog />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path={ROUTES.DASHBOARD}
-                      element={
-                        <PrivateRoute>
-                          <Dashboard />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path={ROUTES.MY_BLOGS}
-                      element={
-                        <PrivateRoute>
-                          <MyBlogs />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path={ROUTES.PROFILE}
-                      element={
-                        <PrivateRoute>
-                          <Profile />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/dashboard/analytics"
-                      element={
-                        <PrivateRoute>
-                          <Analytics />
-                        </PrivateRoute>
-                      }
-                    />
-
-                    {/* User profile pages */}
-                    <Route
-                      path="/users/:userId"
-                      element={
-                        <PrivateRoute>
-                          <UserProfile />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/users/:userId/followers"
-                      element={
-                        <PrivateRoute>
-                          <FollowersPage />
-                        </PrivateRoute>
-                      }
-                    />
-                    <Route
-                      path="/users/:userId/following"
-                      element={
-                        <PrivateRoute>
-                          <FollowingPage />
-                        </PrivateRoute>
-                      }
-                    />
-
-                    {/* Notifications */}
-                    <Route
-                      path="/notifications"
-                      element={
-                        <PrivateRoute>
-                          <Notifications />
-                        </PrivateRoute>
-                      }
-                    />
-
-                    {/* Community Forum */}
-                    <Route
-                      path="/community"
-                      element={
-                        <PrivateRoute>
-                          <CommunityForum />
-                        </PrivateRoute>
-                      }
-                    />
-
-                    {/* Daily Drip */}
-                    <Route path="/daily-drip" element={<DailyDrip />} />
-
-                    {/* Story creation - protected */}
-                    <Route
-                      path="/stories/create"
-                      element={
-                        <PrivateRoute>
-                          <CreateStory />
-                        </PrivateRoute>
-                      }
-                    />
-
-                    {/* Messages - protected */}
-                    <Route
-                      path="/messages"
-                      element={
-                        <PrivateRoute>
-                          <Messages />
-                        </PrivateRoute>
-                      }
-                    />
-
-                    {/* Catch-all route */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-              </main>
-              <Footer />
-            </div>
-
+            <AppLayout />
             <Toaster />
             <Sonner />
           </BrowserRouter>
