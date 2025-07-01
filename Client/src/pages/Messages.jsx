@@ -12,6 +12,9 @@ import {
   Info,
   MoreHorizontal,
   Paperclip,
+  Trash2,
+  Phone,
+  Video,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +27,9 @@ import { getDisplayName, getInitials } from "@/utils/userUtils";
 import { useToast } from "@/hooks/use-toast";
 import messagingService from "@/services/messagingService";
 import NewMessageModal from "@/components/messages/NewMessageModal";
+import EmojiPicker from "@/components/messages/EmojiPicker";
+import FileUpload from "@/components/messages/FileUpload";
+import MessageContextMenu from "@/components/messages/MessageContextMenu";
 
 const Messages = () => {
   const { user } = useAuthContext();
@@ -43,14 +49,40 @@ const Messages = () => {
   const [isSending, setIsSending] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
+  const [replyToMessage, setReplyToMessage] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
   const messagesEndRef = useRef(null);
+  const pollingIntervalRef = useRef(null);
 
   // Check if we need to open conversation with specific user
   const userIdToMessage = searchParams.get("user");
 
   useEffect(() => {
     loadConversations();
-  }, []);
+
+    // Start polling for new messages
+    const startPolling = () => {
+      pollingIntervalRef.current = setInterval(() => {
+        if (selectedChat) {
+          const conversationId = selectedChat.id || selectedChat._id;
+          if (conversationId) {
+            loadMessages(conversationId, true); // Silent reload
+          }
+        }
+        // Also refresh conversations for new message indicators
+        loadConversations(true);
+      }, 3000); // Poll every 3 seconds
+    };
+
+    startPolling();
+
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, [selectedChat]);
 
   useEffect(() => {
     if (userIdToMessage && conversations.length > 0) {
@@ -79,9 +111,9 @@ const Messages = () => {
     }
   }, [searchQuery]);
 
-  const loadConversations = async () => {
+  const loadConversations = async (silent = false) => {
     try {
-      setIsLoading(true);
+      if (!silent) setIsLoading(true);
       const data = await messagingService.getConversations();
 
       // Ensure all conversations have both id and _id fields and remove duplicates
@@ -109,18 +141,18 @@ const Messages = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      if (!silent) setIsLoading(false);
     }
   };
 
-  const loadMessages = async (conversationId) => {
+  const loadMessages = async (conversationId, silent = false) => {
     if (!conversationId) {
       console.error("Cannot load messages: conversationId is required");
       return;
     }
 
     try {
-      setIsLoadingMessages(true);
+      if (!silent) setIsLoadingMessages(true);
       const data = await messagingService.getMessages(conversationId);
       setMessages(data.messages || []);
 
@@ -143,7 +175,7 @@ const Messages = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoadingMessages(false);
+      if (!silent) setIsLoadingMessages(false);
     }
   };
 
