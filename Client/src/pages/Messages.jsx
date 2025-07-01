@@ -76,7 +76,11 @@ const Messages = () => {
 
       // Set up status change handler
       const handleConnectionStatus = (status) => {
-        if (status === "no-auth" || status === "error") {
+        if (
+          status === "no-auth" ||
+          status === "error" ||
+          status === "disabled"
+        ) {
           console.warn(
             "⚠️ Real-time messaging unavailable, using polling fallback",
           );
