@@ -51,7 +51,7 @@ const StoryDetails = () => {
         content:
           "This is a sample story content. In a real implementation, this would be fetched from the API.",
         author: {
-          _id: "author123",
+          _id: "507f1f77bcf86cd799439011", // Valid ObjectId format
           username: "storyteller",
           firstName: "John",
           lastName: "Doe",
