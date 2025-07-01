@@ -216,10 +216,15 @@ export const Navbar = () => {
                                 navigate(`/users/${result.id || result._id}`);
                                 break;
                               case "blog":
-                                navigate(`/blog/${result.id || result._id}`);
+                                navigate(
+                                  `/blog/${result.slug || result.id || result._id}`,
+                                );
                                 break;
                               case "story":
                                 navigate(`/stories/${result.id || result._id}`);
+                                break;
+                              case "dailydrip":
+                                navigate(`/daily-drip`);
                                 break;
                               default:
                                 navigate("/explore");
