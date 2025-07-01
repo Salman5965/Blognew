@@ -737,7 +737,7 @@ const Messages = () => {
 
                 <button
                   onClick={() =>
-                    navigate(`/profile/${selectedChat.participantId}`)
+                    navigate(`/users/${selectedChat.participantId}`)
                   }
                   className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                 >
@@ -843,7 +843,7 @@ const Messages = () => {
                       {!isOwn && showAvatar && (
                         <button
                           onClick={() =>
-                            navigate(`/profile/${selectedChat.participantId}`)
+                            navigate(`/users/${selectedChat.participantId}`)
                           }
                           className="hover:opacity-80 transition-opacity"
                         >
