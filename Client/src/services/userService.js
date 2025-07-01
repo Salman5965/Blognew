@@ -3,11 +3,27 @@ import apiService from "./api";
 class UserService {
   // Get user profile by ID
   async getUserById(userId) {
-    const response = await apiService.get(`/users/${userId}`);
-    if (response.status === "success") {
-      return response.data;
+    try {
+      const response = await apiService.get(`/users/${userId}`);
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to fetch user");
+    } catch (error) {
+      // Handle specific error types
+      if (error.response?.status === 404) {
+        throw new Error("User not found");
+      } else if (error.response?.status === 400) {
+        throw new Error("Invalid user ID");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      } else if (error.message === "Network Error") {
+        throw new Error("Network error. Please check your connection.");
+      }
+
+      // Re-throw the original error if it's already a custom error
+      throw error;
     }
-    throw new Error(response.message || "Failed to fetch user");
   }
 
   // Get user profile by username
