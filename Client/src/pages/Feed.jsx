@@ -152,10 +152,12 @@ const Feed = () => {
     await loadPosts(1, selectedFilter, searchQuery, false);
   };
 
-  const handleFilterChange = (filter) => {
+  const handleFilterChange = async (filter) => {
     setSelectedFilter(filter);
     setCurrentPage(1);
-    loadPosts(1, filter, searchQuery, false);
+    setHasMore(true);
+    setPosts([]); // Clear existing posts
+    await loadPosts(1, filter, searchQuery, false);
   };
 
   const handleSearch = (e) => {
