@@ -54,9 +54,9 @@ const NotificationPanel = ({ onClose }) => {
   return (
     <Card className="w-80 max-h-96 shadow-xl border">
       {/* Header */}
-      <div className="p-4 border-b border-slate-700">
+      <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-white">Notifications</h3>
+          <h3 className="font-semibold">Notifications</h3>
           <div className="flex items-center gap-2">
             {unreadCount > 0 && (
               <Button
