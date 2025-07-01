@@ -34,26 +34,56 @@ export const FollowersPage = () => {
         setLoading(true);
         setError(null);
 
+        // Validate userId format
+        if (!userId || !userId.match(/^[0-9a-fA-F]{24}$/)) {
+          throw new Error("Invalid user ID format");
+        }
+
         // Load user profile
         const userData = await userService.getUserById(userId);
+        if (!userData) {
+          throw new Error("User not found");
+        }
         setUser(userData);
 
-        // Load follow stats
-        const [followersResponse, followingResponse] = await Promise.all([
-          userService.getFollowers(userId, { page: 1, limit: 1 }),
-          userService.getFollowing(userId, { page: 1, limit: 1 }),
-        ]);
+        // Load follow stats - continue even if user profile failed
+        try {
+          const [followersResponse, followingResponse] = await Promise.all([
+            userService.getFollowers(userId, { page: 1, limit: 1 }),
+            userService.getFollowing(userId, { page: 1, limit: 1 }),
+          ]);
 
-        setFollowStats({
-          followersCount: followersResponse.pagination?.totalFollowers || 0,
-          followingCount: followingResponse.pagination?.totalFollowing || 0,
-        });
+          setFollowStats({
+            followersCount: followersResponse.pagination?.totalFollowers || 0,
+            followingCount: followingResponse.pagination?.totalFollowing || 0,
+          });
+        } catch (followError) {
+          console.warn("Failed to load follow stats:", followError);
+          // Set default values if follow stats fail
+          setFollowStats({
+            followersCount: 0,
+            followingCount: 0,
+          });
+        }
       } catch (error) {
         console.error("Error loading user data:", error);
         setError(error.message);
+
+        // More specific error messages
+        let errorMessage = "Failed to load user profile";
+        if (error.message === "Invalid user ID format") {
+          errorMessage = "Invalid user ID. Please check the URL.";
+        } else if (
+          error.message === "User not found" ||
+          error.message === "Not Found"
+        ) {
+          errorMessage =
+            "User not found. They may have been deleted or the link is incorrect.";
+        }
+
         toast({
           title: "Error",
-          description: "Failed to load user profile",
+          description: errorMessage,
           variant: "destructive",
         });
       } finally {
@@ -63,8 +93,11 @@ export const FollowersPage = () => {
 
     if (userId) {
       loadUserData();
+    } else {
+      setError("No user ID provided");
+      setLoading(false);
     }
-  }, [userId]);
+  }, [userId, toast]);
 
   const getInitials = () => {
     if (!user) return "";
