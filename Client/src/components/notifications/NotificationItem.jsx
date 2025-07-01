@@ -109,7 +109,7 @@ const NotificationItem = ({ notification }) => {
                   {notification.relatedUser?.lastName}
                   {!notification.relatedUser && "Someone"}
                 </span>
-                <span className="text-slate-300 ml-1">
+                <span className="text-muted-foreground ml-1">
                   {notification.type === "like" && "liked your post"}
                   {notification.type === "comment" && "commented on your post"}
                   {notification.type === "follow" && "started following you"}
