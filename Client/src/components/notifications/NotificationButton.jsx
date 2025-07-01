@@ -87,8 +87,8 @@ const NotificationButton = () => {
         <Bell
           className={`h-5 w-5 transition-all duration-200 ${
             hasNewNotifications
-              ? "animate-pulse text-blue-400"
-              : "text-slate-300"
+              ? "animate-pulse text-blue-500"
+              : "text-muted-foreground"
           }`}
         />
 
