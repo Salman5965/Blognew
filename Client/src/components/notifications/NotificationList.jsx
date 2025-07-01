@@ -52,7 +52,7 @@ const NotificationList = ({
             size="sm"
             onClick={onLoadMore}
             disabled={isLoading}
-            className="w-full text-xs text-slate-400 hover:text-slate-300"
+            className="w-full text-xs text-muted-foreground hover:text-foreground"
           >
             {isLoading ? (
               <>
