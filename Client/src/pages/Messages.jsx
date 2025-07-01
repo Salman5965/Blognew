@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { getDisplayName, getInitials } from "@/utils/userUtils";
 import { useToast } from "@/hooks/use-toast";
 import messagingService from "@/services/messagingService";
+import socketService from "@/services/socketService";
 import NewMessageModal from "@/components/messages/NewMessageModal";
 import EmojiPicker from "@/components/messages/EmojiPicker";
 import FileUpload from "@/components/messages/FileUpload";
@@ -59,37 +60,143 @@ const Messages = () => {
   const [onlineUsers, setOnlineUsers] = useState(new Set());
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
-  const pollingIntervalRef = useRef(null);
   const lastMessageCountRef = useRef(0);
+  const typingTimeoutRef = useRef(null);
 
   // Check if we need to open conversation with specific user
   const userIdToMessage = searchParams.get("user");
 
+  // Socket.IO connection and real-time event handling
   useEffect(() => {
     loadConversations();
 
-    // Start polling for new messages
-    const startPolling = () => {
-      pollingIntervalRef.current = setInterval(() => {
-        if (selectedChat) {
-          const conversationId = selectedChat.id || selectedChat._id;
-          if (conversationId) {
-            loadMessages(conversationId, true); // Silent reload
+    // Connect to Socket.IO when user is authenticated
+    if (user) {
+      const socket = socketService.connect();
+
+      if (socket) {
+        // Join user's conversation rooms
+        socket.emit("join_conversations");
+
+        // Listen for new messages
+        socket.on("newMessage", (data) => {
+          const { message, conversationId } = data;
+
+          // Update messages if this is the current conversation
+          if (
+            selectedChat &&
+            (selectedChat.id === conversationId ||
+              selectedChat._id === conversationId)
+          ) {
+            setMessages((prev) => {
+              // Avoid duplicates
+              const exists = prev.some(
+                (m) => (m.id || m._id) === (message.id || message._id),
+              );
+              if (!exists) {
+                return [...prev, message];
+              }
+              return prev;
+            });
+
+            // Mark as read if conversation is open
+            messagingService.markAsRead(conversationId);
           }
-        }
-        // Also refresh conversations for new message indicators
-        loadConversations(true);
-      }, 3000); // Poll every 3 seconds
-    };
 
-    startPolling();
+          // Update conversation list with new last message
+          setConversations((prev) =>
+            prev.map((conv) => {
+              if ((conv.id || conv._id) === conversationId) {
+                const isCurrentChat =
+                  selectedChat &&
+                  (selectedChat.id || selectedChat._id) === conversationId;
+                return {
+                  ...conv,
+                  lastMessage: {
+                    content: message.content,
+                    createdAt: message.createdAt,
+                    sender: message.sender._id,
+                  },
+                  unreadCount: isCurrentChat ? 0 : (conv.unreadCount || 0) + 1,
+                };
+              }
+              return conv;
+            }),
+          );
+        });
 
-    return () => {
-      if (pollingIntervalRef.current) {
-        clearInterval(pollingIntervalRef.current);
+        // Listen for message status updates
+        socket.on("messageRead", (data) => {
+          setMessages((prev) =>
+            prev.map((msg) => {
+              if ((msg.id || msg._id) === data.messageId) {
+                return {
+                  ...msg,
+                  readBy: [
+                    ...(msg.readBy || []),
+                    { user: data.readBy, readAt: data.readAt },
+                  ],
+                };
+              }
+              return msg;
+            }),
+          );
+        });
+
+        // Listen for typing indicators
+        socket.on("user_typing", (data) => {
+          if (
+            selectedChat &&
+            data.conversationId === (selectedChat.id || selectedChat._id)
+          ) {
+            // Show typing indicator (implement this UI state)
+            console.log(`${data.username} is typing...`);
+          }
+        });
+
+        socket.on("user_stopped_typing", (data) => {
+          if (
+            selectedChat &&
+            data.conversationId === (selectedChat.id || selectedChat._id)
+          ) {
+            // Hide typing indicator
+            console.log(`User stopped typing`);
+          }
+        });
+
+        // Listen for online status changes
+        socket.on("user_status_changed", (data) => {
+          setOnlineUsers((prev) => {
+            const newSet = new Set(prev);
+            if (data.status === "online") {
+              newSet.add(data.userId);
+            } else {
+              newSet.delete(data.userId);
+            }
+            return newSet;
+          });
+
+          // Update conversation list with online status
+          setConversations((prev) =>
+            prev.map((conv) => {
+              if (conv.participantId === data.userId) {
+                return { ...conv, isOnline: data.status === "online" };
+              }
+              return conv;
+            }),
+          );
+        });
+
+        return () => {
+          socket.off("newMessage");
+          socket.off("messageRead");
+          socket.off("user_typing");
+          socket.off("user_stopped_typing");
+          socket.off("user_status_changed");
+        };
       }
-    };
-  }, [selectedChat]);
+    }
+  }, [user, selectedChat]);
 
   useEffect(() => {
     if (userIdToMessage && conversations.length > 0) {
@@ -102,6 +209,12 @@ const Messages = () => {
       const conversationId = selectedChat.id || selectedChat._id;
       if (conversationId) {
         loadMessages(conversationId);
+
+        // Join the conversation room for real-time updates
+        const socket = socketService.socket;
+        if (socket && socket.connected) {
+          socket.emit("join_conversation", conversationId);
+        }
       }
     }
   }, [selectedChat]);
@@ -127,57 +240,17 @@ const Messages = () => {
     lastMessageCountRef.current = messages.length;
   }, [messages]);
 
-  // Simulate online status for demo (in production, use WebSocket)
+  // Get real online status from Socket.IO
   useEffect(() => {
-    const updateOnlineStatus = () => {
-      // Simulate random online users for demo
-      const mockOnlineUsers = new Set();
+    if (socketService.connected) {
+      // Request initial online status
       conversations.forEach((conv) => {
-        if (Math.random() > 0.3) {
-          // 70% chance to be online
-          mockOnlineUsers.add(conv.participantId);
+        if (conv.isOnline) {
+          setOnlineUsers((prev) => new Set([...prev, conv.participantId]));
         }
       });
-      setOnlineUsers(mockOnlineUsers);
-    };
-
-    updateOnlineStatus();
-    const statusInterval = setInterval(updateOnlineStatus, 30000); // Update every 30s
-
-    return () => clearInterval(statusInterval);
-  }, [conversations]);
-
-  // Real-time message polling with better efficiency
-  useEffect(() => {
-    if (!selectedChat) return;
-
-    const pollMessages = async () => {
-      const conversationId = selectedChat.id || selectedChat._id;
-      if (conversationId && !isSending && !isLoadingMessages) {
-        try {
-          const data = await messagingService.getMessages(conversationId);
-          const newMessages = data.messages || [];
-
-          // Only update if messages have changed
-          if (
-            newMessages.length !== messages.length ||
-            (newMessages.length > 0 &&
-              messages.length > 0 &&
-              newMessages[newMessages.length - 1]?.id !==
-                messages[messages.length - 1]?.id)
-          ) {
-            setMessages(newMessages);
-          }
-        } catch (error) {
-          console.error("Failed to poll messages:", error);
-        }
-      }
-    };
-
-    const messagePollingInterval = setInterval(pollMessages, 2000); // Poll every 2 seconds
-
-    return () => clearInterval(messagePollingInterval);
-  }, [selectedChat, messages.length, isSending, isLoadingMessages]);
+    }
+  }, [conversations, socketService.connected]);
 
   useEffect(() => {
     if (searchQuery.trim()) {
@@ -398,6 +471,28 @@ const Messages = () => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
+
+    // Send typing indicator
+    if (selectedChat && socketService.connected) {
+      const conversationId = selectedChat.id || selectedChat._id;
+
+      // Clear previous timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      // Send typing start
+      socketService.socket.emit("typing_start", conversationId);
+
+      // Stop typing after 1 second of no input
+      typingTimeoutRef.current = setTimeout(() => {
+        socketService.socket.emit("typing_stop", conversationId);
+      }, 1000);
     }
   };
 
@@ -908,8 +1003,7 @@ const Messages = () => {
                             "U"}
                         </AvatarFallback>
                       </Avatar>
-                      {(conversation.isOnline ||
-                        onlineUsers.has(conversation.participantId)) && (
+                      {onlineUsers.has(conversation.participantId) && (
                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
                       )}
                     </div>
@@ -1009,7 +1103,7 @@ const Messages = () => {
                           "U"}
                       </AvatarFallback>
                     </Avatar>
-                    {selectedChat.isOnline && (
+                    {onlineUsers.has(selectedChat.participantId) && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
                     )}
                   </div>
@@ -1019,7 +1113,9 @@ const Messages = () => {
                       {selectedChat.participantName || "Unknown User"}
                     </h2>
                     <p className="text-sm text-muted-foreground">
-                      {selectedChat.isOnline ? "Active now" : "Offline"}
+                      {onlineUsers.has(selectedChat.participantId)
+                        ? "Active now"
+                        : "Offline"}
                     </p>
                   </div>
                 </button>
@@ -1238,7 +1334,7 @@ const Messages = () => {
                       editingMessage ? "Edit message..." : "Message..."
                     }
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={handleInputChange}
                     onKeyPress={handleKeyPress}
                     disabled={isSending || uploadingFile}
                     className="border-0 bg-transparent p-0 text-sm focus-visible:ring-0"
