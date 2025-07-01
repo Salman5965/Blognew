@@ -16,6 +16,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { isValidObjectId } from "@/utils/validation";
 
 export const FollowersPage = () => {
   const { userId } = useParams();
@@ -35,7 +36,7 @@ export const FollowersPage = () => {
         setError(null);
 
         // Validate userId format
-        if (!userId || !userId.match(/^[0-9a-fA-F]{24}$/)) {
+        if (!userId || !isValidObjectId(userId)) {
           throw new Error("Invalid user ID format");
         }
 
