@@ -8,7 +8,7 @@ class SocketService {
     this.listeners = new Map();
   }
 
-  connect(serverUrl = window.location.origin) {
+  connect(serverUrl) {
     if (this.socket?.connected) {
       return this.socket;
     }
@@ -18,6 +18,15 @@ class SocketService {
     if (!token) {
       console.warn("No auth token found, cannot connect to socket");
       return null;
+    }
+
+    // Default to backend server URL if not provided
+    if (!serverUrl) {
+      // In development, connect to localhost:3001 (backend server)
+      // In production, this would be the same origin or configured backend URL
+      serverUrl = import.meta.env.DEV
+        ? "http://localhost:3001"
+        : window.location.origin;
     }
 
     try {
