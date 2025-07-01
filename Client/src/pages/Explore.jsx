@@ -317,11 +317,13 @@ const Explore = () => {
                         </div>
                       </div>
 
-                      <FollowButton
-                        userId={author._id || author.id}
-                        className="w-full"
-                        size="sm"
-                      />
+                      {(author._id || author.id) && (
+                        <FollowButton
+                          userId={author._id || author.id}
+                          className="w-full"
+                          size="sm"
+                        />
+                      )}
                     </CardContent>
                   </Card>
                 ))}
