@@ -15,6 +15,8 @@ import {
   Star,
   Trash2,
   Settings,
+  MessageSquare,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +33,7 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import messageService from "@/services/messageService";
+import { useChatStore } from "@/features/chat/chatStore";
 
 const Messages = () => {
   const [conversations, setConversations] = useState([]);
