@@ -47,6 +47,7 @@ const Messages = () => {
   const messagesEndRef = useRef(null);
   const { user } = useAuthContext();
   const navigate = useNavigate();
+  const { openChat, fetchConversations } = useChatStore();
 
   // Load conversations on mount
   useEffect(() => {
