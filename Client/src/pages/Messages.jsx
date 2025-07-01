@@ -108,10 +108,17 @@ const Messages = () => {
 
   useEffect(() => {
     // Only scroll if new messages were added and user is near bottom
-    if (messages.length > lastMessageCountRef.current && lastMessageCountRef.current > 0) {
+    if (
+      messages.length > lastMessageCountRef.current &&
+      lastMessageCountRef.current > 0
+    ) {
       const container = messagesContainerRef.current;
       if (container) {
-        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+        const isNearBottom =
+          container.scrollHeight -
+            container.scrollTop -
+            container.clientHeight <
+          100;
         if (isNearBottom) {
           setTimeout(() => scrollToBottom(), 100);
         }
@@ -917,7 +924,7 @@ const Messages = () => {
                       </div>
                     </div>
                   </div>
-                </button>
+                </div>
 
                 {/* Conversation Context Menu */}
                 <div className="absolute top-2 right-2">
