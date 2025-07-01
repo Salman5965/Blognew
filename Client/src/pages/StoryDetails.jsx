@@ -262,12 +262,14 @@ const StoryDetails = () => {
                     </div>
                   </div>
 
-                  {!isAuthor && story.author._id && (
-                    <div className="flex items-center gap-2">
-                      <FollowButton userId={story.author._id} size="sm" />
-                      <MessageButton user={story.author} size="sm" />
-                    </div>
-                  )}
+                  {!isAuthor &&
+                    story.author._id &&
+                    story.author._id.match(/^[0-9a-fA-F]{24}$/) && (
+                      <div className="flex items-center gap-2">
+                        <FollowButton userId={story.author._id} size="sm" />
+                        <MessageButton user={story.author} size="sm" />
+                      </div>
+                    )}
                 </div>
 
                 {/* Story Meta */}
