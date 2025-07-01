@@ -82,8 +82,24 @@ const Feed = () => {
         sortOrder: "desc",
       };
 
-      if (search) {
-        query.search = search;
+      // Add filter-specific parameters
+      if (filter === "following" && user) {
+        query.following = true;
+        query.userId = user.id;
+      }
+
+      if (filter === "trending") {
+        query.trending = true;
+        query.timeframe = "week"; // trending in the last week
+      }
+
+      if (filter === "popular") {
+        query.popular = true;
+        query.minLikes = 1; // minimum likes for popular posts
+      }
+
+      if (search && search.trim()) {
+        query.search = search.trim();
       }
 
       const response = await blogService.getBlogs(query);
