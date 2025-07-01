@@ -533,7 +533,7 @@ export const getFollowers = async (req, res, next) => {
     }
 
     // Get followers with pagination
-    const followers = await Follow.find({ followed: userId })
+    const followers = await Follow.find({ following: userId })
       .populate("follower", "username firstName lastName avatar bio")
       .sort({ createdAt: -1 })
       .skip(skip)
@@ -541,7 +541,7 @@ export const getFollowers = async (req, res, next) => {
       .lean();
 
     // Get total count
-    const totalFollowers = await Follow.countDocuments({ followed: userId });
+    const totalFollowers = await Follow.countDocuments({ following: userId });
 
     // Format response
     const formattedFollowers = followers.map((follow) => ({
