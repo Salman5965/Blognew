@@ -82,7 +82,7 @@ const NotificationPanel = ({ onClose }) => {
 
         {/* Filters */}
         <div className="flex items-center gap-2 mb-2">
-          <Filter className="h-3 w-3 text-slate-400" />
+          <Filter className="h-3 w-3 text-muted-foreground" />
           <div className="flex gap-1">
             {["all", "unread", "read"].map((filterType) => (
               <button
