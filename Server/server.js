@@ -28,19 +28,38 @@ const io = new Server(httpServer, {
 // Socket.IO middleware for authentication
 io.use(async (socket, next) => {
   try {
+    console.log("🔐 Socket.IO authentication attempt");
+
     const token = socket.handshake.auth.token;
+    console.log("Token present:", !!token);
+
     if (!token) {
-      return next(new Error("Authentication error: No token provided"));
+      console.error("❌ No token provided");
+      return next(new Error("No token provided"));
     }
 
-    // Verify JWT token (you'll need to import your JWT verification logic)
+    // Verify JWT token
     const jwt = await import("jsonwebtoken");
-    const decoded = jwt.default.verify(token, process.env.JWT_SECRET);
+
+    let decoded;
+    try {
+      decoded = jwt.default.verify(token, process.env.JWT_SECRET);
+      console.log("✅ Token verified for user ID:", decoded.id);
+    } catch (jwtError) {
+      console.error("❌ JWT verification failed:", jwtError.message);
+      return next(new Error("Invalid token"));
+    }
 
     // Get user from database
     const user = await User.findById(decoded.id).select("-password");
     if (!user) {
-      return next(new Error("Authentication error: User not found"));
+      console.error("❌ User not found:", decoded.id);
+      return next(new Error("User not found"));
+    }
+
+    if (!user.isActive) {
+      console.error("❌ User account is inactive:", decoded.id);
+      return next(new Error("Account is inactive"));
     }
 
     socket.userId = user._id.toString();
@@ -52,9 +71,11 @@ io.use(async (socket, next) => {
       lastSeen: new Date(),
     });
 
+    console.log("✅ Socket.IO authentication successful for:", user.username);
     next();
   } catch (error) {
-    next(new Error("Authentication error: Invalid token"));
+    console.error("❌ Socket.IO authentication error:", error.message);
+    return next(new Error("Authentication failed"));
   }
 });
 
