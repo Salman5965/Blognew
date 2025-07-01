@@ -84,22 +84,30 @@ export const Navbar = () => {
           "@/services/exploreService"
         );
 
-        // Search across all content types
+        // Search across all content types with higher limits for better results
         const results = await exploreService.searchContent(value, "all", {
-          limit: 8,
+          limit: 15,
+          sortBy: "relevance",
         });
 
-        // Combine and format results
+        // Combine and format results with better distribution
         const combinedResults = [
+          // Users (up to 4)
           ...(results.results?.users || [])
-            .slice(0, 3)
+            .slice(0, 4)
             .map((user) => ({ ...user, type: "user" })),
+          // Blogs (up to 4)
           ...(results.results?.blogs || [])
-            .slice(0, 3)
+            .slice(0, 4)
             .map((blog) => ({ ...blog, type: "blog" })),
+          // Stories (up to 3)
           ...(results.results?.stories || [])
-            .slice(0, 2)
+            .slice(0, 3)
             .map((story) => ({ ...story, type: "story" })),
+          // Daily Drip content (up to 2)
+          ...(results.results?.dailydrip || [])
+            .slice(0, 2)
+            .map((drip) => ({ ...drip, type: "dailydrip" })),
         ];
 
         setSearchResults(combinedResults);
