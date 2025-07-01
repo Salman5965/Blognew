@@ -499,9 +499,10 @@ const Explore = () => {
                           </p>
                         </div>
 
-                        <FollowButton
-                          userId={user._id || user.id}
-                          size="sm"
+                        {(user._id || user.id) && (
+                          <FollowButton
+                            userId={user._id || user.id}
+                            size="sm"
                           showText={false}
                         />
                       </div>

@@ -232,10 +232,12 @@ export const UserProfile = () => {
                         <MessageCircle className="h-4 w-4" />
                         <span>Message</span>
                       </Button>
-                      <FollowButton
-                        userId={user._id}
-                        onFollowChange={handleFollowChange}
-                      />
+                      {user._id && (
+                        <FollowButton
+                          userId={user._id}
+                          onFollowChange={handleFollowChange}
+                        />
+                      )}
                     </div>
                   )}
                 </div>
