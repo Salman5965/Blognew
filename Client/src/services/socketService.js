@@ -39,7 +39,7 @@ class SocketService {
     return this.attemptConnection(serverUrl, token);
   }
 
-  attemptConnection(serverUrl, token) {
+  async attemptConnection(serverUrl, token) {
     try {
       console.log(`🔌 Attempting Socket.IO connection:`);
       console.log(`  - Server URL: ${serverUrl}`);
@@ -49,6 +49,20 @@ class SocketService {
         `  - Is local dev: ${window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"}`,
       );
       console.log(`  - Has token: ${!!token}`);
+
+      // Test if Socket.IO endpoint is reachable
+      try {
+        const testUrl = `${serverUrl}/socket.io/?transport=polling`;
+        console.log(`🧪 Testing Socket.IO endpoint: ${testUrl}`);
+
+        const response = await fetch(testUrl, {
+          method: "GET",
+          mode: "cors",
+        });
+        console.log(`✅ Socket.IO endpoint test - Status: ${response.status}`);
+      } catch (testError) {
+        console.error(`❌ Socket.IO endpoint test failed:`, testError);
+      }
 
       this.socket = io(serverUrl, {
         auth: {
