@@ -153,6 +153,21 @@ io.on("connection", (socket) => {
     }
   });
 
+  // Handle online status query
+  socket.on("get_online_status", async (userIds) => {
+    try {
+      const onlineUsers = await User.find({
+        _id: { $in: userIds },
+        isOnline: true,
+      }).select("_id");
+
+      const onlineUserIds = onlineUsers.map((user) => user._id.toString());
+      socket.emit("online_status_response", onlineUserIds);
+    } catch (error) {
+      console.error("Error getting online status:", error);
+    }
+  });
+
   // Handle disconnection
   socket.on("disconnect", async (reason) => {
     console.log(`User ${socket.user.username} disconnected: ${reason}`);
