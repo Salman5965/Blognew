@@ -153,12 +153,12 @@ const NotificationPanel = ({ onClose }) => {
       </div>
 
       {/* Footer */}
-      <div className="p-2 border-t border-slate-700 text-center">
+      <div className="p-2 border-t text-center">
         <Button
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="text-xs text-slate-400 hover:text-slate-300"
+          className="text-xs text-muted-foreground hover:text-foreground"
         >
           View all notifications
         </Button>
