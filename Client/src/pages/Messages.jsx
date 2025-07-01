@@ -1212,7 +1212,7 @@ const Messages = () => {
             {/* Messages */}
             <div
               ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4"
+              className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[calc(100vh-12rem)]"
             >
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center h-full">
