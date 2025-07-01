@@ -72,7 +72,7 @@ const NotificationPanel = ({ onClose }) => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-slate-300 hover:bg-slate-800"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
               aria-label="Notification settings"
             >
               <Settings className="h-4 w-4" />
