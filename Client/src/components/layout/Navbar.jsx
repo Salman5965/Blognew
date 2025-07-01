@@ -41,6 +41,8 @@ export const Navbar = () => {
   const navigate = useNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [unreadNotifications, setUnreadNotifications] = React.useState(0);
+  const [unreadMessages, setUnreadMessages] = React.useState(0);
   const [filters, setFilters] = React.useState({
     search: "",
     category: "",
