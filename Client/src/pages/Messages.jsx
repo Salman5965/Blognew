@@ -107,12 +107,15 @@ const Messages = () => {
   }, [selectedChat]);
 
   useEffect(() => {
-    // Only scroll if new messages were added, not on initial load
-    if (
-      messages.length > lastMessageCountRef.current &&
-      lastMessageCountRef.current > 0
-    ) {
-      scrollToBottom();
+    // Only scroll if new messages were added and user is near bottom
+    if (messages.length > lastMessageCountRef.current && lastMessageCountRef.current > 0) {
+      const container = messagesContainerRef.current;
+      if (container) {
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+        if (isNearBottom) {
+          setTimeout(() => scrollToBottom(), 100);
+        }
+      }
     }
     lastMessageCountRef.current = messages.length;
   }, [messages]);
@@ -846,9 +849,10 @@ const Messages = () => {
                   selectedChat?.id === conversation.id && "bg-muted",
                 )}
               >
-                <button
+                <div
                   onClick={() => handleChatSelect(conversation)}
-                  className="w-full p-4 text-left"
+                  className="w-full p-4 text-left cursor-pointer"
+                  onDoubleClick={(e) => e.preventDefault()}
                 >
                   <div className="flex items-center gap-3">
                     <div
