@@ -76,8 +76,8 @@ const NotificationItem = ({ notification }) => {
 
   const NotificationContent = () => (
     <div
-      className={`p-3 hover:bg-slate-800 transition-colors cursor-pointer relative group ${
-        !notification.isRead ? "bg-slate-800/50" : ""
+      className={`p-3 hover:bg-accent transition-colors cursor-pointer relative group ${
+        !notification.isRead ? "bg-accent/50" : ""
       }`}
       onClick={handleClick}
       onMouseEnter={() => setShowActions(true)}
