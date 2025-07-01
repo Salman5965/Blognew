@@ -559,3 +559,300 @@ export const getTrendingTopics = async (req, res) => {
     });
   }
 };
+
+/**
+ * @desc    Search content (users, blogs, etc.)
+ * @route   GET /api/explore/search
+ * @access  Public
+ */
+export const searchContent = async (req, res) => {
+  try {
+    const {
+      q: query,
+      type = "all",
+      page = 1,
+      limit = 10,
+      sortBy = "relevance",
+    } = req.query;
+
+    if (!query || query.trim().length === 0) {
+      return res.status(400).json({
+        status: "error",
+        message: "Search query is required",
+      });
+    }
+
+    const searchQuery = query.trim();
+    const skip = (page - 1) * limit;
+
+    let searchResults = {
+      users: [],
+      blogs: [],
+      total: 0,
+    };
+
+    // Search users if type is 'users' or 'all'
+    if (type === "users" || type === "all") {
+      const userSearch = {
+        $or: [
+          { username: { $regex: searchQuery, $options: "i" } },
+          { firstName: { $regex: searchQuery, $options: "i" } },
+          { lastName: { $regex: searchQuery, $options: "i" } },
+          { bio: { $regex: searchQuery, $options: "i" } },
+        ],
+      };
+
+      const users = await User.aggregate([
+        { $match: userSearch },
+        {
+          $lookup: {
+            from: "blogs",
+            localField: "_id",
+            foreignField: "author",
+            as: "blogs",
+            pipeline: [{ $match: { status: "published" } }],
+          },
+        },
+        {
+          $lookup: {
+            from: "follows",
+            localField: "_id",
+            foreignField: "followed",
+            as: "followers",
+          },
+        },
+        {
+          $addFields: {
+            blogsCount: { $size: "$blogs" },
+            followersCount: { $size: "$followers" },
+            relevanceScore: {
+              $add: [
+                {
+                  $cond: [
+                    {
+                      $regexMatch: {
+                        input: "$username",
+                        regex: searchQuery,
+                        options: "i",
+                      },
+                    },
+                    10,
+                    0,
+                  ],
+                },
+                {
+                  $cond: [
+                    {
+                      $regexMatch: {
+                        input: "$firstName",
+                        regex: searchQuery,
+                        options: "i",
+                      },
+                    },
+                    8,
+                    0,
+                  ],
+                },
+                {
+                  $cond: [
+                    {
+                      $regexMatch: {
+                        input: "$lastName",
+                        regex: searchQuery,
+                        options: "i",
+                      },
+                    },
+                    8,
+                    0,
+                  ],
+                },
+                { $multiply: [{ $size: "$blogs" }, 2] },
+                { $size: "$followers" },
+              ],
+            },
+          },
+        },
+        {
+          $sort:
+            sortBy === "relevance"
+              ? { relevanceScore: -1 }
+              : { followersCount: -1, blogsCount: -1 },
+        },
+        ...(type === "users"
+          ? [{ $skip: skip }, { $limit: parseInt(limit) }]
+          : []),
+        {
+          $project: {
+            username: 1,
+            firstName: 1,
+            lastName: 1,
+            avatar: 1,
+            bio: 1,
+            blogsCount: 1,
+            followersCount: 1,
+            createdAt: 1,
+          },
+        },
+      ]);
+
+      searchResults.users = users;
+    }
+
+    // Search blogs if type is 'blogs' or 'all'
+    if (type === "blogs" || type === "all") {
+      const blogSearch = {
+        status: "published",
+        $or: [
+          { title: { $regex: searchQuery, $options: "i" } },
+          { summary: { $regex: searchQuery, $options: "i" } },
+          { content: { $regex: searchQuery, $options: "i" } },
+          { tags: { $regex: searchQuery, $options: "i" } },
+          { category: { $regex: searchQuery, $options: "i" } },
+        ],
+      };
+
+      const blogs = await Blog.aggregate([
+        { $match: blogSearch },
+        {
+          $lookup: {
+            from: "users",
+            localField: "author",
+            foreignField: "_id",
+            as: "authorInfo",
+          },
+        },
+        {
+          $lookup: {
+            from: "likes",
+            localField: "_id",
+            foreignField: "blog",
+            as: "likes",
+          },
+        },
+        {
+          $lookup: {
+            from: "comments",
+            localField: "_id",
+            foreignField: "blog",
+            as: "comments",
+          },
+        },
+        {
+          $addFields: {
+            author: { $arrayElemAt: ["$authorInfo", 0] },
+            likesCount: { $size: "$likes" },
+            commentsCount: { $size: "$comments" },
+            relevanceScore: {
+              $add: [
+                {
+                  $cond: [
+                    {
+                      $regexMatch: {
+                        input: "$title",
+                        regex: searchQuery,
+                        options: "i",
+                      },
+                    },
+                    10,
+                    0,
+                  ],
+                },
+                {
+                  $cond: [
+                    {
+                      $regexMatch: {
+                        input: "$summary",
+                        regex: searchQuery,
+                        options: "i",
+                      },
+                    },
+                    8,
+                    0,
+                  ],
+                },
+                { $multiply: [{ $size: "$likes" }, 2] },
+                { $multiply: [{ $size: "$comments" }, 3] },
+                { $multiply: ["$viewsCount", 0.1] },
+              ],
+            },
+          },
+        },
+        {
+          $sort:
+            sortBy === "relevance" ? { relevanceScore: -1 } : { createdAt: -1 },
+        },
+        ...(type === "blogs"
+          ? [{ $skip: skip }, { $limit: parseInt(limit) }]
+          : []),
+        {
+          $project: {
+            title: 1,
+            summary: 1,
+            content: { $substr: ["$content", 0, 200] },
+            coverImage: 1,
+            category: 1,
+            tags: 1,
+            viewsCount: 1,
+            likesCount: 1,
+            commentsCount: 1,
+            createdAt: 1,
+            author: {
+              _id: "$author._id",
+              username: "$author.username",
+              firstName: "$author.firstName",
+              lastName: "$author.lastName",
+              avatar: "$author.avatar",
+            },
+          },
+        },
+      ]);
+
+      searchResults.blogs = blogs;
+    }
+
+    // Apply pagination for specific type searches
+    if (type === "users") {
+      searchResults = {
+        users: searchResults.users,
+        total: searchResults.users.length,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(searchResults.users.length / limit),
+          hasNextPage: searchResults.users.length === parseInt(limit),
+          hasPrevPage: page > 1,
+          limit: parseInt(limit),
+        },
+      };
+    } else if (type === "blogs") {
+      searchResults = {
+        blogs: searchResults.blogs,
+        total: searchResults.blogs.length,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(searchResults.blogs.length / limit),
+          hasNextPage: searchResults.blogs.length === parseInt(limit),
+          hasPrevPage: page > 1,
+          limit: parseInt(limit),
+        },
+      };
+    } else {
+      // For 'all' type, return limited results
+      searchResults = {
+        users: searchResults.users.slice(0, 5),
+        blogs: searchResults.blogs.slice(0, 5),
+        total: searchResults.users.length + searchResults.blogs.length,
+      };
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: searchResults,
+    });
+  } catch (error) {
+    console.error("Error searching content:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to search content",
+    });
+  }
+};
