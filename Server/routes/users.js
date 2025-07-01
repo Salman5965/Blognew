@@ -6,6 +6,8 @@ import {
   deleteUser,
   getUserStats,
   updateUserRole,
+  getFollowers,
+  getFollowing,
 } from "../controllers/userController.js";
 import { protect, authorize } from "../middlewares/auth.js";
 import { validateUserUpdate } from "../validators/userValidator.js";
