@@ -282,9 +282,12 @@ const Messages = () => {
           container.scrollHeight -
             container.scrollTop -
             container.clientHeight <
-          100;
+          150; // Increased threshold to be less aggressive
         if (isNearBottom) {
-          setTimeout(() => scrollToBottom(), 100);
+          // Use requestAnimationFrame for smoother scrolling
+          requestAnimationFrame(() => {
+            scrollToBottom();
+          });
         }
       }
     }
