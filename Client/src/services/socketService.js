@@ -131,8 +131,21 @@ class SocketService {
         console.error("Could not stringify error object");
       }
 
-      this.connectionStatus = "error";
-      this.emit("connectionStatusChanged", "error");
+      // If it's an authentication error, we should still allow the app to function
+      // without real-time features
+      if (
+        error?.message?.includes("token") ||
+        error?.message?.includes("Authentication")
+      ) {
+        console.warn(
+          "⚠️ Socket.IO authentication failed - running without real-time features",
+        );
+        this.connectionStatus = "no-auth";
+      } else {
+        this.connectionStatus = "error";
+      }
+
+      this.emit("connectionStatusChanged", this.connectionStatus);
     });
 
     this.socket.on("reconnect", (attemptNumber) => {
