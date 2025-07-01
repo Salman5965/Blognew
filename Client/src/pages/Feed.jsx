@@ -131,13 +131,14 @@ const Feed = () => {
   const getSortBy = (filter) => {
     switch (filter) {
       case "trending":
-        return "views";
+        return "viewsCount"; // Sort by view count for trending
       case "popular":
-        return "likeCount";
+        return "likesCount"; // Sort by likes count for popular
       case "following":
-        return "createdAt"; // In real app, filter by followed users
+        return "createdAt"; // Sort by creation date for following
+      case "latest":
       default:
-        return "createdAt";
+        return "createdAt"; // Sort by creation date for latest
     }
   };
 
