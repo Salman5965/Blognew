@@ -1221,7 +1221,16 @@ const Messages = () => {
                 <FileUpload
                   onFileSelect={handleFileSelect}
                   disabled={uploadingFile || isSending}
-                />
+                >
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    className="rounded-full cursor-pointer hover:bg-muted flex items-center justify-center h-8 w-8"
+                    title="Attach file"
+                  >
+                    <Paperclip className="h-5 w-5" />
+                  </div>
+                </FileUpload>
 
                 <div className="flex-1 bg-muted rounded-full flex items-center px-4 py-2">
                   <Input
@@ -1237,16 +1246,10 @@ const Messages = () => {
                   <div className="flex items-center gap-2 ml-2">
                     <EmojiPicker onEmojiSelect={handleEmojiSelect} />
                     {!newMessage.trim() && !uploadingFile && (
-                      <>
-                        <ImageUpload
-                          onImageSelect={handleImageSelect}
-                          disabled={uploadingFile || isSending}
-                        />
-                        <FileUpload
-                          onFileSelect={handleFileSelect}
-                          disabled={uploadingFile || isSending}
-                        />
-                      </>
+                      <ImageUpload
+                        onImageSelect={handleImageSelect}
+                        disabled={uploadingFile || isSending}
+                      />
                     )}
                   </div>
                 </div>
