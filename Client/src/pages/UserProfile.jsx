@@ -202,10 +202,15 @@ export const UserProfile = () => {
     );
   }
 
-  // If viewing own profile, redirect to settings profile
+  // If viewing own profile, show loading while redirecting
   if (isOwnProfile) {
-    navigate(ROUTES.PROFILE);
-    return null;
+    return (
+      <PageWrapper>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </PageWrapper>
+    );
   }
 
   return (
