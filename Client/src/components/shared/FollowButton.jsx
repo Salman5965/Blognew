@@ -31,6 +31,12 @@ export const FollowButton = ({
       if (!user || !userId || userId === "undefined" || user._id === userId)
         return;
 
+      // Skip check if userId is not a valid ObjectId format (24 hex characters)
+      if (!userId.match(/^[0-9a-fA-F]{24}$/)) {
+        console.warn("Invalid ObjectId format for userId:", userId);
+        return;
+      }
+
       try {
         const following = await followService.isFollowing(userId);
         setIsFollowing(following);
@@ -60,12 +66,24 @@ export const FollowButton = ({
   }, [userId, user]);
 
   // Don't show follow button for invalid conditions - AFTER all hooks
-  if (!user || !userId || userId === "undefined" || userId === user._id) {
+  if (
+    !user ||
+    !userId ||
+    userId === "undefined" ||
+    userId === user._id ||
+    !userId.match(/^[0-9a-fA-F]{24}$/)
+  ) {
     return null;
   }
 
   const handleFollowToggle = async () => {
-    if (isLoading || !userId || userId === "undefined") return;
+    if (
+      isLoading ||
+      !userId ||
+      userId === "undefined" ||
+      !userId.match(/^[0-9a-fA-F]{24}$/)
+    )
+      return;
 
     setIsLoading(true);
     try {
