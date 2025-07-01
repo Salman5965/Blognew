@@ -55,14 +55,13 @@ const FileUpload = ({ onFileSelect, children, disabled = false }) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           {children || (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full"
-              disabled={disabled}
+            <div
+              role="button"
+              tabIndex={0}
+              className={`rounded-full cursor-pointer hover:bg-muted flex items-center justify-center h-8 w-8 ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <Paperclip className="h-5 w-5" />
-            </Button>
+            </div>
           )}
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="top" align="start">

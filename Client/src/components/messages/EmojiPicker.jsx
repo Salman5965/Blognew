@@ -125,9 +125,13 @@ const EmojiPicker = ({ onEmojiSelect, children }) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {children || (
-          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
+          <div
+            role="button"
+            tabIndex={0}
+            className="h-6 w-6 rounded-full cursor-pointer hover:bg-muted flex items-center justify-center"
+          >
             <Smile className="h-4 w-4" />
-          </Button>
+          </div>
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-80 p-0" side="top" align="end">
