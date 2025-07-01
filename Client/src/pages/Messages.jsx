@@ -1105,6 +1105,11 @@ const Messages = () => {
                           >
                             <span className="text-xs">
                               {formatMessageTime(message.createdAt)}
+                              {message.isEdited && (
+                                <span className="ml-1 opacity-70">
+                                  (edited)
+                                </span>
+                              )}
                             </span>
                             {getMessageStatus(message)}
                           </div>
@@ -1129,7 +1134,7 @@ const Messages = () => {
 
             {/* Message Input */}
             <div className="p-4 border-t bg-card">
-              {/* Reply indicator */}
+              {/* Reply/Edit indicator */}
               {replyToMessage && (
                 <div className="mb-3 p-3 bg-muted/50 rounded-lg flex items-center justify-between">
                   <div className="flex-1">
@@ -1141,6 +1146,28 @@ const Messages = () => {
                     size="icon"
                     className="h-6 w-6"
                     onClick={() => setReplyToMessage(null)}
+                  >
+                    ×
+                  </Button>
+                </div>
+              )}
+
+              {editingMessage && (
+                <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-xs text-blue-600 dark:text-blue-400">
+                      Editing message
+                    </p>
+                    <p className="text-sm truncate">{editingMessage.content}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => {
+                      setEditingMessage(null);
+                      setNewMessage("");
+                    }}
                   >
                     ×
                   </Button>
