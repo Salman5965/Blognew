@@ -928,7 +928,7 @@ const Messages = () => {
   });
 
   return (
-    <div className="h-screen bg-background flex">
+    <div className="min-h-[calc(100vh-4rem)] bg-background flex">
       {/* Conversations Sidebar */}
       <div
         className={cn(
