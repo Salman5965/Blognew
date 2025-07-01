@@ -65,6 +65,13 @@ io.on("connection", (socket) => {
   // Join user to their personal room
   socket.join(`user:${socket.userId}`);
 
+  // Broadcast online status to all connected users
+  io.emit("user_status_changed", {
+    userId: socket.userId,
+    status: "online",
+    lastSeen: new Date(),
+  });
+
   // Join user to their conversation rooms
   socket.on("join_conversations", async () => {
     try {
@@ -135,8 +142,8 @@ io.on("connection", (socket) => {
         lastSeen: new Date(),
       });
 
-      // Broadcast status to user's connections
-      socket.broadcast.emit("user_status_changed", {
+      // Broadcast status to all connected users
+      io.emit("user_status_changed", {
         userId: socket.userId,
         status,
         lastSeen: new Date(),
@@ -157,8 +164,8 @@ io.on("connection", (socket) => {
         lastSeen: new Date(),
       });
 
-      // Broadcast offline status
-      socket.broadcast.emit("user_status_changed", {
+      // Broadcast offline status to all connected users
+      io.emit("user_status_changed", {
         userId: socket.userId,
         status: "offline",
         lastSeen: new Date(),
