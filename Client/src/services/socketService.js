@@ -77,13 +77,27 @@ class SocketService {
     });
 
     this.socket.on("connect_error", (error) => {
-      console.error("🔴 Socket connection error:", {
-        message: error.message,
-        description: error.description,
-        context: error.context,
-        type: error.type,
-        serverUrl: this.socket?.io?.uri,
-      });
+      console.error("🔴 Socket connection error:");
+      console.error("Error object:", error);
+      console.error("Error message:", error?.message || "No message");
+      console.error("Error type:", error?.type || "No type");
+      console.error(
+        "Error description:",
+        error?.description || "No description",
+      );
+      console.error("Server URL:", this.socket?.io?.uri || "Unknown URL");
+      console.error("Error stack:", error?.stack || "No stack");
+
+      // Try to stringify the entire error object
+      try {
+        console.error(
+          "Full error JSON:",
+          JSON.stringify(error, Object.getOwnPropertyNames(error)),
+        );
+      } catch (e) {
+        console.error("Could not stringify error object");
+      }
+
       this.connectionStatus = "error";
       this.emit("connectionStatusChanged", "error");
     });
