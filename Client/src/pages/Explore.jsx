@@ -503,8 +503,9 @@ const Explore = () => {
                           <FollowButton
                             userId={user._id || user.id}
                             size="sm"
-                          showText={false}
-                        />
+                            showText={false}
+                          />
+                        )}
                       </div>
                     ))}
                   </div>
