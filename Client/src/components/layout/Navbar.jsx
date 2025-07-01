@@ -47,7 +47,7 @@ export const Navbar = () => {
     sortBy: "latest",
   });
 
-  const debouncedSearch = useDebouncedCallback((value) => {
+  const [debouncedSearch] = useDebouncedCallback((value) => {
     setFilters((prev) => ({ ...prev, search: value }));
   }, DEBOUNCE_DELAY);
 
