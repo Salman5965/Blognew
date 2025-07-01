@@ -29,7 +29,9 @@ import messagingService from "@/services/messagingService";
 import NewMessageModal from "@/components/messages/NewMessageModal";
 import EmojiPicker from "@/components/messages/EmojiPicker";
 import FileUpload from "@/components/messages/FileUpload";
+import ImageUpload from "@/components/messages/ImageUpload";
 import MessageContextMenu from "@/components/messages/MessageContextMenu";
+import ConversationContextMenu from "@/components/messages/ConversationContextMenu";
 
 const Messages = () => {
   const { user } = useAuthContext();
@@ -52,8 +54,11 @@ const Messages = () => {
   const [replyToMessage, setReplyToMessage] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const pollingIntervalRef = useRef(null);
+  const lastMessageCountRef = useRef(0);
 
   // Check if we need to open conversation with specific user
   const userIdToMessage = searchParams.get("user");
@@ -100,8 +105,35 @@ const Messages = () => {
   }, [selectedChat]);
 
   useEffect(() => {
-    scrollToBottom();
+    // Only scroll if new messages were added, not on initial load
+    if (
+      messages.length > lastMessageCountRef.current &&
+      lastMessageCountRef.current > 0
+    ) {
+      scrollToBottom();
+    }
+    lastMessageCountRef.current = messages.length;
   }, [messages]);
+
+  // Simulate online status for demo (in production, use WebSocket)
+  useEffect(() => {
+    const updateOnlineStatus = () => {
+      // Simulate random online users for demo
+      const mockOnlineUsers = new Set();
+      conversations.forEach((conv) => {
+        if (Math.random() > 0.3) {
+          // 70% chance to be online
+          mockOnlineUsers.add(conv.participantId);
+        }
+      });
+      setOnlineUsers(mockOnlineUsers);
+    };
+
+    updateOnlineStatus();
+    const statusInterval = setInterval(updateOnlineStatus, 30000); // Update every 30s
+
+    return () => clearInterval(statusInterval);
+  }, [conversations]);
 
   useEffect(() => {
     if (searchQuery.trim()) {
