@@ -573,6 +573,58 @@ const Messages = () => {
     }
   };
 
+  const handleMuteConversation = async (conversation) => {
+    try {
+      setConversations((prev) =>
+        prev.map((conv) =>
+          (conv.id || conv._id) === (conversation.id || conversation._id)
+            ? { ...conv, isMuted: !conv.isMuted }
+            : conv,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to mute conversation:", error);
+    }
+  };
+
+  const handlePinConversation = async (conversation) => {
+    try {
+      setConversations((prev) => {
+        const updated = prev.map((conv) =>
+          (conv.id || conv._id) === (conversation.id || conversation._id)
+            ? { ...conv, isPinned: !conv.isPinned }
+            : conv,
+        );
+
+        // Sort: pinned first, then by last message date
+        return updated.sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return (
+            new Date(b.lastMessage?.createdAt || 0) -
+            new Date(a.lastMessage?.createdAt || 0)
+          );
+        });
+      });
+    } catch (error) {
+      console.error("Failed to pin conversation:", error);
+    }
+  };
+
+  const handleArchiveConversation = async (conversation) => {
+    try {
+      setConversations((prev) =>
+        prev.map((conv) =>
+          (conv.id || conv._id) === (conversation.id || conversation._id)
+            ? { ...conv, isArchived: !conv.isArchived }
+            : conv,
+        ),
+      );
+    } catch (error) {
+      console.error("Failed to archive conversation:", error);
+    }
+  };
+
   const filteredConversations = conversations.filter((conv) => {
     const name = conv.participantName || "";
     return name.toLowerCase().includes(searchQuery.toLowerCase());
