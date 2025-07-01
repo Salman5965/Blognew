@@ -192,9 +192,11 @@ export const Navbar = () => {
                   setTimeout(() => setShowSearchResults(false), 200)
                 }
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && filters.search) {
+                  if (e.key === "Enter" && filters.search) {
                     setShowSearchResults(false);
-                    navigate(`/explore?q=${encodeURIComponent(filters.search)}`);
+                    navigate(
+                      `/explore?q=${encodeURIComponent(filters.search)}`,
+                    );
                   }
                 }}
               />
@@ -211,29 +213,7 @@ export const Navbar = () => {
                     </div>
                   ) : searchResults.length > 0 ? (
                     <div className="py-2">
-                      {/* Group results by type for better organization */}
-                      {(() => {
-                        const groupedResults = searchResults.reduce((acc, result) => {
-                          if (!acc[result.type]) acc[result.type] = [];
-                          acc[result.type].push(result);
-                          return acc;
-                        }, {});
-
-                        return Object.entries(groupedResults).map(([type, results]) => (
-                          <div key={type}>
-                            {type !== 'user' && results.length > 0 && (
-                              <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b">
-                                {type === 'blog' ? 'Blogs' :
-                                 type === 'story' ? 'Stories' :
-                                 type === 'dailydrip' ? 'Daily Drip' : type}
-                              </div>
-                            )}
-                            {type === 'user' && results.length > 0 && (
-                              <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b">
-                                People
-                              </div>
-                            )}
-                            {results.map((result, index) => (
+                      {searchResults.map((result, index) => (
                         <div
                           key={`${result.type}-${result.id || result._id}-${index}`}
                           className="px-4 py-3 hover:bg-muted cursor-pointer border-b last:border-b-0"
@@ -244,7 +224,9 @@ export const Navbar = () => {
                                 navigate(`/users/${result.id || result._id}`);
                                 break;
                               case "blog":
-                                navigate(`/blog/${result.slug || result.id || result._id}`);
+                                navigate(
+                                  `/blog/${result.slug || result.id || result._id}`,
+                                );
                                 break;
                               case "story":
                                 navigate(`/stories/${result.id || result._id}`);
@@ -317,10 +299,12 @@ export const Navbar = () => {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-medium truncate">
-                                    {result.title || result.content?.substring(0, 50) + "..."}
+                                    {result.title ||
+                                      result.content?.substring(0, 50) + "..."}
                                   </p>
                                   <p className="text-xs text-muted-foreground truncate">
-                                    Daily Drip • {result.type?.toUpperCase() || "CONTENT"}
+                                    Daily Drip •{" "}
+                                    {result.type?.toUpperCase() || "CONTENT"}
                                   </p>
                                 </div>
                               </>
