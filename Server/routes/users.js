@@ -41,23 +41,33 @@ router.get(
       const { q: query, page = 1, limit = 20 } = req.query;
       const currentUserId = req.user.id;
 
-      const users = await User.searchUsers(query, {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        excludeIds: [currentUserId],
-      });
+      if (!query || query.trim() === "") {
+        return res.status(400).json({
+          status: "error",
+          message: "Search query is required",
+        });
+      }
 
-      const totalUsers = await User.countDocuments({
-        isActive: true,
+      // Simplified search query to avoid MongoDB planning issues
+      const searchCriteria = {
         _id: { $ne: currentUserId },
-        ...(query && {
-          $or: [
-            { username: { $regex: query, $options: "i" } },
-            { firstName: { $regex: query, $options: "i" } },
-            { lastName: { $regex: query, $options: "i" } },
-          ],
-        }),
-      });
+        $or: [
+          { username: { $regex: query.trim(), $options: "i" } },
+          { firstName: { $regex: query.trim(), $options: "i" } },
+          { lastName: { $regex: query.trim(), $options: "i" } },
+        ],
+      };
+
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+
+      const users = await User.find(searchCriteria)
+        .select("username firstName lastName avatar bio")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean();
+
+      const totalUsers = await User.countDocuments(searchCriteria);
 
       res.status(200).json({
         status: "success",
