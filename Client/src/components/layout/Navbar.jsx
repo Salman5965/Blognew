@@ -183,14 +183,22 @@ export const Navbar = () => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search everything..."
-                className="pl-10"
+                placeholder="Search users, blogs, stories, everything..."
+                className="pl-10 pr-4"
                 defaultValue={filters.search}
                 onChange={(e) => debouncedSearch(e.target.value)}
                 onFocus={() => filters.search && setShowSearchResults(true)}
                 onBlur={() =>
                   setTimeout(() => setShowSearchResults(false), 200)
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && filters.search) {
+                    setShowSearchResults(false);
+                    navigate(
+                      `/explore?q=${encodeURIComponent(filters.search)}`,
+                    );
+                  }
+                }}
               />
 
               {/* Search Results Dropdown */}
