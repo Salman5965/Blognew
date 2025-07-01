@@ -16,7 +16,9 @@ class SocketService {
     const token = localStorage.getItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
 
     if (!token) {
-      console.warn("No auth token found, cannot connect to socket");
+      console.warn("No auth token found, will work without real-time features");
+      this.connectionStatus = "no-auth";
+      this.emit("connectionStatusChanged", "no-auth");
       return null;
     }
 
@@ -31,8 +33,14 @@ class SocketService {
         // In local development, connect to backend server on port 3001
         serverUrl = "http://localhost:3001";
       } else {
-        // In deployed environment, use same origin (backend and frontend on same server)
-        serverUrl = window.location.origin;
+        // In deployed environment, disable Socket.IO to avoid parser errors
+        // The app will use polling fallback instead
+        console.warn(
+          "⚠️ Socket.IO disabled in deployed environment, using polling fallback",
+        );
+        this.connectionStatus = "disabled";
+        this.emit("connectionStatusChanged", "disabled");
+        return null;
       }
     }
 
