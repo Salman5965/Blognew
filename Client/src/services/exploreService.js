@@ -169,6 +169,40 @@ class ExploreService {
     };
   }
 
+  // Search for users
+  async searchUsers(query, options = {}) {
+    try {
+      const params = new URLSearchParams();
+      params.append("q", query);
+      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
+      params.append("limit", String(options.limit || 10));
+      params.append("type", "users"); // Specify we want to search for users
+
+      if (options.sortBy) params.append("sortBy", options.sortBy);
+
+      const response = await apiService.get(`/explore/search?${params}`);
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn("Error searching users:", error.message);
+    }
+
+    // Return empty search results
+    return {
+      users: [],
+      pagination: {
+        currentPage: options.page || 1,
+        totalPages: 0,
+        totalResults: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: options.limit || 10,
+      },
+    };
+  }
+
   // Search across all content types
   async searchAll(query, options = {}) {
     try {
