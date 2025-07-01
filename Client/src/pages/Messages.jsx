@@ -60,7 +60,10 @@ const Messages = () => {
 
   useEffect(() => {
     if (selectedChat) {
-      loadMessages(selectedChat.id);
+      const conversationId = selectedChat.id || selectedChat._id;
+      if (conversationId) {
+        loadMessages(conversationId);
+      }
     }
   }, [selectedChat]);
 
@@ -94,6 +97,11 @@ const Messages = () => {
   };
 
   const loadMessages = async (conversationId) => {
+    if (!conversationId) {
+      console.error("Cannot load messages: conversationId is required");
+      return;
+    }
+
     try {
       setIsLoadingMessages(true);
       const data = await messagingService.getMessages(conversationId);
