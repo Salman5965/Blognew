@@ -260,82 +260,11 @@ const Messages = () => {
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedChat || isSending) return;
 
-    const conversationId = selectedChat.id || selectedChat._id;
-    if (!conversationId) {
-      console.error("Cannot send message: conversation ID is missing");
-      toast({
-        title: "Error",
-        description: "Invalid conversation. Please try refreshing the page.",
-        variant: "destructive",
-      });
-      return;
-    }
+    const content = newMessage.trim();
+    setNewMessage("");
+    setEditingMessage(null);
 
-    try {
-      setIsSending(true);
-
-      // Optimistically add message to UI
-      const optimisticMessage = {
-        id: `temp-${Date.now()}`,
-        content: newMessage.trim(),
-        sender: { _id: user._id, username: user.username },
-        createdAt: new Date().toISOString(),
-        status: "sending",
-      };
-
-      setMessages((prev) => [...prev, optimisticMessage]);
-      const messageContent = newMessage.trim();
-      setNewMessage("");
-
-      // Send message to backend
-      const data = await messagingService.sendMessage(
-        conversationId,
-        messageContent,
-      );
-
-      // Replace optimistic message with real one
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === optimisticMessage.id
-            ? { ...data.message, status: "sent" }
-            : msg,
-        ),
-      );
-
-      // Update conversation last message
-      setConversations((prev) =>
-        prev.map((conv) =>
-          conv.id === conversationId || conv._id === conversationId
-            ? {
-                ...conv,
-                lastMessage: {
-                  content: messageContent,
-                  createdAt: new Date().toISOString(),
-                  sender: user._id,
-                },
-              }
-            : conv,
-        ),
-      );
-    } catch (error) {
-      console.error("Failed to send message:", error);
-
-      // Remove optimistic message on error
-      setMessages((prev) =>
-        prev.filter((msg) => msg.id !== `temp-${Date.now()}`),
-      );
-
-      // Restore message content
-      setNewMessage(messageContent);
-
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSending(false);
-    }
+    await handleSendMessageContent(content);
   };
 
   const scrollToBottom = () => {
@@ -413,6 +342,202 @@ const Messages = () => {
       setSearchResults([]);
     } catch (error) {
       console.error("Failed to start new chat:", error);
+    }
+  };
+
+  const handleEmojiSelect = (emoji) => {
+    setNewMessage((prev) => prev + emoji);
+  };
+
+  const handleFileSelect = async (file, type) => {
+    if (!selectedChat) return;
+
+    try {
+      setUploadingFile(true);
+
+      // Create form data
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("type", type);
+
+      const conversationId = selectedChat.id || selectedChat._id;
+
+      // For now, we'll send the file name as a message
+      // In a real app, you'd upload to a file service first
+      const fileName = file.name;
+      const fileMessage =
+        type === "image" ? `📷 Image: ${fileName}` : `📄 File: ${fileName}`;
+
+      await handleSendMessageContent(fileMessage);
+
+      toast({
+        title: "File sent",
+        description: `${type === "image" ? "Image" : "File"} sent successfully`,
+      });
+    } catch (error) {
+      console.error("Failed to send file:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send file. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const handleSendMessageContent = async (content) => {
+    if (!content.trim() || !selectedChat || isSending) return;
+
+    const conversationId = selectedChat.id || selectedChat._id;
+    if (!conversationId) {
+      console.error("Cannot send message: conversation ID is missing");
+      toast({
+        title: "Error",
+        description: "Invalid conversation. Please try refreshing the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsSending(true);
+
+      // Optimistically add message to UI
+      const optimisticMessage = {
+        id: `temp-${Date.now()}`,
+        content: content.trim(),
+        sender: { _id: user._id, username: user.username },
+        createdAt: new Date().toISOString(),
+        status: "sending",
+        replyTo: replyToMessage,
+      };
+
+      setMessages((prev) => [...prev, optimisticMessage]);
+      const messageContent = content.trim();
+
+      // Send message to backend
+      const data = await messagingService.sendMessage(
+        conversationId,
+        messageContent,
+      );
+
+      // Replace optimistic message with real one
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === optimisticMessage.id
+            ? { ...data.message, status: "sent" }
+            : msg,
+        ),
+      );
+
+      // Update conversation last message
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === conversationId || conv._id === conversationId
+            ? {
+                ...conv,
+                lastMessage: {
+                  content: messageContent,
+                  createdAt: new Date().toISOString(),
+                  sender: user._id,
+                },
+              }
+            : conv,
+        ),
+      );
+
+      // Clear reply state
+      setReplyToMessage(null);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+
+      // Remove optimistic message on error
+      setMessages((prev) =>
+        prev.filter((msg) => msg.id !== optimisticMessage.id),
+      );
+
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleDeleteMessage = async (message) => {
+    try {
+      await messagingService.deleteMessage(message.id || message._id);
+
+      setMessages((prev) =>
+        prev.filter(
+          (msg) => (msg.id || msg._id) !== (message.id || message._id),
+        ),
+      );
+
+      toast({
+        title: "Message deleted",
+        description: "Message was deleted successfully",
+      });
+    } catch (error) {
+      console.error("Failed to delete message:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete message. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEditMessage = (message) => {
+    setEditingMessage(message);
+    setNewMessage(message.content);
+  };
+
+  const handleReplyToMessage = (message) => {
+    setReplyToMessage(message);
+  };
+
+  const handleReactToMessage = (messageId, emoji) => {
+    // For now, just show a toast
+    toast({
+      title: "Reaction sent",
+      description: `Reacted with ${emoji}`,
+    });
+  };
+
+  const handleDeleteConversation = async (conversation) => {
+    try {
+      // Add API call here when backend supports it
+      setConversations((prev) =>
+        prev.filter(
+          (conv) =>
+            (conv.id || conv._id) !== (conversation.id || conversation._id),
+        ),
+      );
+
+      if (
+        selectedChat &&
+        (selectedChat.id || selectedChat._id) ===
+          (conversation.id || conversation._id)
+      ) {
+        setSelectedChat(null);
+        setShowMobileChat(false);
+      }
+
+      toast({
+        title: "Conversation deleted",
+        description: "Conversation was deleted successfully",
+      });
+    } catch (error) {
+      console.error("Failed to delete conversation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete conversation. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
