@@ -39,8 +39,15 @@ export const FollowersPage = () => {
         setUser(userData);
 
         // Load follow stats
-        const stats = await followService.getFollowStats(userId);
-        setFollowStats(stats);
+        const [followersResponse, followingResponse] = await Promise.all([
+          userService.getFollowers(userId, { page: 1, limit: 1 }),
+          userService.getFollowing(userId, { page: 1, limit: 1 }),
+        ]);
+
+        setFollowStats({
+          followersCount: followersResponse.pagination?.totalFollowers || 0,
+          followingCount: followingResponse.pagination?.totalFollowing || 0,
+        });
       } catch (error) {
         console.error("Error loading user data:", error);
         setError(error.message);
