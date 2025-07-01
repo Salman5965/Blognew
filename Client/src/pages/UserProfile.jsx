@@ -144,34 +144,9 @@ export const UserProfile = () => {
     }));
   };
 
-  const handleSendMessage = async () => {
-    try {
-      // Create user object for chat service
-      const chatUser = {
-        id: user._id,
-        name: getDisplayName(),
-        username: user.username,
-        avatar: user.avatar,
-      };
-
-      // Start conversation with this user
-      await startConversation(chatUser);
-
-      // Open chat panel
-      openChat();
-
-      toast({
-        title: "Chat opened",
-        description: `You can now send messages to ${getDisplayName()}`,
-      });
-    } catch (error) {
-      console.error("Failed to start conversation:", error);
-      toast({
-        title: "Error",
-        description: "Failed to start conversation. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const handleSendMessage = () => {
+    // Navigate to Messages page with user ID to start conversation
+    navigate(`/messages?user=${user._id}`);
   };
 
   if (loading) {
