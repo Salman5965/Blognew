@@ -37,15 +37,20 @@ class SocketService {
     }
 
     try {
+      console.log(`🔌 Attempting Socket.IO connection to: ${serverUrl}`);
+
       this.socket = io(serverUrl, {
         auth: {
           token: token,
         },
-        transports: ["websocket", "polling"],
+        transports: ["polling", "websocket"], // Try polling first, then upgrade to websocket
         upgrade: true,
-        rememberUpgrade: true,
-        timeout: 20000,
+        rememberUpgrade: false, // Don't remember upgrade in case of issues
+        timeout: 10000, // Reduce timeout to 10 seconds
         forceNew: false,
+        reconnection: true,
+        reconnectionAttempts: 3,
+        reconnectionDelay: 1000,
       });
 
       this.setupEventHandlers();
