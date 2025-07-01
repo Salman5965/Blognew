@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { getDisplayName, getInitials } from "@/utils/userUtils";
 import { useToast } from "@/hooks/use-toast";
 import messagingService from "@/services/messagingService";
+import NewMessageModal from "@/components/messages/NewMessageModal";
 
 const Messages = () => {
   const { user } = useAuthContext();
@@ -41,6 +42,7 @@ const Messages = () => {
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  const [showNewMessageModal, setShowNewMessageModal] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Check if we need to open conversation with specific user
@@ -355,7 +357,12 @@ const Messages = () => {
         <div className="p-4 border-b">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-semibold">Messages</h1>
-            <Button variant="ghost" size="icon" className="rounded-full">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => setShowNewMessageModal(true)}
+            >
               <Plus className="h-5 w-5" />
             </Button>
           </div>
@@ -688,13 +695,19 @@ const Messages = () => {
                 Send private messages to fellow writers, share ideas, and build
                 meaningful connections.
               </p>
-              <Button onClick={() => navigate("/explore")}>
-                Find People to Message
+              <Button onClick={() => setShowNewMessageModal(true)}>
+                Message
               </Button>
             </div>
           </div>
         )}
       </div>
+
+      <NewMessageModal
+        open={showNewMessageModal}
+        onOpenChange={setShowNewMessageModal}
+        onStartConversation={handleDirectMessage}
+      />
     </div>
   );
 };
