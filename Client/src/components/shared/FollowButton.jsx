@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -28,8 +27,9 @@ export const FollowButton = ({
     let timeoutId;
 
     const checkFollowStatus = async () => {
-      // Skip check if user is not authenticated
-      if (!user) return;
+      // Skip check if user is not authenticated or userId is invalid
+      if (!user || !userId || userId === "undefined" || user._id === userId)
+        return;
 
       try {
         const following = await followService.isFollowing(userId);
@@ -59,13 +59,13 @@ export const FollowButton = ({
     };
   }, [userId, user]);
 
-  // Don't show follow button for current user - AFTER all hooks
-  if (!user || user._id === userId) {
+  // Don't show follow button for invalid conditions - AFTER all hooks
+  if (!user || !userId || userId === "undefined" || userId === user._id) {
     return null;
   }
 
   const handleFollowToggle = async () => {
-    if (isLoading) return;
+    if (isLoading || !userId || userId === "undefined") return;
 
     setIsLoading(true);
     try {
