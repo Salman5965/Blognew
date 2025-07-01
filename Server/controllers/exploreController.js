@@ -1030,12 +1030,42 @@ export const searchContent = async (req, res) => {
           limit: parseInt(limit),
         },
       };
+    } else if (type === "stories") {
+      searchResults = {
+        stories: searchResults.stories,
+        total: searchResults.stories.length,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(searchResults.stories.length / limit),
+          hasNextPage: searchResults.stories.length === parseInt(limit),
+          hasPrevPage: page > 1,
+          limit: parseInt(limit),
+        },
+      };
+    } else if (type === "dailydrip") {
+      searchResults = {
+        dailydrip: searchResults.dailydrip,
+        total: searchResults.dailydrip.length,
+        pagination: {
+          currentPage: parseInt(page),
+          totalPages: Math.ceil(searchResults.dailydrip.length / limit),
+          hasNextPage: searchResults.dailydrip.length === parseInt(limit),
+          hasPrevPage: page > 1,
+          limit: parseInt(limit),
+        },
+      };
     } else {
       // For 'all' type, return limited results
       searchResults = {
         users: searchResults.users.slice(0, 5),
         blogs: searchResults.blogs.slice(0, 5),
-        total: searchResults.users.length + searchResults.blogs.length,
+        stories: searchResults.stories.slice(0, 5),
+        dailydrip: searchResults.dailydrip.slice(0, 5),
+        total:
+          searchResults.users.length +
+          searchResults.blogs.length +
+          searchResults.stories.length +
+          searchResults.dailydrip.length,
       };
     }
 
