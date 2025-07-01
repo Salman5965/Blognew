@@ -74,6 +74,19 @@ const Messages = () => {
     if (user) {
       const socket = socketService.connect();
 
+      // Set up status change handler
+      const handleConnectionStatus = (status) => {
+        if (status === "no-auth" || status === "error") {
+          console.warn(
+            "⚠️ Real-time messaging unavailable, using polling fallback",
+          );
+          // Set up polling fallback for when Socket.IO fails
+          startPollingFallback();
+        }
+      };
+
+      socketService.on("connectionStatusChanged", handleConnectionStatus);
+
       if (socket) {
         // Join user's conversation rooms
         socket.emit("join_conversations");
