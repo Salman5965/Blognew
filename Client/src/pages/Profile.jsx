@@ -130,6 +130,7 @@ const Profile = () => {
     if (user?._id) {
       loadUserStats();
       loadRecentBlogs();
+      loadFollowStats();
     }
   }, [user]);
 
@@ -147,6 +148,28 @@ const Profile = () => {
       });
     } finally {
       setStatsLoading(false);
+    }
+  };
+
+  const loadFollowStats = async () => {
+    try {
+      // Get followers and following counts from backend
+      const [followersResponse, followingResponse] = await Promise.all([
+        userService.getFollowers(user._id, { page: 1, limit: 1 }),
+        userService.getFollowing(user._id, { page: 1, limit: 1 }),
+      ]);
+
+      setFollowStats({
+        followersCount: followersResponse.pagination?.totalFollowers || 0,
+        followingCount: followingResponse.pagination?.totalFollowing || 0,
+      });
+    } catch (error) {
+      console.error("Error loading follow stats:", error);
+      // Set fallback values
+      setFollowStats({
+        followersCount: 0,
+        followingCount: 0,
+      });
     }
   };
 
