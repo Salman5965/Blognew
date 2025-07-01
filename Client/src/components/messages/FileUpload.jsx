@@ -6,17 +6,17 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Paperclip, Image as ImageIcon, FileText, Camera } from "lucide-react";
+import { Paperclip, FileText, File, Archive } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const FileUpload = ({ onFileSelect, children, disabled = false }) => {
-  const imageInputRef = useRef(null);
-  const fileInputRef = useRef(null);
+  const documentInputRef = useRef(null);
+  const archiveInputRef = useRef(null);
   const { toast } = useToast();
 
   const handleFileSelect = (type) => {
     const input =
-      type === "image" ? imageInputRef.current : fileInputRef.current;
+      type === "archive" ? archiveInputRef.current : documentInputRef.current;
     input?.click();
   };
 
@@ -24,21 +24,11 @@ const FileUpload = ({ onFileSelect, children, disabled = false }) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
+    // Validate file size (25MB limit for documents)
+    if (file.size > 25 * 1024 * 1024) {
       toast({
         title: "File too large",
-        description: "Please select a file smaller than 10MB",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validate file type
-    if (type === "image" && !file.type.startsWith("image/")) {
-      toast({
-        title: "Invalid file type",
-        description: "Please select an image file",
+        description: "Please select a file smaller than 25MB",
         variant: "destructive",
       });
       return;
@@ -65,42 +55,34 @@ const FileUpload = ({ onFileSelect, children, disabled = false }) => {
           )}
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="top" align="start">
-          <DropdownMenuItem onClick={() => handleFileSelect("image")}>
-            <ImageIcon className="h-4 w-4 mr-2" />
-            Photo
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleFileSelect("file")}>
+          <DropdownMenuItem onClick={() => handleFileSelect("document")}>
             <FileText className="h-4 w-4 mr-2" />
             Document
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => {
-              // For future implementation - camera access
-              toast({
-                title: "Camera",
-                description: "Camera feature coming soon!",
-              });
-            }}
-          >
-            <Camera className="h-4 w-4 mr-2" />
-            Camera
+          <DropdownMenuItem onClick={() => handleFileSelect("file")}>
+            <File className="h-4 w-4 mr-2" />
+            Other file
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleFileSelect("archive")}>
+            <Archive className="h-4 w-4 mr-2" />
+            Archive
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       {/* Hidden file inputs */}
       <input
-        ref={imageInputRef}
+        ref={documentInputRef}
         type="file"
-        accept="image/*"
-        onChange={(e) => handleFileChange(e, "image")}
+        accept=".pdf,.doc,.docx,.txt,.xlsx,.pptx"
+        onChange={(e) => handleFileChange(e, "document")}
         className="hidden"
       />
       <input
-        ref={fileInputRef}
+        ref={archiveInputRef}
         type="file"
-        accept=".pdf,.doc,.docx,.txt,.zip,.rar"
-        onChange={(e) => handleFileChange(e, "file")}
+        accept=".zip,.rar,.7z,.tar,.gz"
+        onChange={(e) => handleFileChange(e, "archive")}
         className="hidden"
       />
     </>
