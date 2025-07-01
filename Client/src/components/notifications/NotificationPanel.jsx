@@ -52,18 +52,18 @@ const NotificationPanel = ({ onClose }) => {
   ];
 
   return (
-    <Card className="w-80 max-h-96 bg-slate-900 border-slate-700 shadow-xl">
+    <Card className="w-80 max-h-96 shadow-xl border">
       {/* Header */}
-      <div className="p-4 border-b border-slate-700">
+      <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-white">Notifications</h3>
+          <h3 className="font-semibold">Notifications</h3>
           <div className="flex items-center gap-2">
             {unreadCount > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleMarkAllAsRead}
-                className="text-xs text-blue-400 hover:text-blue-300 hover:bg-slate-800"
+                className="text-xs text-blue-500 hover:text-blue-600 hover:bg-accent"
               >
                 <CheckCheck className="h-3 w-3 mr-1" />
                 Mark all read
@@ -72,7 +72,7 @@ const NotificationPanel = ({ onClose }) => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-slate-400 hover:text-slate-300 hover:bg-slate-800"
+              className="text-muted-foreground hover:text-foreground hover:bg-accent"
               aria-label="Notification settings"
             >
               <Settings className="h-4 w-4" />
@@ -82,7 +82,7 @@ const NotificationPanel = ({ onClose }) => {
 
         {/* Filters */}
         <div className="flex items-center gap-2 mb-2">
-          <Filter className="h-3 w-3 text-slate-400" />
+          <Filter className="h-3 w-3 text-muted-foreground" />
           <div className="flex gap-1">
             {["all", "unread", "read"].map((filterType) => (
               <button
@@ -90,8 +90,8 @@ const NotificationPanel = ({ onClose }) => {
                 onClick={() => setFilter(filterType)}
                 className={`px-2 py-1 text-xs rounded transition-colors ${
                   filter === filterType
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-accent"
                 }`}
               >
                 {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
@@ -104,7 +104,7 @@ const NotificationPanel = ({ onClose }) => {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="w-full text-xs bg-slate-800 border border-slate-600 rounded px-2 py-1 text-white"
+          className="w-full text-xs bg-background border rounded px-2 py-1"
         >
           {notificationTypes.map((type) => (
             <option key={type.value} value={type.value}>
@@ -153,12 +153,12 @@ const NotificationPanel = ({ onClose }) => {
       </div>
 
       {/* Footer */}
-      <div className="p-2 border-t border-slate-700 text-center">
+      <div className="p-2 border-t text-center">
         <Button
           variant="ghost"
           size="sm"
           onClick={onClose}
-          className="text-xs text-slate-400 hover:text-slate-300"
+          className="text-xs text-muted-foreground hover:text-foreground"
         >
           View all notifications
         </Button>

@@ -21,6 +21,7 @@ import notificationRoutes from "./routes/notifications.js";
 import forumRoutes from "./routes/forum.js";
 import dailyDripRoutes from "./routes/dailyDrip.js";
 import storyRoutes from "./routes/stories.js";
+import exploreRoutes from "./routes/explore.js";
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
@@ -140,6 +141,7 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/forum", forumRoutes);
 app.use("/api/daily-drip", dailyDripRoutes);
 app.use("/api/stories", storyRoutes);
+app.use("/api/explore", exploreRoutes);
 
 // Welcome route
 app.get("/", (req, res) => {

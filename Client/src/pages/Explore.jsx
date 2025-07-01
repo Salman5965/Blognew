@@ -47,13 +47,28 @@ const Explore = () => {
   });
 
   const {
-    trendingAuthors,
-    featuredContent,
-    popularTags,
-    recommendedUsers,
-    trendingTopics,
-    exploreStats,
-  } = data;
+    trendingAuthors = [],
+    featuredContent = [],
+    popularTags = [],
+    recommendedUsers = [],
+    trendingTopics = [],
+    exploreStats = {},
+  } = data || {};
+
+  // Ensure all arrays are actually arrays to prevent map errors
+  const safeTrendingAuthors = Array.isArray(trendingAuthors)
+    ? trendingAuthors
+    : [];
+  const safeFeaturedContent = Array.isArray(featuredContent)
+    ? featuredContent
+    : [];
+  const safePopularTags = Array.isArray(popularTags) ? popularTags : [];
+  const safeRecommendedUsers = Array.isArray(recommendedUsers)
+    ? recommendedUsers
+    : [];
+  const safeTrendingTopics = Array.isArray(trendingTopics)
+    ? trendingTopics
+    : [];
 
   const {
     authors: isLoadingAuthors,
@@ -177,21 +192,19 @@ const Explore = () => {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {(Array.isArray(trendingTopics) ? trendingTopics : [])
-                  .slice(0, 10)
-                  .map((topic, index) => (
-                    <Badge
-                      key={topic.id || index}
-                      variant="secondary"
-                      className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                    >
-                      <Hash className="h-3 w-3 mr-1" />
-                      {topic.name || topic}
-                      {topic.count && (
-                        <span className="ml-1 opacity-70">({topic.count})</span>
-                      )}
-                    </Badge>
-                  ))}
+                {safeTrendingTopics.slice(0, 10).map((topic, index) => (
+                  <Badge
+                    key={topic.id || index}
+                    variant="secondary"
+                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                  >
+                    <Hash className="h-3 w-3 mr-1" />
+                    {topic.name || topic}
+                    {topic.count && (
+                      <span className="ml-1 opacity-70">({topic.count})</span>
+                    )}
+                  </Badge>
+                ))}
               </div>
             )}
           </CardContent>
@@ -228,7 +241,7 @@ const Explore = () => {
                   </Card>
                 ))}
               </div>
-            ) : trendingAuthors.length === 0 ? (
+            ) : safeTrendingAuthors.length === 0 ? (
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
@@ -240,7 +253,7 @@ const Explore = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {trendingAuthors.map((author, index) => (
+                {safeTrendingAuthors.map((author, index) => (
                   <Card
                     key={author._id || author.id}
                     className="hover:shadow-lg transition-shadow"
@@ -304,11 +317,13 @@ const Explore = () => {
                         </div>
                       </div>
 
-                      <FollowButton
-                        userId={author._id || author.id}
-                        className="w-full"
-                        size="sm"
-                      />
+                      {(author._id || author.id) && (
+                        <FollowButton
+                          userId={author._id || author.id}
+                          className="w-full"
+                          size="sm"
+                        />
+                      )}
                     </CardContent>
                   </Card>
                 ))}
@@ -342,7 +357,7 @@ const Explore = () => {
                       </div>
                     ))}
                   </div>
-                ) : featuredContent.length === 0 ? (
+                ) : safeFeaturedContent.length === 0 ? (
                   <div className="text-center py-8">
                     <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
@@ -354,7 +369,7 @@ const Explore = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {featuredContent.slice(0, 5).map((content) => (
+                    {safeFeaturedContent.slice(0, 5).map((content) => (
                       <div
                         key={content._id || content.id}
                         className="flex space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
@@ -445,7 +460,7 @@ const Explore = () => {
                       </div>
                     ))}
                   </div>
-                ) : recommendedUsers.length === 0 ? (
+                ) : safeRecommendedUsers.length === 0 ? (
                   <div className="text-center py-8">
                     <UserPlus className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">
@@ -454,7 +469,7 @@ const Explore = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {recommendedUsers.slice(0, 6).map((user) => (
+                    {safeRecommendedUsers.slice(0, 6).map((user) => (
                       <div
                         key={user._id || user.id}
                         className="flex items-center space-x-3"
@@ -484,11 +499,13 @@ const Explore = () => {
                           </p>
                         </div>
 
-                        <FollowButton
-                          userId={user._id || user.id}
-                          size="sm"
-                          showText={false}
-                        />
+                        {(user._id || user.id) && (
+                          <FollowButton
+                            userId={user._id || user.id}
+                            size="sm"
+                            showText={false}
+                          />
+                        )}
                       </div>
                     ))}
                   </div>
@@ -513,7 +530,7 @@ const Explore = () => {
                   <Skeleton key={i} className="h-8 w-16" />
                 ))}
               </div>
-            ) : popularTags.length === 0 ? (
+            ) : safePopularTags.length === 0 ? (
               <div className="text-center py-8">
                 <Hash className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
@@ -525,7 +542,7 @@ const Explore = () => {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {popularTags.map((tag, index) => (
+                {safePopularTags.map((tag, index) => (
                   <Badge
                     key={tag.id || index}
                     variant="outline"

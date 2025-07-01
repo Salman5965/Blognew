@@ -16,6 +16,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { isValidObjectId } from "@/utils/validation";
 
 export const FollowingPage = () => {
   const { userId } = useParams();
@@ -34,19 +35,56 @@ export const FollowingPage = () => {
         setLoading(true);
         setError(null);
 
+        // Validate userId format
+        if (!userId || !isValidObjectId(userId)) {
+          throw new Error("Invalid user ID format");
+        }
+
         // Load user profile
         const userData = await userService.getUserById(userId);
+        if (!userData) {
+          throw new Error("User not found");
+        }
         setUser(userData);
 
-        // Load follow stats
-        const stats = await followService.getFollowStats(userId);
-        setFollowStats(stats);
+        // Load follow stats - continue even if user profile failed
+        try {
+          const [followersResponse, followingResponse] = await Promise.all([
+            userService.getFollowers(userId, { page: 1, limit: 1 }),
+            userService.getFollowing(userId, { page: 1, limit: 1 }),
+          ]);
+
+          setFollowStats({
+            followersCount: followersResponse.pagination?.totalFollowers || 0,
+            followingCount: followingResponse.pagination?.totalFollowing || 0,
+          });
+        } catch (followError) {
+          console.warn("Failed to load follow stats:", followError);
+          // Set default values if follow stats fail
+          setFollowStats({
+            followersCount: 0,
+            followingCount: 0,
+          });
+        }
       } catch (error) {
         console.error("Error loading user data:", error);
         setError(error.message);
+
+        // More specific error messages
+        let errorMessage = "Failed to load user profile";
+        if (error.message === "Invalid user ID format") {
+          errorMessage = "Invalid user ID. Please check the URL.";
+        } else if (
+          error.message === "User not found" ||
+          error.message === "Not Found"
+        ) {
+          errorMessage =
+            "User not found. They may have been deleted or the link is incorrect.";
+        }
+
         toast({
           title: "Error",
-          description: "Failed to load user profile",
+          description: errorMessage,
           variant: "destructive",
         });
       } finally {
@@ -56,23 +94,66 @@ export const FollowingPage = () => {
 
     if (userId) {
       loadUserData();
+    } else {
+      setError("No user ID provided");
+      setLoading(false);
     }
-  }, [userId]);
+  }, [userId, toast]);
 
   const getInitials = () => {
     if (!user) return "";
-    if (user.firstName && user.lastName) {
+
+    // Check if both firstName and lastName exist and are not empty
+    if (
+      user.firstName &&
+      user.lastName &&
+      typeof user.firstName === "string" &&
+      typeof user.lastName === "string" &&
+      user.firstName.length > 0 &&
+      user.lastName.length > 0
+    ) {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
     }
-    return user.username.charAt(0).toUpperCase();
+
+    // Fallback to username if available
+    if (
+      user.username &&
+      typeof user.username === "string" &&
+      user.username.length > 0
+    ) {
+      return user.username.charAt(0).toUpperCase();
+    }
+
+    // Final fallback
+    return "U";
   };
 
   const getDisplayName = () => {
     if (!user) return "";
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
+
+    // Check if both firstName and lastName exist and are not empty
+    if (
+      user.firstName &&
+      user.lastName &&
+      typeof user.firstName === "string" &&
+      typeof user.lastName === "string" &&
+      user.firstName.trim().length > 0 &&
+      user.lastName.trim().length > 0
+    ) {
+      return `${user.firstName.trim()} ${user.lastName.trim()}`;
     }
-    return user.username;
+
+    // Fallback to username if available
+    if (
+      user.username &&
+      typeof user.username === "string" &&
+      user.username.trim().length > 0
+    ) {
+      return user.username.trim();
+    }
+
+    // Final fallback
+    return "Anonymous User";
   };
 
   if (loading) {

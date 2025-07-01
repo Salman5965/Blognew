@@ -11,7 +11,6 @@ import { Footer } from "@/components/layout/Footer";
 import { PrivateRoute } from "@/components/shared/PrivateRoute";
 import { ROUTES } from "@/utils/constant";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChatPanel } from "@/components/chat/ChatPanel";
 
 // Lazy import pages for code splitting
 const Home = React.lazy(() =>
@@ -61,6 +60,7 @@ const Notifications = React.lazy(() => import("./pages/Notifications"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
 const DailyDrip = React.lazy(() => import("./pages/DailyDrip"));
 const Stories = React.lazy(() => import("./pages/Stories"));
+const StoryDetails = React.lazy(() => import("./pages/StoryDetails"));
 const CreateStory = React.lazy(() => import("./pages/CreateStory"));
 const Explore = React.lazy(() => import("./pages/Explore"));
 const Messages = React.lazy(() => import("./pages/Messages"));
@@ -121,6 +121,7 @@ const App = () => (
 
                     {/* Public browsing routes */}
                     <Route path="/stories" element={<Stories />} />
+                    <Route path="/stories/:id" element={<StoryDetails />} />
                     <Route path="/explore" element={<Explore />} />
 
                     {/* Static Pages */}
@@ -265,9 +266,6 @@ const App = () => (
               </main>
               <Footer />
             </div>
-
-            {/* Chat Panel - Available globally for authenticated users */}
-            <ChatPanel />
 
             <Toaster />
             <Sonner />

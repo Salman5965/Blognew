@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,14 +41,78 @@ export const Navbar = () => {
   const navigate = useNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [unreadNotifications, setUnreadNotifications] = React.useState(0);
+  const [unreadMessages, setUnreadMessages] = React.useState(0);
   const [filters, setFilters] = React.useState({
     search: "",
     category: "",
     sortBy: "latest",
   });
+  const [searchResults, setSearchResults] = React.useState([]);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [showSearchResults, setShowSearchResults] = React.useState(false);
 
-  const debouncedSearch = useDebouncedCallback((value) => {
+  // Fetch unread counts when user is logged in
+  React.useEffect(() => {
+    if (!user) return;
+
+    const fetchCounts = async () => {
+      try {
+        // For now, simulate with random values
+        setUnreadNotifications(Math.floor(Math.random() * 5));
+        setUnreadMessages(Math.floor(Math.random() * 3));
+      } catch (error) {
+        console.error("Failed to fetch counts:", error);
+      }
+    };
+
+    fetchCounts();
+    const interval = setInterval(fetchCounts, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  const [debouncedSearch] = useDebouncedCallback(async (value) => {
     setFilters((prev) => ({ ...prev, search: value }));
+
+    if (value.trim()) {
+      setIsSearching(true);
+      setShowSearchResults(true);
+
+      try {
+        // Import exploreService dynamically to avoid circular dependencies
+        const { default: exploreService } = await import(
+          "@/services/exploreService"
+        );
+
+        // Search across all content types
+        const results = await exploreService.searchContent(value, "all", {
+          limit: 8,
+        });
+
+        // Combine and format results
+        const combinedResults = [
+          ...(results.results?.users || [])
+            .slice(0, 3)
+            .map((user) => ({ ...user, type: "user" })),
+          ...(results.results?.blogs || [])
+            .slice(0, 3)
+            .map((blog) => ({ ...blog, type: "blog" })),
+          ...(results.results?.stories || [])
+            .slice(0, 2)
+            .map((story) => ({ ...story, type: "story" })),
+        ];
+
+        setSearchResults(combinedResults);
+      } catch (error) {
+        console.error("Search failed:", error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    } else {
+      setSearchResults([]);
+      setShowSearchResults(false);
+    }
   }, DEBOUNCE_DELAY);
 
   const handleCreatePost = () => {
@@ -106,16 +170,145 @@ export const Navbar = () => {
             )}
           </div>
 
-          {/* Search Bar */}
+          {/* Enhanced Search Bar */}
           <div className="flex-1 max-w-md mx-8">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Search blogs..."
+                placeholder="Search everything..."
                 className="pl-10"
                 defaultValue={filters.search}
                 onChange={(e) => debouncedSearch(e.target.value)}
+                onFocus={() => filters.search && setShowSearchResults(true)}
+                onBlur={() =>
+                  setTimeout(() => setShowSearchResults(false), 200)
+                }
               />
+
+              {/* Search Results Dropdown */}
+              {showSearchResults && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
+                  {isSearching ? (
+                    <div className="p-4 text-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Searching...
+                      </p>
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    <div className="py-2">
+                      {searchResults.map((result, index) => (
+                        <div
+                          key={`${result.type}-${result.id || result._id}-${index}`}
+                          className="px-4 py-3 hover:bg-muted cursor-pointer border-b last:border-b-0"
+                          onClick={() => {
+                            setShowSearchResults(false);
+                            switch (result.type) {
+                              case "user":
+                                navigate(`/users/${result.id || result._id}`);
+                                break;
+                              case "blog":
+                                navigate(`/blog/${result.id || result._id}`);
+                                break;
+                              case "story":
+                                navigate(`/stories/${result.id || result._id}`);
+                                break;
+                              default:
+                                navigate("/explore");
+                            }
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            {result.type === "user" ? (
+                              <>
+                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <User className="h-4 w-4" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">
+                                    {result.firstName || result.lastName
+                                      ? `${result.firstName || ""} ${result.lastName || ""}`.trim()
+                                      : result.username}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    @{result.username} • User
+                                  </p>
+                                </div>
+                              </>
+                            ) : result.type === "blog" ? (
+                              <>
+                                <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                                  <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">
+                                    {result.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    By{" "}
+                                    {result.author?.firstName ||
+                                      result.author?.username ||
+                                      "Unknown"}{" "}
+                                    • Blog
+                                  </p>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                                  <BookOpen className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">
+                                    {result.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    By{" "}
+                                    {result.author?.firstName ||
+                                      result.author?.username ||
+                                      "Unknown"}{" "}
+                                    • Story
+                                  </p>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      <div className="px-4 py-3 border-t">
+                        <button
+                          className="text-sm text-primary hover:underline"
+                          onClick={() => {
+                            setShowSearchResults(false);
+                            navigate(
+                              `/explore?q=${encodeURIComponent(filters.search)}`,
+                            );
+                          }}
+                        >
+                          View all results for "{filters.search}"
+                        </button>
+                      </div>
+                    </div>
+                  ) : filters.search ? (
+                    <div className="p-4 text-center text-muted-foreground">
+                      <p className="text-sm">
+                        No results found for "{filters.search}"
+                      </p>
+                      <button
+                        className="text-sm text-primary hover:underline mt-1"
+                        onClick={() => {
+                          setShowSearchResults(false);
+                          navigate(
+                            `/explore?q=${encodeURIComponent(filters.search)}`,
+                          );
+                        }}
+                      >
+                        Search in Explore
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
 
@@ -142,22 +335,32 @@ export const Navbar = () => {
                   onClick={() => navigate("/notifications")}
                 >
                   <Bell className="h-4 w-4" />
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
-                  >
-                    3
-                  </Badge>
+                  {unreadNotifications > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
+                    >
+                      {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                    </Badge>
+                  )}
                 </Button>
 
                 {/* Messages */}
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hidden md:flex"
+                  className="relative hidden md:flex"
                   onClick={() => navigate("/messages")}
                 >
                   <MessageCircle className="h-4 w-4" />
+                  {unreadMessages > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
+                    >
+                      {unreadMessages > 9 ? "9+" : unreadMessages}
+                    </Badge>
+                  )}
                 </Button>
 
                 {/* Mobile menu button */}

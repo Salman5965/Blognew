@@ -35,14 +35,12 @@ import {
   Globe,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useChatStore } from "@/features/chat/chatStore";
 
 export const UserProfile = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
   const { user: currentUser } = useAuthContext();
   const { toast } = useToast();
-  const { startConversation, openChat } = useChatStore();
 
   const [user, setUser] = useState(null);
   const [userStats, setUserStats] = useState(null);
@@ -60,6 +58,13 @@ export const UserProfile = () => {
       loadUserData();
     }
   }, [userId]);
+
+  // Handle redirect for own profile
+  useEffect(() => {
+    if (isOwnProfile) {
+      navigate(ROUTES.PROFILE);
+    }
+  }, [isOwnProfile, navigate]);
 
   const loadUserData = async () => {
     try {
@@ -93,10 +98,30 @@ export const UserProfile = () => {
 
   const getInitials = () => {
     if (!user) return "";
-    if (user.firstName && user.lastName) {
+
+    // Check if both firstName and lastName exist and are not empty
+    if (
+      user.firstName &&
+      user.lastName &&
+      typeof user.firstName === "string" &&
+      typeof user.lastName === "string" &&
+      user.firstName.length > 0 &&
+      user.lastName.length > 0
+    ) {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
     }
-    return user.username.charAt(0).toUpperCase();
+
+    // Fallback to username if available
+    if (
+      user.username &&
+      typeof user.username === "string" &&
+      user.username.length > 0
+    ) {
+      return user.username.charAt(0).toUpperCase();
+    }
+
+    // Final fallback
+    return "U";
   };
 
   const getDisplayName = () => {
@@ -117,34 +142,9 @@ export const UserProfile = () => {
     }));
   };
 
-  const handleSendMessage = async () => {
-    try {
-      // Create user object for chat service
-      const chatUser = {
-        id: user._id,
-        name: getDisplayName(),
-        username: user.username,
-        avatar: user.avatar,
-      };
-
-      // Start conversation with this user
-      await startConversation(chatUser);
-
-      // Open chat panel
-      openChat();
-
-      toast({
-        title: "Chat opened",
-        description: `You can now send messages to ${getDisplayName()}`,
-      });
-    } catch (error) {
-      console.error("Failed to start conversation:", error);
-      toast({
-        title: "Error",
-        description: "Failed to start conversation. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const handleSendMessage = () => {
+    // Navigate to Messages page with user ID to start conversation
+    navigate(`/messages?user=${user._id}`);
   };
 
   if (loading) {
@@ -175,10 +175,15 @@ export const UserProfile = () => {
     );
   }
 
-  // If viewing own profile, redirect to settings profile
+  // If viewing own profile, show loading while redirecting
   if (isOwnProfile) {
-    navigate(ROUTES.PROFILE);
-    return null;
+    return (
+      <PageWrapper>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </PageWrapper>
+    );
   }
 
   return (
@@ -227,10 +232,12 @@ export const UserProfile = () => {
                         <MessageCircle className="h-4 w-4" />
                         <span>Message</span>
                       </Button>
-                      <FollowButton
-                        userId={user._id}
-                        onFollowChange={handleFollowChange}
-                      />
+                      {user._id && (
+                        <FollowButton
+                          userId={user._id}
+                          onFollowChange={handleFollowChange}
+                        />
+                      )}
                     </div>
                   )}
                 </div>

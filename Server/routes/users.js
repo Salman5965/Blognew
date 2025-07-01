@@ -6,6 +6,9 @@ import {
   deleteUser,
   getUserStats,
   updateUserRole,
+  getFollowers,
+  getFollowing,
+  getTopAuthors,
 } from "../controllers/userController.js";
 import { protect, authorize } from "../middlewares/auth.js";
 import { validateUserUpdate } from "../validators/userValidator.js";
@@ -38,23 +41,33 @@ router.get(
       const { q: query, page = 1, limit = 20 } = req.query;
       const currentUserId = req.user.id;
 
-      const users = await User.searchUsers(query, {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        excludeIds: [currentUserId],
-      });
+      if (!query || query.trim() === "") {
+        return res.status(400).json({
+          status: "error",
+          message: "Search query is required",
+        });
+      }
 
-      const totalUsers = await User.countDocuments({
-        isActive: true,
+      // Simplified search query to avoid MongoDB planning issues
+      const searchCriteria = {
         _id: { $ne: currentUserId },
-        ...(query && {
-          $or: [
-            { username: { $regex: query, $options: "i" } },
-            { firstName: { $regex: query, $options: "i" } },
-            { lastName: { $regex: query, $options: "i" } },
-          ],
-        }),
-      });
+        $or: [
+          { username: { $regex: query.trim(), $options: "i" } },
+          { firstName: { $regex: query.trim(), $options: "i" } },
+          { lastName: { $regex: query.trim(), $options: "i" } },
+        ],
+      };
+
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+
+      const users = await User.find(searchCriteria)
+        .select("username firstName lastName avatar bio")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean();
+
+      const totalUsers = await User.countDocuments(searchCriteria);
 
       res.status(200).json({
         status: "success",
@@ -85,7 +98,20 @@ router.get(
 // Get all users (admin only)
 router.get("/", protect, authorize("admin"), getAllUsers);
 
-// Get user by ID
+// Get top authors (public route)
+router.get("/top-authors", getTopAuthors);
+
+// Specific routes must come before generic /:id route
+// Get user statistics
+router.get("/:id/stats", protect, validateUserId, getUserStats);
+
+// Get user followers
+router.get("/:id/followers", validateUserId, getFollowers);
+
+// Get user following
+router.get("/:id/following", validateUserId, getFollowing);
+
+// Get user by ID (must come after specific routes)
 router.get("/:id", protect, validateUserId, getUserById);
 
 // Update user role (admin only)
@@ -100,9 +126,6 @@ router.put(
 
 // Delete user (admin only)
 router.delete("/:id", protect, authorize("admin"), validateUserId, deleteUser);
-
-// Get user statistics
-router.get("/:id/stats", protect, validateUserId, getUserStats);
 
 // Get user activity
 router.get("/:id/activity", protect, validateUserId, async (req, res) => {

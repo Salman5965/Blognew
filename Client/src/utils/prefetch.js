@@ -218,9 +218,9 @@ export class RoutePrefetcher {
   static prefetchRelatedRoutes(currentPath) {
     const routeMap = {
       "/": ["/feed", "/dashboard"],
-      "/feed": ["/create-blog", "/profile"],
+      "/feed": ["/create-blog", "/dashboard/profile"],
       "/blog": ["/", "/feed"],
-      "/dashboard": ["/my-blogs", "/profile"],
+      "/dashboard": ["/my-blogs", "/dashboard/profile"],
       "/my-blogs": ["/create-blog", "/dashboard"],
     };
 

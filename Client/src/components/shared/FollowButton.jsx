@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { followService } from "@/services/followService";
 import { UserPlus, UserMinus, Loader2, UserCheck } from "lucide-react";
+import { isValidObjectId } from "@/utils/validation";
 
 export const FollowButton = ({
   userId,
@@ -28,8 +28,15 @@ export const FollowButton = ({
     let timeoutId;
 
     const checkFollowStatus = async () => {
-      // Skip check if user is not authenticated
-      if (!user) return;
+      // Skip check if user is not authenticated or userId is invalid
+      if (!user || !userId || userId === "undefined" || user._id === userId)
+        return;
+
+      // Skip check if userId is not a valid ObjectId format
+      if (!isValidObjectId(userId)) {
+        console.warn("Invalid ObjectId format for userId:", userId);
+        return;
+      }
 
       try {
         const following = await followService.isFollowing(userId);
@@ -59,13 +66,25 @@ export const FollowButton = ({
     };
   }, [userId, user]);
 
-  // Don't show follow button for current user - AFTER all hooks
-  if (!user || user._id === userId) {
+  // Don't show follow button for invalid conditions - AFTER all hooks
+  if (
+    !user ||
+    !userId ||
+    userId === "undefined" ||
+    userId === user._id ||
+    !isValidObjectId(userId)
+  ) {
     return null;
   }
 
   const handleFollowToggle = async () => {
-    if (isLoading) return;
+    if (
+      isLoading ||
+      !userId ||
+      userId === "undefined" ||
+      !isValidObjectId(userId)
+    )
+      return;
 
     setIsLoading(true);
     try {

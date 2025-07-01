@@ -79,16 +79,16 @@ const NotificationButton = () => {
         variant="ghost"
         size="sm"
         onClick={handleToggle}
-        className={`relative p-2 hover:bg-slate-800 transition-colors ${
-          isOpen ? "bg-slate-800" : ""
+        className={`relative p-2 hover:bg-accent transition-colors ${
+          isOpen ? "bg-accent" : ""
         }`}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
       >
         <Bell
           className={`h-5 w-5 transition-all duration-200 ${
             hasNewNotifications
-              ? "animate-pulse text-blue-400"
-              : "text-slate-300"
+              ? "animate-pulse text-blue-500"
+              : "text-muted-foreground"
           }`}
         />
 
@@ -101,7 +101,7 @@ const NotificationButton = () => {
 
         {/* New notification indicator */}
         {hasNewNotifications && (
-          <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-400 rounded-full animate-ping" />
+          <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-500 rounded-full animate-ping" />
         )}
       </Button>
 

@@ -3,29 +3,63 @@ import apiService from "./api";
 class UserService {
   // Get user profile by ID
   async getUserById(userId) {
-    const response = await apiService.get(`/users/${userId}`);
-    if (response.status === "success") {
-      return response.data;
+    try {
+      const response = await apiService.get(`/users/${userId}`);
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to fetch user");
+    } catch (error) {
+      // Handle specific error types
+      if (error.response?.status === 404) {
+        throw new Error("User not found");
+      } else if (error.response?.status === 400) {
+        throw new Error("Invalid user ID");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      } else if (error.message === "Network Error") {
+        throw new Error("Network error. Please check your connection.");
+      }
+
+      // Re-throw the original error if it's already a custom error
+      throw error;
     }
-    throw new Error(response.message || "Failed to fetch user");
   }
 
   // Get user profile by username
   async getUserByUsername(username) {
-    const response = await apiService.get(`/users/username/${username}`);
-    if (response.status === "success") {
-      return response.data;
+    try {
+      const response = await apiService.get(`/users/username/${username}`);
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to fetch user");
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new Error("User not found");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
     }
-    throw new Error(response.message || "Failed to fetch user");
   }
 
   // Get user statistics
   async getUserStats(userId) {
-    const response = await apiService.get(`/users/${userId}/stats`);
-    if (response.status === "success") {
-      return response.data.stats;
+    try {
+      const response = await apiService.get(`/users/${userId}/stats`);
+      if (response.status === "success") {
+        return response.data.stats;
+      }
+      throw new Error(response.message || "Failed to fetch user stats");
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new Error("User not found");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
     }
-    throw new Error(response.message || "Failed to fetch user stats");
   }
 
   // Get activity on current user's blogs (likes, comments from other users)
@@ -95,6 +129,66 @@ class UserService {
       return true;
     }
     throw new Error(response.message || "Failed to delete user");
+  }
+
+  // Get user followers
+  async getFollowers(userId, options = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (options.page) params.append("page", options.page);
+      if (options.limit) params.append("limit", options.limit);
+
+      const response = await apiService.get(
+        `/users/${userId}/followers?${params}`,
+      );
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to fetch followers");
+    } catch (error) {
+      console.error("Error fetching followers:", error);
+      return {
+        followers: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalFollowers: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+          limit: options.limit || 20,
+        },
+      };
+    }
+  }
+
+  // Get user following
+  async getFollowing(userId, options = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (options.page) params.append("page", options.page);
+      if (options.limit) params.append("limit", options.limit);
+
+      const response = await apiService.get(
+        `/users/${userId}/following?${params}`,
+      );
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to fetch following");
+    } catch (error) {
+      console.error("Error fetching following:", error);
+      return {
+        following: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalFollowing: 0,
+          hasNextPage: false,
+          hasPrevPage: false,
+          limit: options.limit || 20,
+        },
+      };
+    }
   }
 
   // Get current user profile (using auth endpoint)
