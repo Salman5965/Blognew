@@ -101,7 +101,7 @@ const NotificationButton = () => {
 
         {/* New notification indicator */}
         {hasNewNotifications && (
-          <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-400 rounded-full animate-ping" />
+          <span className="absolute -top-1 -right-1 h-3 w-3 bg-blue-500 rounded-full animate-ping" />
         )}
       </Button>
 
