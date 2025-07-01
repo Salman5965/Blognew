@@ -658,7 +658,7 @@ const Messages = () => {
                   <div
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/profile/${conversation.participantId}`);
+                      navigate(`/users/${conversation.participantId}`);
                     }}
                     className="relative hover:opacity-80 transition-opacity cursor-pointer"
                   >

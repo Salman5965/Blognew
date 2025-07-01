@@ -125,7 +125,7 @@ const NewMessageModal = ({ open, onOpenChange, onStartConversation }) => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/profile/${user._id || user.id}`);
+                        navigate(`/users/${user._id || user.id}`);
                         onOpenChange(false);
                       }}
                       className="hover:opacity-80 transition-opacity"
