@@ -41,7 +41,6 @@ export const UserProfile = () => {
   const navigate = useNavigate();
   const { user: currentUser } = useAuthContext();
   const { toast } = useToast();
-  const { startConversation, openChat } = useChatStore();
 
   const [user, setUser] = useState(null);
   const [userStats, setUserStats] = useState(null);
