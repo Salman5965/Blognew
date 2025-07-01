@@ -940,7 +940,10 @@ const Messages = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div
+              ref={messagesContainerRef}
+              className="flex-1 overflow-y-auto p-4 space-y-4"
+            >
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -1088,15 +1091,16 @@ const Messages = () => {
                   <div className="flex items-center gap-2 ml-2">
                     <EmojiPicker onEmojiSelect={handleEmojiSelect} />
                     {!newMessage.trim() && !uploadingFile && (
-                      <FileUpload onFileSelect={handleFileSelect}>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6 rounded-full"
-                        >
-                          <ImageIcon className="h-4 w-4" />
-                        </Button>
-                      </FileUpload>
+                      <>
+                        <ImageUpload
+                          onImageSelect={handleImageSelect}
+                          disabled={uploadingFile || isSending}
+                        />
+                        <FileUpload
+                          onFileSelect={handleFileSelect}
+                          disabled={uploadingFile || isSending}
+                        />
+                      </>
                     )}
                   </div>
                 </div>
