@@ -147,6 +147,38 @@ const Messages = () => {
     return () => clearInterval(statusInterval);
   }, [conversations]);
 
+  // Real-time message polling with better efficiency
+  useEffect(() => {
+    if (!selectedChat) return;
+
+    const pollMessages = async () => {
+      const conversationId = selectedChat.id || selectedChat._id;
+      if (conversationId && !isSending && !isLoadingMessages) {
+        try {
+          const data = await messagingService.getMessages(conversationId);
+          const newMessages = data.messages || [];
+
+          // Only update if messages have changed
+          if (
+            newMessages.length !== messages.length ||
+            (newMessages.length > 0 &&
+              messages.length > 0 &&
+              newMessages[newMessages.length - 1]?.id !==
+                messages[messages.length - 1]?.id)
+          ) {
+            setMessages(newMessages);
+          }
+        } catch (error) {
+          console.error("Failed to poll messages:", error);
+        }
+      }
+    };
+
+    const messagePollingInterval = setInterval(pollMessages, 2000); // Poll every 2 seconds
+
+    return () => clearInterval(messagePollingInterval);
+  }, [selectedChat, messages.length, isSending, isLoadingMessages]);
+
   useEffect(() => {
     if (searchQuery.trim()) {
       handleSearch();
