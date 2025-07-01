@@ -28,20 +28,38 @@ class UserService {
 
   // Get user profile by username
   async getUserByUsername(username) {
-    const response = await apiService.get(`/users/username/${username}`);
-    if (response.status === "success") {
-      return response.data;
+    try {
+      const response = await apiService.get(`/users/username/${username}`);
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to fetch user");
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new Error("User not found");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
     }
-    throw new Error(response.message || "Failed to fetch user");
   }
 
   // Get user statistics
   async getUserStats(userId) {
-    const response = await apiService.get(`/users/${userId}/stats`);
-    if (response.status === "success") {
-      return response.data.stats;
+    try {
+      const response = await apiService.get(`/users/${userId}/stats`);
+      if (response.status === "success") {
+        return response.data.stats;
+      }
+      throw new Error(response.message || "Failed to fetch user stats");
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new Error("User not found");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
     }
-    throw new Error(response.message || "Failed to fetch user stats");
   }
 
   // Get activity on current user's blogs (likes, comments from other users)
