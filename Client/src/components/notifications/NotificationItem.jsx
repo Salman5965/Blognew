@@ -103,7 +103,7 @@ const NotificationItem = ({ notification }) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-sm text-white">
+              <p className="text-sm text-foreground">
                 <span className="font-medium">
                   {notification.relatedUser?.firstName}{" "}
                   {notification.relatedUser?.lastName}
@@ -119,15 +119,15 @@ const NotificationItem = ({ notification }) => {
               </p>
 
               {notification.relatedBlog && (
-                <p className="text-xs text-slate-400 mt-1 truncate">
+                <p className="text-xs text-muted-foreground mt-1 truncate">
                   "{notification.relatedBlog.title}"
                 </p>
               )}
 
               <div className="flex items-center mt-1 space-x-2">
-                <span className="text-xs text-slate-500">{timeAgo}</span>
+                <span className="text-xs text-muted-foreground">{timeAgo}</span>
                 {!notification.isRead && (
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
                 )}
               </div>
             </div>
