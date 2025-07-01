@@ -50,19 +50,26 @@ class SocketService {
       );
       console.log(`  - Has token: ${!!token}`);
 
-      // Test if Socket.IO endpoint is reachable
-      try {
-        const testUrl = `${serverUrl}/socket.io/?transport=polling`;
-        console.log(`🧪 Testing Socket.IO endpoint: ${testUrl}`);
+      // Test if Socket.IO endpoint is reachable (non-blocking)
+      const testUrl = `${serverUrl}/socket.io/?transport=polling`;
+      console.log(`🧪 Testing Socket.IO endpoint: ${testUrl}`);
 
-        const response = await fetch(testUrl, {
-          method: "GET",
-          mode: "cors",
+      fetch(testUrl, {
+        method: "GET",
+        mode: "cors",
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+      })
+        .then((response) => {
+          console.log(
+            `✅ Socket.IO endpoint test - Status: ${response.status}`,
+          );
+        })
+        .catch((testError) => {
+          console.error(
+            `❌ Socket.IO endpoint test failed:`,
+            testError.message,
+          );
         });
-        console.log(`✅ Socket.IO endpoint test - Status: ${response.status}`);
-      } catch (testError) {
-        console.error(`❌ Socket.IO endpoint test failed:`, testError);
-      }
 
       this.socket = io(serverUrl, {
         auth: {
