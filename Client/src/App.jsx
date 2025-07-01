@@ -11,7 +11,6 @@ import { Footer } from "@/components/layout/Footer";
 import { PrivateRoute } from "@/components/shared/PrivateRoute";
 import { ROUTES } from "@/utils/constant";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChatPanel } from "@/components/chat/ChatPanel";
 
 // Lazy import pages for code splitting
 const Home = React.lazy(() =>
