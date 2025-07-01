@@ -594,7 +594,7 @@ export const getFollowing = async (req, res, next) => {
 
     // Get following with pagination
     const following = await Follow.find({ follower: userId })
-      .populate("followed", "username firstName lastName avatar bio")
+      .populate("following", "username firstName lastName avatar bio")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -605,12 +605,12 @@ export const getFollowing = async (req, res, next) => {
 
     // Format response
     const formattedFollowing = following.map((follow) => ({
-      id: follow.followed._id,
-      username: follow.followed.username,
-      firstName: follow.followed.firstName,
-      lastName: follow.followed.lastName,
-      avatar: follow.followed.avatar,
-      bio: follow.followed.bio,
+      id: follow.following._id,
+      username: follow.following.username,
+      firstName: follow.following.firstName,
+      lastName: follow.following.lastName,
+      avatar: follow.following.avatar,
+      bio: follow.following.bio,
       followedAt: follow.createdAt,
     }));
 
