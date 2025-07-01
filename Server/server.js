@@ -25,20 +25,63 @@ const io = new Server(httpServer, {
   transports: ["websocket", "polling"],
 });
 
-// Socket.IO middleware for authentication - TEMPORARILY DISABLED FOR TESTING
+// Socket.IO middleware for authentication
 io.use(async (socket, next) => {
   try {
-    console.log("🔐 Socket.IO connection attempt (auth disabled for testing)");
+    console.log("🔐 Socket.IO authentication attempt");
 
-    // Temporary: Skip authentication to test basic connection
-    socket.userId = "test-user";
-    socket.user = { username: "test", _id: "test-user" };
+    const token = socket.handshake.auth.token;
+    console.log("Token present:", !!token);
 
-    console.log("✅ Socket.IO connection allowed (no auth)");
+    if (!token) {
+      console.error("❌ No token provided");
+      return next(new Error("No token provided"));
+    }
+
+    // Check if JWT_SECRET is available
+    if (!process.env.JWT_SECRET) {
+      console.error("❌ JWT_SECRET not configured");
+      return next(new Error("Server configuration error"));
+    }
+
+    // Verify JWT token
+    const jwt = await import("jsonwebtoken");
+
+    let decoded;
+    try {
+      decoded = jwt.default.verify(token, process.env.JWT_SECRET);
+      console.log("✅ Token verified for user ID:", decoded.id);
+    } catch (jwtError) {
+      console.error("❌ JWT verification failed:", jwtError.message);
+      return next(new Error("Invalid token"));
+    }
+
+    // Get user from database
+    const user = await User.findById(decoded.id).select("-password");
+    if (!user) {
+      console.error("❌ User not found:", decoded.id);
+      return next(new Error("User not found"));
+    }
+
+    if (!user.isActive) {
+      console.error("❌ User account is inactive:", decoded.id);
+      return next(new Error("Account is inactive"));
+    }
+
+    socket.userId = user._id.toString();
+    socket.user = user;
+
+    // Update user online status
+    await User.findByIdAndUpdate(user._id, {
+      isOnline: true,
+      lastSeen: new Date(),
+    });
+
+    console.log("✅ Socket.IO authentication successful for:", user.username);
     next();
   } catch (error) {
-    console.error("❌ Socket.IO connection error:", error.message);
-    return next(new Error("Connection failed"));
+    console.error("❌ Socket.IO authentication error:", error.message);
+    return next(new Error("Authentication failed"));
   }
 });
 
