@@ -387,30 +387,61 @@ const Messages = () => {
     try {
       setUploadingFile(true);
 
-      // Create form data
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("type", type);
-
-      const conversationId = selectedChat.id || selectedChat._id;
-
-      // For now, we'll send the file name as a message
-      // In a real app, you'd upload to a file service first
       const fileName = file.name;
-      const fileMessage =
-        type === "image" ? `📷 Image: ${fileName}` : `📄 File: ${fileName}`;
+      const fileSize = (file.size / 1024 / 1024).toFixed(2); // MB
+
+      let fileMessage;
+      switch (type) {
+        case "document":
+          fileMessage = `📄 Document: ${fileName} (${fileSize}MB)`;
+          break;
+        case "archive":
+          fileMessage = `🗂️ Archive: ${fileName} (${fileSize}MB)`;
+          break;
+        default:
+          fileMessage = `📎 File: ${fileName} (${fileSize}MB)`;
+      }
 
       await handleSendMessageContent(fileMessage);
 
       toast({
         title: "File sent",
-        description: `${type === "image" ? "Image" : "File"} sent successfully`,
+        description: "File sent successfully",
       });
     } catch (error) {
       console.error("Failed to send file:", error);
       toast({
         title: "Error",
         description: "Failed to send file. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const handleImageSelect = async (file) => {
+    if (!selectedChat) return;
+
+    try {
+      setUploadingFile(true);
+
+      const fileName = file.name;
+      const fileSize = (file.size / 1024 / 1024).toFixed(2); // MB
+
+      const imageMessage = `🖼️ Image: ${fileName} (${fileSize}MB)`;
+
+      await handleSendMessageContent(imageMessage);
+
+      toast({
+        title: "Image sent",
+        description: "Image sent successfully",
+      });
+    } catch (error) {
+      console.error("Failed to send image:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send image. Please try again.",
         variant: "destructive",
       });
     } finally {
