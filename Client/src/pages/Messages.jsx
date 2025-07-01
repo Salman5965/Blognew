@@ -15,6 +15,8 @@ import {
   Trash2,
   Phone,
   Video,
+  Pin,
+  VolumeX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -761,69 +763,93 @@ const Messages = () => {
             </div>
           ) : (
             filteredConversations.map((conversation, index) => (
-              <button
+              <div
                 key={`conversation-${conversation.id || conversation._id}-${index}`}
-                onClick={() => handleChatSelect(conversation)}
                 className={cn(
-                  "w-full p-4 text-left hover:bg-muted/50 transition-colors border-b",
+                  "group w-full border-b hover:bg-muted/50 transition-colors relative",
                   selectedChat?.id === conversation.id && "bg-muted",
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/users/${conversation.participantId}`);
-                    }}
-                    className="relative hover:opacity-80 transition-opacity cursor-pointer"
-                  >
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={conversation.participantAvatar} />
-                      <AvatarFallback>
-                        {conversation.participantName?.[0]?.toUpperCase() ||
-                          "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    {conversation.isOnline && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
-                    )}
-                  </div>
+                <button
+                  onClick={() => handleChatSelect(conversation)}
+                  className="w-full p-4 text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/users/${conversation.participantId}`);
+                      }}
+                      className="relative hover:opacity-80 transition-opacity cursor-pointer"
+                    >
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={conversation.participantAvatar} />
+                        <AvatarFallback>
+                          {conversation.participantName?.[0]?.toUpperCase() ||
+                            "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      {(conversation.isOnline ||
+                        onlineUsers.has(conversation.participantId)) && (
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+                      )}
+                    </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-medium truncate">
-                        {conversation.participantName || "Unknown User"}
-                      </h3>
-                      {conversation.lastMessage && (
-                        <span className="text-xs text-muted-foreground">
-                          {formatTime(conversation.lastMessage.createdAt)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p
-                        className={cn(
-                          "text-sm truncate",
-                          conversation.unreadCount > 0
-                            ? "text-foreground font-medium"
-                            : "text-muted-foreground",
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          {conversation.isPinned && (
+                            <Pin className="h-3 w-3 text-muted-foreground" />
+                          )}
+                          {conversation.isMuted && (
+                            <VolumeX className="h-3 w-3 text-muted-foreground" />
+                          )}
+                          <h3 className="font-medium truncate">
+                            {conversation.participantName || "Unknown User"}
+                          </h3>
+                        </div>
+                        {conversation.lastMessage && (
+                          <span className="text-xs text-muted-foreground">
+                            {formatTime(conversation.lastMessage.createdAt)}
+                          </span>
                         )}
-                      >
-                        {conversation.lastMessage?.content ||
-                          "Start a conversation"}
-                      </p>
-                      {conversation.unreadCount > 0 && (
-                        <Badge
-                          variant="destructive"
-                          className="text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center"
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <p
+                          className={cn(
+                            "text-sm truncate",
+                            conversation.unreadCount > 0
+                              ? "text-foreground font-medium"
+                              : "text-muted-foreground",
+                          )}
                         >
-                          {conversation.unreadCount}
-                        </Badge>
-                      )}
+                          {conversation.lastMessage?.content ||
+                            "Start a conversation"}
+                        </p>
+                        {conversation.unreadCount > 0 && (
+                          <Badge
+                            variant="destructive"
+                            className="text-xs h-5 w-5 rounded-full p-0 flex items-center justify-center"
+                          >
+                            {conversation.unreadCount}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </div>
+                </button>
+
+                {/* Conversation Context Menu */}
+                <div className="absolute top-2 right-2">
+                  <ConversationContextMenu
+                    conversation={conversation}
+                    onDelete={handleDeleteConversation}
+                    onMute={handleMuteConversation}
+                    onPin={handlePinConversation}
+                    onArchive={handleArchiveConversation}
+                  />
                 </div>
-              </button>
+              </div>
             ))
           )}
         </div>
