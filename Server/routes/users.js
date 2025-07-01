@@ -87,7 +87,17 @@ router.get(
 // Get all users (admin only)
 router.get("/", protect, authorize("admin"), getAllUsers);
 
-// Get user by ID
+// Specific routes must come before generic /:id route
+// Get user statistics
+router.get("/:id/stats", protect, validateUserId, getUserStats);
+
+// Get user followers
+router.get("/:id/followers", validateUserId, getFollowers);
+
+// Get user following
+router.get("/:id/following", validateUserId, getFollowing);
+
+// Get user by ID (must come after specific routes)
 router.get("/:id", protect, validateUserId, getUserById);
 
 // Update user role (admin only)
@@ -102,15 +112,6 @@ router.put(
 
 // Delete user (admin only)
 router.delete("/:id", protect, authorize("admin"), validateUserId, deleteUser);
-
-// Get user statistics
-router.get("/:id/stats", protect, validateUserId, getUserStats);
-
-// Get user followers
-router.get("/:id/followers", validateUserId, getFollowers);
-
-// Get user following
-router.get("/:id/following", validateUserId, getFollowing);
 
 // Get user activity
 router.get("/:id/activity", protect, validateUserId, async (req, res) => {
