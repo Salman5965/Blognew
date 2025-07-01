@@ -52,7 +52,7 @@ const NotificationPanel = ({ onClose }) => {
   ];
 
   return (
-    <Card className="w-80 max-h-96 bg-slate-900 border-slate-700 shadow-xl">
+    <Card className="w-80 max-h-96 shadow-xl border">
       {/* Header */}
       <div className="p-4 border-b border-slate-700">
         <div className="flex items-center justify-between mb-3">
