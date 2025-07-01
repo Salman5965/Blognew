@@ -201,9 +201,19 @@ const Messages = () => {
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedChat || isSending) return;
 
+    const conversationId = selectedChat.id || selectedChat._id;
+    if (!conversationId) {
+      console.error("Cannot send message: conversation ID is missing");
+      toast({
+        title: "Error",
+        description: "Invalid conversation. Please try refreshing the page.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsSending(true);
-      const conversationId = selectedChat.id || selectedChat._id;
 
       // Optimistically add message to UI
       const optimisticMessage = {
