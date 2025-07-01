@@ -166,27 +166,85 @@ const Messages = () => {
   );
 
   return (
-    <div className="h-screen bg-background flex">
-      {/* Conversations Sidebar */}
-      <div
-        className={cn(
-          "w-full md:w-80 border-r bg-card flex flex-col",
-          !showMobileConversations && "hidden md:flex",
-        )}
-      >
-        {/* Header */}
-        <div className="p-4 border-b">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-semibold">Messages</h1>
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm">
-                <Settings className="h-4 w-4" />
+    <div className="min-h-screen bg-background">
+      {/* Enhanced Header Section */}
+      <div className="bg-gradient-to-br from-primary/10 via-background to-background border-b">
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-4xl mx-auto text-center">
+            <MessageSquare className="h-16 w-16 text-primary mx-auto mb-4" />
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Stay Connected
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8">
+              Message other writers, collaborate on ideas, and build meaningful connections
+            </p>
+
+            {/* Quick Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button
+                onClick={() => {
+                  openChat();
+                  fetchConversations();
+                }}
+                className="flex items-center gap-2"
+                size="lg"
+              >
+                <Sparkles className="h-5 w-5" />
+                Open Chat Panel
               </Button>
-              <Button variant="ghost" size="sm">
-                <Plus className="h-4 w-4" />
+              <Button
+                variant="outline"
+                onClick={() => navigate("/explore")}
+                size="lg"
+              >
+                <Users className="h-5 w-5 mr-2" />
+                Find People to Message
               </Button>
             </div>
+
+            <div className="mt-8 p-4 bg-card rounded-lg border max-w-md mx-auto">
+              <h3 className="font-semibold mb-2">💡 Tip</h3>
+              <p className="text-sm text-muted-foreground">
+                Click the message button on any user's profile to start a conversation instantly!
+              </p>
+            </div>
           </div>
+        </div>
+      </div>
+
+      {/* Full Messages Interface */}
+      <div className="h-screen bg-background flex">
+        {/* Conversations Sidebar */}
+        <div
+          className={cn(
+            "w-full md:w-80 border-r bg-card flex flex-col",
+            !showMobileConversations && "hidden md:flex",
+          )}
+        >
+          {/* Header */}
+          <div className="p-4 border-b">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold">Messages</h2>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    openChat();
+                    fetchConversations();
+                  }}
+                  title="Open Chat Panel"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm">
+                  <Settings className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={() => navigate("/explore")}>
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
 
           {/* Search */}
           <div className="relative">
