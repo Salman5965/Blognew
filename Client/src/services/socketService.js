@@ -77,10 +77,13 @@ class SocketService {
     });
 
     this.socket.on("connect_error", (error) => {
-      // Only log if it's not a typical deployment websocket error
-      if (!error.message.includes("websocket error")) {
-        console.error("Socket connection error:", error);
-      }
+      console.error("🔴 Socket connection error:", {
+        message: error.message,
+        description: error.description,
+        context: error.context,
+        type: error.type,
+        serverUrl: this.socket?.io?.uri,
+      });
       this.connectionStatus = "error";
       this.emit("connectionStatusChanged", "error");
     });
