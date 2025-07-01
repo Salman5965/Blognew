@@ -6,6 +6,7 @@ import {
   getPopularTags,
   getRecommendedUsers,
   getTrendingTopics,
+  searchContent,
 } from "../controllers/exploreController.js";
 import { optionalAuth } from "../middlewares/auth.js";
 import { rateLimiter } from "../middlewares/rateLimiter.js";
