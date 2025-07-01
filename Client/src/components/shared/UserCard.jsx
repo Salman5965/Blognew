@@ -75,7 +75,7 @@ export const UserCard = ({
             )}
           </div>
         </div>
-        {showFollowButton && (
+        {showFollowButton && user?._id && (
           <FollowButton
             userId={user._id}
             initialFollowingStatus={user.isFollowing}
