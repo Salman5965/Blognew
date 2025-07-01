@@ -141,13 +141,13 @@ const NotificationItem = ({ notification }) => {
 
         {/* Actions */}
         {showActions && (
-          <div className="absolute top-2 right-2 flex items-center space-x-1 bg-slate-900 rounded-md p-1 shadow-lg">
+          <div className="absolute top-2 right-2 flex items-center space-x-1 bg-background border rounded-md p-1 shadow-lg">
             {!notification.isRead && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleMarkAsRead}
-                className="h-6 w-6 p-0 text-slate-400 hover:text-blue-400"
+                className="h-6 w-6 p-0 text-muted-foreground hover:text-primary"
                 title="Mark as read"
               >
                 <Check className="h-3 w-3" />
@@ -157,7 +157,7 @@ const NotificationItem = ({ notification }) => {
               variant="ghost"
               size="sm"
               onClick={handleDelete}
-              className="h-6 w-6 p-0 text-slate-400 hover:text-red-400"
+              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
               title="Delete notification"
             >
               <Trash2 className="h-3 w-3" />
