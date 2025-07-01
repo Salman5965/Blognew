@@ -1,196 +1,147 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
-  Send,
-  Search,
-  MoreVertical,
-  Phone,
-  Video,
-  Paperclip,
-  Smile,
-  Image,
-  ArrowLeft,
-  Users,
-  Plus,
-  Archive,
-  Star,
-  Trash2,
-  Settings,
   MessageSquare,
+  Users,
   Sparkles,
+  Search,
+  Plus,
+  Settings,
+  ArrowRight,
+  Zap,
+  Heart,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import messageService from "@/services/messageService";
 import { useChatStore } from "@/features/chat/chatStore";
+import { userService } from "@/services/userService";
+import { getDisplayName, getInitials } from "@/utils/userUtils";
+import { useToast } from "@/hooks/use-toast";
 
 const Messages = () => {
-  const [conversations, setConversations] = useState([]);
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSending, setIsSending] = useState(false);
-  const [showMobileConversations, setShowMobileConversations] = useState(true);
-  const messagesEndRef = useRef(null);
   const { user } = useAuthContext();
   const navigate = useNavigate();
-  const { openChat, fetchConversations } = useChatStore();
+  const {
+    openChat,
+    fetchConversations,
+    startConversation,
+    conversations,
+    unreadCount,
+  } = useChatStore();
+  const { toast } = useToast();
 
-  // Load conversations on mount
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [recentContacts, setRecentContacts] = useState([]);
+
   useEffect(() => {
-    loadConversations();
+    loadRecentContacts();
+    fetchConversations();
   }, []);
 
-  // Load messages when conversation is selected
   useEffect(() => {
-    if (selectedConversation) {
-      loadMessages(selectedConversation.id);
-      setShowMobileConversations(false);
-    }
-  }, [selectedConversation]);
-
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const loadConversations = async () => {
-    try {
-      setIsLoading(true);
-      const response = await messageService.getConversations();
-      setConversations(response.conversations || []);
-    } catch (error) {
-      console.error("Failed to load conversations:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadMessages = async (conversationId) => {
-    try {
-      const response = await messageService.getMessages(conversationId);
-      setMessages(response.messages || []);
-    } catch (error) {
-      console.error("Failed to load messages:", error);
-    }
-  };
-
-  const sendMessage = async () => {
-    if (!newMessage.trim() || !selectedConversation || isSending) return;
-
-    try {
-      setIsSending(true);
-      const messageData = {
-        content: newMessage.trim(),
-        conversationId: selectedConversation.id,
-      };
-
-      const response = await messageService.sendMessage(messageData);
-
-      // Add message to local state immediately for better UX
-      const optimisticMessage = {
-        id: Date.now(),
-        content: newMessage.trim(),
-        senderId: user.id,
-        createdAt: new Date().toISOString(),
-        isRead: false,
-        sender: user,
-      };
-
-      setMessages((prev) => [...prev, optimisticMessage]);
-      setNewMessage("");
-
-      // Update conversation last message
-      setConversations((prev) =>
-        prev.map((conv) =>
-          conv.id === selectedConversation.id
-            ? {
-                ...conv,
-                lastMessage: optimisticMessage,
-                updatedAt: new Date().toISOString(),
-              }
-            : conv,
-        ),
-      );
-    } catch (error) {
-      console.error("Failed to send message:", error);
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-
-    if (hours < 24) {
-      return date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+    if (searchQuery.trim()) {
+      handleSearch();
     } else {
-      return date.toLocaleDateString();
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
+  const loadRecentContacts = async () => {
+    try {
+      // Get some recent users who might be good to message
+      const response = await userService.getTopAuthors(6);
+      setRecentContacts(response || []);
+    } catch (error) {
+      console.error("Failed to load recent contacts:", error);
     }
   };
 
-  const filteredConversations = conversations.filter((conv) =>
-    conv.participants.some((p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()),
-    ),
-  );
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+
+    try {
+      setIsSearching(true);
+      const results = await userService.searchUsers(searchQuery, 8);
+      setSearchResults(results || []);
+    } catch (error) {
+      console.error("Search failed:", error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleStartConversation = async (userToMessage) => {
+    try {
+      const chatUser = {
+        id: userToMessage._id || userToMessage.id,
+        name: getDisplayName(userToMessage),
+        username: userToMessage.username,
+        avatar: userToMessage.avatar,
+      };
+
+      await startConversation(chatUser);
+      openChat();
+
+      toast({
+        title: "Chat started",
+        description: `You can now message ${chatUser.name}`,
+      });
+    } catch (error) {
+      console.error("Failed to start conversation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to start conversation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleQuickOpenChat = () => {
+    fetchConversations();
+    openChat();
+    toast({
+      title: "Chat opened",
+      description:
+        "Chat panel is now open. You can continue your conversations.",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Enhanced Header Section */}
+      {/* Hero Section */}
       <div className="bg-gradient-to-br from-primary/10 via-background to-background border-b">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center">
-            <MessageSquare className="h-16 w-16 text-primary mx-auto mb-4" />
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Stay Connected
+            <MessageSquare className="h-20 w-20 text-primary mx-auto mb-6" />
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Connect & Collaborate
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              Message other writers, collaborate on ideas, and build meaningful connections
+            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Message other writers, share ideas, get feedback, and build
+              meaningful connections in our writing community.
             </p>
 
-            {/* Quick Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {/* Primary Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               <Button
-                onClick={() => {
-                  openChat();
-                  fetchConversations();
-                }}
+                onClick={handleQuickOpenChat}
                 className="flex items-center gap-2"
                 size="lg"
               >
                 <Sparkles className="h-5 w-5" />
                 Open Chat Panel
+                {unreadCount > 0 && (
+                  <Badge variant="destructive" className="ml-2">
+                    {unreadCount}
+                  </Badge>
+                )}
               </Button>
               <Button
                 variant="outline"
@@ -198,315 +149,248 @@ const Messages = () => {
                 size="lg"
               >
                 <Users className="h-5 w-5 mr-2" />
-                Find People to Message
+                Discover Writers
               </Button>
             </div>
 
-            <div className="mt-8 p-4 bg-card rounded-lg border max-w-md mx-auto">
-              <h3 className="font-semibold mb-2">💡 Tip</h3>
-              <p className="text-sm text-muted-foreground">
-                Click the message button on any user's profile to start a conversation instantly!
-              </p>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <Card className="bg-card/50 backdrop-blur">
+                <CardContent className="p-6 text-center">
+                  <MessageSquare className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Real-time Messaging</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Instant messaging with other writers in our community
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="bg-card/50 backdrop-blur">
+                <CardContent className="p-6 text-center">
+                  <Zap className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Quick Connections</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Start conversations with one click from any profile
+                  </p>
+                </CardContent>
+              </Card>
+              <Card className="bg-card/50 backdrop-blur">
+                <CardContent className="p-6 text-center">
+                  <Heart className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold mb-2">Build Community</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Connect with like-minded writers and creators
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Full Messages Interface */}
-      <div className="h-screen bg-background flex">
-        {/* Conversations Sidebar */}
-        <div
-          className={cn(
-            "w-full md:w-80 border-r bg-card flex flex-col",
-            !showMobileConversations && "hidden md:flex",
-          )}
-        >
-          {/* Header */}
-          <div className="p-4 border-b">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Messages</h2>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    openChat();
-                    fetchConversations();
-                  }}
-                  title="Open Chat Panel"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Settings className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/explore")}>
-                  <Plus className="h-4 w-4" />
-                </Button>
+      {/* Search and Connect Section */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Search Section */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Find People to Message
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search for writers by name or username..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-            </div>
 
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Search conversations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-
-        {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto">
-          {isLoading ? (
-            <div className="p-4 space-y-4">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="flex items-center space-x-3 animate-pulse"
-                >
-                  <div className="w-12 h-12 bg-muted rounded-full"></div>
-                  <div className="flex-1 space-y-1">
-                    <div className="h-4 bg-muted rounded w-3/4"></div>
-                    <div className="h-3 bg-muted rounded w-1/2"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : filteredConversations.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">
-              <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No conversations yet</p>
-              <p className="text-sm">
-                Start a conversation by messaging someone!
-              </p>
-            </div>
-          ) : (
-            filteredConversations.map((conversation) => {
-              const otherParticipant = conversation.participants.find(
-                (p) => p.id !== user?.id,
-              );
-              const isSelected = selectedConversation?.id === conversation.id;
-
-              return (
-                <button
-                  key={conversation.id}
-                  onClick={() => setSelectedConversation(conversation)}
-                  className={cn(
-                    "w-full p-4 text-left hover:bg-muted/50 transition-colors border-b",
-                    isSelected && "bg-muted",
-                  )}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <Avatar className="w-12 h-12">
-                        <AvatarImage src={otherParticipant?.avatar} />
-                        <AvatarFallback>
-                          {otherParticipant?.name?.charAt(0) || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      {otherParticipant?.isOnline && (
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
-                      )}
+              {/* Search Results */}
+              {searchQuery && (
+                <div className="space-y-3">
+                  {isSearching ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Searching...
+                      </p>
                     </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <h3 className="font-medium truncate">
-                          {otherParticipant?.name || "Unknown User"}
-                        </h3>
-                        <span className="text-xs text-muted-foreground">
-                          {formatTime(conversation.updatedAt)}
-                        </span>
+                  ) : searchResults.length > 0 ? (
+                    <div className="space-y-3">
+                      <h4 className="font-medium text-sm text-muted-foreground">
+                        Search Results
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {searchResults.map((person) => (
+                          <Card
+                            key={person._id || person.id}
+                            className="hover:shadow-md transition-shadow"
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <Avatar className="h-10 w-10">
+                                    <AvatarImage src={person.avatar} />
+                                    <AvatarFallback>
+                                      {getInitials(
+                                        person.firstName,
+                                        person.lastName,
+                                      )}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <p className="font-medium">
+                                      {getDisplayName(person)}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">
+                                      @{person.username}
+                                    </p>
+                                  </div>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  onClick={() =>
+                                    handleStartConversation(person)
+                                  }
+                                >
+                                  Message
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))}
                       </div>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {conversation.lastMessage?.content || "No messages yet"}
-                      </p>
-                      {conversation.unreadCount > 0 && (
-                        <Badge variant="destructive" className="text-xs mt-1">
-                          {conversation.unreadCount}
-                        </Badge>
-                      )}
                     </div>
-                  </div>
-                </button>
-              );
-            })
-          )}
-        </div>
-      </div>
-
-      {/* Messages Area */}
-      <div
-        className={cn(
-          "flex-1 flex flex-col",
-          showMobileConversations && "hidden md:flex",
-        )}
-      >
-        {selectedConversation ? (
-          <>
-            {/* Messages Header */}
-            <div className="p-4 border-b bg-card">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="md:hidden"
-                    onClick={() => setShowMobileConversations(true)}
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-
-                  {(() => {
-                    const otherParticipant =
-                      selectedConversation.participants.find(
-                        (p) => p.id !== user?.id,
-                      );
-                    return (
-                      <>
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={otherParticipant?.avatar} />
-                          <AvatarFallback>
-                            {otherParticipant?.name?.charAt(0) || "U"}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <h2 className="font-semibold">
-                            {otherParticipant?.name || "Unknown User"}
-                          </h2>
-                          <p className="text-sm text-muted-foreground">
-                            {otherParticipant?.isOnline ? "Online" : "Offline"}
-                          </p>
-                        </div>
-                      </>
-                    );
-                  })()}
+                  ) : (
+                    <div className="text-center py-8">
+                      <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-sm text-muted-foreground">
+                        No users found for "{searchQuery}"
+                      </p>
+                    </div>
+                  )}
                 </div>
+              )}
+            </CardContent>
+          </Card>
 
-                <div className="flex items-center space-x-2">
-                  <Button variant="ghost" size="sm">
-                    <Phone className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Video className="h-4 w-4" />
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>
-                        <Archive className="h-4 w-4 mr-2" />
-                        Archive
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Star className="h-4 w-4 mr-2" />
-                        Star
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => {
-                const isOwn = message.senderId === user?.id;
-
-                return (
-                  <div
-                    key={message.id}
-                    className={cn(
-                      "flex",
-                      isOwn ? "justify-end" : "justify-start",
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        "max-w-xs lg:max-w-md px-4 py-2 rounded-lg",
-                        isOwn
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted",
-                      )}
+          {/* Recent/Popular Writers */}
+          {!searchQuery && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Popular Writers
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {recentContacts.map((person) => (
+                    <Card
+                      key={person._id || person.id}
+                      className="hover:shadow-md transition-shadow"
                     >
-                      <p className="text-sm">{message.content}</p>
-                      <p
-                        className={cn(
-                          "text-xs mt-1",
-                          isOwn
-                            ? "text-primary-foreground/70"
-                            : "text-muted-foreground",
-                        )}
-                      >
-                        {formatTime(message.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Message Input */}
-            <div className="p-4 border-t bg-card">
-              <div className="flex items-end space-x-2">
-                <Button variant="ghost" size="sm">
-                  <Paperclip className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <Image className="h-4 w-4" />
-                </Button>
-
-                <div className="flex-1 relative">
-                  <Input
-                    placeholder="Type a message..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    className="pr-10"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-1 top-1/2 -translate-y-1/2"
-                  >
-                    <Smile className="h-4 w-4" />
-                  </Button>
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-12 w-12">
+                              <AvatarImage src={person.avatar} />
+                              <AvatarFallback>
+                                {getInitials(person.firstName, person.lastName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">
+                                {getDisplayName(person)}
+                              </p>
+                              <p className="text-sm text-muted-foreground">
+                                @{person.username}
+                              </p>
+                              {person.bio && (
+                                <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                                  {person.bio}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            onClick={() => handleStartConversation(person)}
+                          >
+                            <MessageSquare className="h-4 w-4 mr-1" />
+                            Message
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
+              </CardContent>
+            </Card>
+          )}
 
-                <Button
-                  onClick={sendMessage}
-                  disabled={!newMessage.trim() || isSending}
-                  size="sm"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+          {/* How it Works */}
+          <Card className="mt-8 bg-gradient-to-r from-primary/5 to-background">
+            <CardHeader>
+              <CardTitle>How to Start Conversations</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-primary font-bold">1</span>
+                  </div>
+                  <h4 className="font-medium mb-2">Find Someone</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Browse profiles, search for writers, or discover new people
+                  </p>
+                </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-primary font-bold">2</span>
+                  </div>
+                  <h4 className="font-medium mb-2">Click Message</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Click the message button on their profile or from search
+                    results
+                  </p>
+                </div>
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-primary font-bold">3</span>
+                  </div>
+                  <h4 className="font-medium mb-2">Start Chatting</h4>
+                  <p className="text-sm text-muted-foreground">
+                    The chat panel opens automatically - start your
+                    conversation!
+                  </p>
+                </div>
               </div>
-            </div>
-          </>
-        ) : (
-          <div className="flex-1 flex items-center justify-center text-center">
-            <div>
-              <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <h2 className="text-xl font-semibold mb-2">
-                Welcome to Messages
-              </h2>
-              <p className="text-muted-foreground">
-                Select a conversation to start messaging
-              </p>
-            </div>
+            </CardContent>
+          </Card>
+
+          {/* Quick Access */}
+          <div className="mt-8 text-center">
+            <p className="text-muted-foreground mb-4">
+              Already have ongoing conversations?
+            </p>
+            <Button
+              variant="outline"
+              onClick={handleQuickOpenChat}
+              className="flex items-center gap-2 mx-auto"
+            >
+              Open Chat Panel
+              <ArrowRight className="h-4 w-4" />
+              {unreadCount > 0 && (
+                <Badge variant="destructive">{unreadCount} unread</Badge>
+              )}
+            </Button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
