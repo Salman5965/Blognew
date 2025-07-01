@@ -90,8 +90,8 @@ const NotificationPanel = ({ onClose }) => {
                 onClick={() => setFilter(filterType)}
                 className={`px-2 py-1 text-xs rounded transition-colors ${
                   filter === filterType
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-secondary-foreground hover:bg-accent"
                 }`}
               >
                 {filterType.charAt(0).toUpperCase() + filterType.slice(1)}
