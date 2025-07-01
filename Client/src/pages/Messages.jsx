@@ -295,10 +295,57 @@ const Messages = () => {
     if (!newMessage.trim() || !selectedChat || isSending) return;
 
     const content = newMessage.trim();
+
+    if (editingMessage) {
+      // Handle message editing
+      await handleEditMessageContent(content);
+    } else {
+      // Handle new message
+      setNewMessage("");
+      await handleSendMessageContent(content);
+    }
+  };
+
+  const handleEditMessageContent = async (content) => {
+    if (!editingMessage) return;
+
+    const messageId = editingMessage.id || editingMessage._id;
+
+    // Optimistically update message in UI
+    setMessages((prev) =>
+      prev.map((msg) =>
+        (msg.id || msg._id) === messageId
+          ? { ...msg, content, isEdited: true }
+          : msg,
+      ),
+    );
+
     setNewMessage("");
     setEditingMessage(null);
 
-    await handleSendMessageContent(content);
+    try {
+      await messagingService.editMessage(messageId, content);
+
+      toast({
+        title: "Message edited",
+        description: "Message was updated successfully",
+      });
+    } catch (error) {
+      console.error("Failed to edit message:", error);
+
+      // Restore original message on error
+      setMessages((prev) =>
+        prev.map((msg) =>
+          (msg.id || msg._id) === messageId ? { ...editingMessage } : msg,
+        ),
+      );
+
+      toast({
+        title: "Error",
+        description: "Failed to edit message. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const scrollToBottom = () => {
@@ -533,14 +580,18 @@ const Messages = () => {
   };
 
   const handleDeleteMessage = async (message) => {
-    try {
-      await messagingService.deleteMessage(message.id || message._id);
+    if (!window.confirm("Are you sure you want to delete this message?")) {
+      return;
+    }
 
-      setMessages((prev) =>
-        prev.filter(
-          (msg) => (msg.id || msg._id) !== (message.id || message._id),
-        ),
-      );
+    // Optimistically remove message from UI
+    const messageId = message.id || message._id;
+    setMessages((prev) =>
+      prev.filter((msg) => (msg.id || msg._id) !== messageId),
+    );
+
+    try {
+      await messagingService.deleteMessage(messageId);
 
       toast({
         title: "Message deleted",
@@ -548,6 +599,21 @@ const Messages = () => {
       });
     } catch (error) {
       console.error("Failed to delete message:", error);
+
+      // Restore message on error
+      setMessages((prev) => {
+        const updated = [...prev];
+        const index = prev.findIndex(
+          (msg) => new Date(msg.createdAt) > new Date(message.createdAt),
+        );
+        if (index === -1) {
+          updated.push(message);
+        } else {
+          updated.splice(index, 0, message);
+        }
+        return updated;
+      });
+
       toast({
         title: "Error",
         description: "Failed to delete message. Please try again.",
@@ -559,6 +625,16 @@ const Messages = () => {
   const handleEditMessage = (message) => {
     setEditingMessage(message);
     setNewMessage(message.content);
+    // Focus on input after state update
+    setTimeout(() => {
+      const input = document.querySelector(
+        'input[placeholder*="Edit message"]',
+      );
+      if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    }, 100);
   };
 
   const handleReplyToMessage = (message) => {
