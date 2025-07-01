@@ -88,6 +88,9 @@ router.get(
 // Get all users (admin only)
 router.get("/", protect, authorize("admin"), getAllUsers);
 
+// Get top authors (public route)
+router.get("/top-authors", getTopAuthors);
+
 // Specific routes must come before generic /:id route
 // Get user statistics
 router.get("/:id/stats", protect, validateUserId, getUserStats);
