@@ -206,6 +206,7 @@ const Messages = () => {
           socket.off("user_typing");
           socket.off("user_stopped_typing");
           socket.off("user_status_changed");
+          socket.off("online_status_response");
         };
       }
     }
