@@ -295,9 +295,23 @@ export const getUserStats = async (req, res, next) => {
       },
     ]);
 
-    // Get comment statistics
+    // Get comments on user's blogs
     const commentStats = await Comment.aggregate([
-      { $match: { author: user._id, status: "active" } },
+      {
+        $lookup: {
+          from: "blogs",
+          localField: "contentId",
+          foreignField: "_id",
+          as: "blog",
+        },
+      },
+      {
+        $match: {
+          "blog.author": user._id,
+          "blog.status": "published",
+          status: "active",
+        },
+      },
       {
         $group: {
           _id: null,
