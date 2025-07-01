@@ -61,6 +61,13 @@ export const UserProfile = () => {
     }
   }, [userId]);
 
+  // Handle redirect for own profile
+  useEffect(() => {
+    if (isOwnProfile) {
+      navigate(ROUTES.PROFILE);
+    }
+  }, [isOwnProfile, navigate]);
+
   const loadUserData = async () => {
     try {
       setLoading(true);
