@@ -106,6 +106,12 @@ router.delete("/:id", protect, authorize("admin"), validateUserId, deleteUser);
 // Get user statistics
 router.get("/:id/stats", protect, validateUserId, getUserStats);
 
+// Get user followers
+router.get("/:id/followers", validateUserId, getFollowers);
+
+// Get user following
+router.get("/:id/following", validateUserId, getFollowing);
+
 // Get user activity
 router.get("/:id/activity", protect, validateUserId, async (req, res) => {
   try {
