@@ -655,12 +655,12 @@ const Messages = () => {
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <button
+                  <div
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/profile/${conversation.participantId}`);
                     }}
-                    className="relative hover:opacity-80 transition-opacity"
+                    className="relative hover:opacity-80 transition-opacity cursor-pointer"
                   >
                     <Avatar className="h-12 w-12">
                       <AvatarImage src={conversation.participantAvatar} />
@@ -672,7 +672,7 @@ const Messages = () => {
                     {conversation.isOnline && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
                     )}
-                  </button>
+                  </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
