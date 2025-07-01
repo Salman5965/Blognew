@@ -127,7 +127,7 @@ export const Dashboard = () => {
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className={`h-4 w-4 text-${color}-600 dark:text-${color}-400`} />
+        <Icon className={`h-5 w-5 text-${color}-600 dark:text-${color}-400`} />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">
@@ -370,11 +370,11 @@ export const Dashboard = () => {
                             </div>
                             <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                               <div className="flex items-center space-x-1">
-                                <Eye className="h-4 w-4" />
+                                <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                 <span>{blog.views || blog.viewCount || 0}</span>
                               </div>
                               <div className="flex items-center space-x-1">
-                                <Heart className="h-4 w-4" />
+                                <Heart className="h-4 w-4 text-red-600 dark:text-red-400" />
                                 <span>
                                   {blog.likesCount ||
                                     blog.likeCount ||
@@ -383,7 +383,7 @@ export const Dashboard = () => {
                                 </span>
                               </div>
                               <div className="flex items-center space-x-1">
-                                <MessageCircle className="h-4 w-4" />
+                                <MessageCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
                                 <span>
                                   {blog.commentsCount ||
                                     blog.commentCount ||
@@ -472,7 +472,7 @@ export const Dashboard = () => {
                       className="w-full justify-start"
                       onClick={() => navigate(ROUTES.CREATE_BLOG)}
                     >
-                      <PlusCircle className="h-4 w-4 mr-2" />
+                      <PlusCircle className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
                       Create New Blog
                     </Button>
                     <Button
@@ -480,7 +480,7 @@ export const Dashboard = () => {
                       className="w-full justify-start"
                       onClick={() => navigate(ROUTES.MY_BLOGS)}
                     >
-                      <FileText className="h-4 w-4 mr-2" />
+                      <FileText className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
                       Manage Blogs
                     </Button>
                     <Button
@@ -599,11 +599,11 @@ export const Dashboard = () => {
                             </div>
                             <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                               <div className="flex items-center space-x-1">
-                                <Eye className="h-4 w-4" />
+                                <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                 <span>{story.views || 0}</span>
                               </div>
                               <div className="flex items-center space-x-1">
-                                <Heart className="h-4 w-4" />
+                                <Heart className="h-4 w-4 text-red-600 dark:text-red-400" />
                                 <span>{story.likes?.length || 0}</span>
                               </div>
                               <Button
@@ -687,7 +687,7 @@ export const Dashboard = () => {
                       className="w-full justify-start"
                       onClick={() => navigate("/stories/create")}
                     >
-                      <PlusCircle className="h-4 w-4 mr-2" />
+                      <PlusCircle className="h-4 w-4 mr-2 text-green-600 dark:text-green-400" />
                       Create New Story
                     </Button>
                     <Button
@@ -695,7 +695,7 @@ export const Dashboard = () => {
                       className="w-full justify-start"
                       onClick={() => navigate("/stories")}
                     >
-                      <BookOpen className="h-4 w-4 mr-2" />
+                      <BookOpen className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
                       Browse Stories
                     </Button>
                     <Button
