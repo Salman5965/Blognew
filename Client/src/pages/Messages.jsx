@@ -515,7 +515,11 @@ const Messages = () => {
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current && messagesEndRef.current) {
+      // Scroll within the messages container only, not the entire page
+      messagesContainerRef.current.scrollTop =
+        messagesContainerRef.current.scrollHeight;
+    }
   };
 
   const handleKeyPress = (e) => {
