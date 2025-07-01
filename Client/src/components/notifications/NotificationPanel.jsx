@@ -63,7 +63,7 @@ const NotificationPanel = ({ onClose }) => {
                 variant="ghost"
                 size="sm"
                 onClick={handleMarkAllAsRead}
-                className="text-xs text-blue-400 hover:text-blue-300 hover:bg-slate-800"
+                className="text-xs text-blue-500 hover:text-blue-600 hover:bg-accent"
               >
                 <CheckCheck className="h-3 w-3 mr-1" />
                 Mark all read
