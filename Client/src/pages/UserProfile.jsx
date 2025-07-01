@@ -35,7 +35,6 @@ import {
   Globe,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useChatStore } from "@/features/chat/chatStore";
 
 export const UserProfile = () => {
   const { userId } = useParams();
