@@ -173,7 +173,17 @@ const Messages = () => {
         unreadCount: 0,
       };
 
-      setConversations((prev) => [formattedConversation, ...prev]);
+      setConversations((prev) => {
+        // Remove any existing conversation with the same ID to prevent duplicates
+        const filtered = prev.filter(
+          (conv) =>
+            conv.id !== formattedConversation.id &&
+            conv._id !== formattedConversation.id &&
+            conv.id !== formattedConversation._id &&
+            conv._id !== formattedConversation._id,
+        );
+        return [formattedConversation, ...filtered];
+      });
       setSelectedChat(formattedConversation);
       setShowMobileChat(true);
 
@@ -473,7 +483,7 @@ const Messages = () => {
           ) : (
             filteredConversations.map((conversation, index) => (
               <button
-                key={`conversation-${conversation.id || conversation._id || index}`}
+                key={`conversation-${conversation.id || conversation._id}-${index}`}
                 onClick={() => handleChatSelect(conversation)}
                 className={cn(
                   "w-full p-4 text-left hover:bg-muted/50 transition-colors border-b",
