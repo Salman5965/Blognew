@@ -8,6 +8,7 @@ import {
   updateUserRole,
   getFollowers,
   getFollowing,
+  getTopAuthors,
 } from "../controllers/userController.js";
 import { protect, authorize } from "../middlewares/auth.js";
 import { validateUserUpdate } from "../validators/userValidator.js";
