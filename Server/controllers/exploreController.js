@@ -685,6 +685,8 @@ export const searchContent = async (req, res) => {
     let searchResults = {
       users: [],
       blogs: [],
+      stories: [],
+      dailydrip: [],
       total: 0,
     };
 
