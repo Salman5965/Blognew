@@ -104,7 +104,7 @@ const NotificationPanel = ({ onClose }) => {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="w-full text-xs bg-slate-800 border border-slate-600 rounded px-2 py-1 text-white"
+          className="w-full text-xs bg-background border rounded px-2 py-1"
         >
           {notificationTypes.map((type) => (
             <option key={type.value} value={type.value}>
