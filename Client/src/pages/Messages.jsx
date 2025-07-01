@@ -498,7 +498,13 @@ const Messages = () => {
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <div className="relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/profile/${conversation.participantId}`);
+                    }}
+                    className="relative hover:opacity-80 transition-opacity"
+                  >
                     <Avatar className="h-12 w-12">
                       <AvatarImage src={conversation.participantAvatar} />
                       <AvatarFallback>
@@ -509,7 +515,7 @@ const Messages = () => {
                     {conversation.isOnline && (
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
                     )}
-                  </div>
+                  </button>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
@@ -572,26 +578,34 @@ const Messages = () => {
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
 
-                <div className="relative">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={selectedChat.participantAvatar} />
-                    <AvatarFallback>
-                      {selectedChat.participantName?.[0]?.toUpperCase() || "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  {selectedChat.isOnline && (
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
-                  )}
-                </div>
+                <button
+                  onClick={() =>
+                    navigate(`/profile/${selectedChat.participantId}`)
+                  }
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
+                  <div className="relative">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={selectedChat.participantAvatar} />
+                      <AvatarFallback>
+                        {selectedChat.participantName?.[0]?.toUpperCase() ||
+                          "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    {selectedChat.isOnline && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
+                    )}
+                  </div>
 
-                <div>
-                  <h2 className="font-semibold">
-                    {selectedChat.participantName || "Unknown User"}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedChat.isOnline ? "Active now" : "Offline"}
-                  </p>
-                </div>
+                  <div className="text-left">
+                    <h2 className="font-semibold">
+                      {selectedChat.participantName || "Unknown User"}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedChat.isOnline ? "Active now" : "Offline"}
+                    </p>
+                  </div>
+                </button>
               </div>
 
               <div className="flex items-center gap-2">

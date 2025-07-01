@@ -82,19 +82,9 @@ const NewMessageModal = ({ open, onOpenChange, onStartConversation }) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="border-b pb-4">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold">
-              New Message
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onOpenChange(false)}
-              className="h-8 w-8 rounded-full"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="text-lg font-semibold text-center">
+            New Message
+          </DialogTitle>
         </DialogHeader>
 
         <div className="py-4">
@@ -128,26 +118,37 @@ const NewMessageModal = ({ open, onOpenChange, onStartConversation }) => {
                   People
                 </h3>
                 {searchResults.map((user, index) => (
-                  <button
+                  <div
                     key={`modal-user-${user._id || user.id || index}`}
-                    onClick={() => handleUserSelect(user)}
-                    className="w-full p-3 text-left hover:bg-muted/50 rounded-lg transition-colors flex items-center gap-3"
+                    className="flex items-center gap-3 p-3 hover:bg-muted/50 rounded-lg transition-colors"
                   >
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.avatar} />
-                      <AvatarFallback>
-                        {getInitials(user.firstName, user.lastName)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/profile/${user._id || user.id}`);
+                        onOpenChange(false);
+                      }}
+                      className="hover:opacity-80 transition-opacity"
+                    >
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage src={user.avatar} />
+                        <AvatarFallback>
+                          {getInitials(user.firstName, user.lastName)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </button>
+                    <button
+                      onClick={() => handleUserSelect(user)}
+                      className="flex-1 min-w-0 text-left"
+                    >
                       <p className="font-medium truncate">
                         {getDisplayName(user)}
                       </p>
                       <p className="text-sm text-muted-foreground truncate">
                         @{user.username}
                       </p>
-                    </div>
-                  </button>
+                    </button>
+                  </div>
                 ))}
               </div>
             ) : (
