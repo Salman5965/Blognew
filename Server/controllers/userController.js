@@ -512,3 +512,123 @@ export const getTopAuthors = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get user's followers
+// @route   GET /api/users/:id/followers
+// @access  Public
+export const getFollowers = async (req, res, next) => {
+  try {
+    const { id: userId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // Get followers with pagination
+    const followers = await Follow.find({ followed: userId })
+      .populate("follower", "username firstName lastName avatar bio")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // Get total count
+    const totalFollowers = await Follow.countDocuments({ followed: userId });
+
+    // Format response
+    const formattedFollowers = followers.map((follow) => ({
+      id: follow.follower._id,
+      username: follow.follower.username,
+      firstName: follow.follower.firstName,
+      lastName: follow.follower.lastName,
+      avatar: follow.follower.avatar,
+      bio: follow.follower.bio,
+      followedAt: follow.createdAt,
+    }));
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        followers: formattedFollowers,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalFollowers / limit),
+          totalFollowers,
+          hasNextPage: page < Math.ceil(totalFollowers / limit),
+          hasPrevPage: page > 1,
+          limit,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get user's following
+// @route   GET /api/users/:id/following
+// @access  Public
+export const getFollowing = async (req, res, next) => {
+  try {
+    const { id: userId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // Get following with pagination
+    const following = await Follow.find({ follower: userId })
+      .populate("followed", "username firstName lastName avatar bio")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // Get total count
+    const totalFollowing = await Follow.countDocuments({ follower: userId });
+
+    // Format response
+    const formattedFollowing = following.map((follow) => ({
+      id: follow.followed._id,
+      username: follow.followed.username,
+      firstName: follow.followed.firstName,
+      lastName: follow.followed.lastName,
+      avatar: follow.followed.avatar,
+      bio: follow.followed.bio,
+      followedAt: follow.createdAt,
+    }));
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        following: formattedFollowing,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalFollowing / limit),
+          totalFollowing,
+          hasNextPage: page < Math.ceil(totalFollowing / limit),
+          hasPrevPage: page > 1,
+          limit,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
