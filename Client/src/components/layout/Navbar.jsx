@@ -360,7 +360,7 @@ export const Navbar = () => {
                   onClick={handleCreatePost}
                   className="hidden md:flex items-center space-x-2"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <span>Create</span>
                 </Button>
 
@@ -371,7 +371,7 @@ export const Navbar = () => {
                   className="relative hidden md:flex"
                   onClick={() => navigate("/notifications")}
                 >
-                  <Bell className="h-4 w-4" />
+                  <Bell className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                   {unreadNotifications > 0 && (
                     <Badge
                       variant="destructive"
@@ -389,7 +389,7 @@ export const Navbar = () => {
                   className="relative hidden md:flex"
                   onClick={() => navigate("/messages")}
                 >
-                  <MessageCircle className="h-4 w-4" />
+                  <MessageCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   {unreadMessages > 0 && (
                     <Badge
                       variant="destructive"
@@ -441,24 +441,24 @@ export const Navbar = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link to={ROUTES.DASHBOARD}>
-                        <User className="mr-2 h-4 w-4" />
+                        <User className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                         Dashboard
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to={ROUTES.MY_BLOGS}>
-                        <BookOpen className="mr-2 h-4 w-4" />
+                        <BookOpen className="mr-2 h-4 w-4 text-purple-600 dark:text-purple-400" />
                         My Blogs
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to={ROUTES.PROFILE}>
-                        <Settings className="mr-2 h-4 w-4" />
+                        <Settings className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
                         Profile
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/community")}>
-                      <Users className="mr-2 h-4 w-4" />
+                      <Users className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
                       <span>Community</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
@@ -470,9 +470,9 @@ export const Navbar = () => {
                         className="flex-1 justify-start h-8"
                       >
                         {theme === "dark" ? (
-                          <Sun className="mr-2 h-4 w-4" />
+                          <Sun className="mr-2 h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                         ) : (
-                          <Moon className="mr-2 h-4 w-4" />
+                          <Moon className="mr-2 h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                         )}
                         <span className="text-sm">
                           {theme === "dark" ? "Light" : "Dark"}
@@ -484,7 +484,7 @@ export const Navbar = () => {
                         onClick={logout}
                         className="flex-1 justify-start h-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
                       >
-                        <LogOut className="mr-2 h-4 w-4" />
+                        <LogOut className="mr-2 h-4 w-4 text-red-600 dark:text-red-400" />
                         <span className="text-sm">Logout</span>
                       </Button>
                     </div>
@@ -544,7 +544,7 @@ export const Navbar = () => {
                   setIsMobileMenuOpen(false);
                 }}
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
                 Create Post
               </Button>
               <Button
