@@ -11,7 +11,7 @@ class ChatService {
   // Get user conversations
   async getConversations() {
     try {
-      const response = await apiService.get("/messages/conversations");
+      const response = await apiService.get("/chat/conversations");
       if (response.status === "success") {
         return {
           data: response.data.conversations || [],
@@ -33,7 +33,7 @@ class ChatService {
   async getMessages(conversationId, page = 1, limit = 50) {
     try {
       const response = await apiService.get(
-        `/messages/conversations/${conversationId}/messages?page=${page}&limit=${limit}`,
+        `/chat/conversations/${conversationId}/messages?page=${page}&limit=${limit}`,
       );
       if (response.status === "success") {
         return {
@@ -66,7 +66,7 @@ class ChatService {
   async sendMessage(conversationId, content, type = "text") {
     try {
       const response = await apiService.post(
-        `/messages/conversations/${conversationId}/messages`,
+        `/chat/conversations/${conversationId}/messages`,
         {
           content,
           type,
@@ -90,7 +90,7 @@ class ChatService {
   // Create a new conversation
   async createConversation(participantId) {
     try {
-      const response = await apiService.post("/messages/conversations", {
+      const response = await apiService.post("/chat/conversations", {
         participantId,
       });
 
@@ -111,8 +111,8 @@ class ChatService {
   // Mark conversation as read
   async markAsRead(conversationId) {
     try {
-      const response = await apiService.put(
-        `/messages/conversations/${conversationId}/read`,
+      const response = await apiService.patch(
+        `/chat/conversations/${conversationId}/read`,
       );
       return response;
     } catch (error) {
