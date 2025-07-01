@@ -34,8 +34,16 @@ export const MessageButton = ({
       e.preventDefault();
     }
 
-    // Open modal instead of navigating directly
-    setShowModal(true);
+    // Check if we're already on the messages page
+    const currentPath = window.location.pathname;
+    if (currentPath === "/messages") {
+      // If on messages page, open modal
+      setShowModal(true);
+    } else {
+      // If on any other page, navigate to messages with user parameter
+      const userId = user._id || user.id;
+      navigate(`/messages?user=${userId}`);
+    }
   };
 
   const handleStartConversation = async (userId) => {
