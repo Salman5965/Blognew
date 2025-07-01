@@ -129,10 +129,10 @@ const Feed = () => {
     loadPosts();
   }, []);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setRefreshing(true);
     setCurrentPage(1);
-    loadPosts(1, selectedFilter, searchQuery, false);
+    await loadPosts(1, selectedFilter, searchQuery, false);
   };
 
   const handleFilterChange = (filter) => {
