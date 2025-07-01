@@ -60,6 +60,7 @@ const Notifications = React.lazy(() => import("./pages/Notifications"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
 const DailyDrip = React.lazy(() => import("./pages/DailyDrip"));
 const Stories = React.lazy(() => import("./pages/Stories"));
+const StoryDetails = React.lazy(() => import("./pages/StoryDetails"));
 const CreateStory = React.lazy(() => import("./pages/CreateStory"));
 const Explore = React.lazy(() => import("./pages/Explore"));
 const Messages = React.lazy(() => import("./pages/Messages"));
@@ -120,6 +121,7 @@ const App = () => (
 
                     {/* Public browsing routes */}
                     <Route path="/stories" element={<Stories />} />
+                    <Route path="/stories/:id" element={<StoryDetails />} />
                     <Route path="/explore" element={<Explore />} />
 
                     {/* Static Pages */}
