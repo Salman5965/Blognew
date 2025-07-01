@@ -486,9 +486,9 @@ export const Dashboard = () => {
                     <Button
                       variant="ghost"
                       className="w-full justify-start"
-                      onClick={() => navigate("/dashboard/analytics")}
+                      onClick={() => navigate("/dashboard/blog-analytics")}
                     >
-                      <BarChart3 className="h-4 w-4 mr-2" />
+                      <BarChart3 className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
                       Detailed Analytics
                     </Button>
                   </CardContent>
@@ -701,9 +701,9 @@ export const Dashboard = () => {
                     <Button
                       variant="ghost"
                       className="w-full justify-start"
-                      onClick={() => navigate("/dashboard/analytics")}
+                      onClick={() => navigate("/dashboard/story-analytics")}
                     >
-                      <BarChart3 className="h-4 w-4 mr-2" />
+                      <BarChart3 className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
                       Detailed Analytics
                     </Button>
                   </CardContent>
