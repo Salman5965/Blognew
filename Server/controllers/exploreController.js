@@ -909,6 +909,102 @@ export const searchContent = async (req, res) => {
       searchResults.blogs = blogs;
     }
 
+    // Search stories if type is 'stories' or 'all' (using blogs as stories for now)
+    if (type === "stories" || type === "all") {
+      // For now, use blogs as stories with story-specific filtering
+      const storySearch = {
+        status: "published",
+        // Add story-specific filtering criteria if needed
+        $or: [
+          { title: { $regex: searchQuery, $options: "i" } },
+          { summary: { $regex: searchQuery, $options: "i" } },
+          { content: { $regex: searchQuery, $options: "i" } },
+          { tags: { $regex: searchQuery, $options: "i" } },
+        ],
+      };
+
+      const stories = await Blog.aggregate([
+        { $match: storySearch },
+        {
+          $lookup: {
+            from: "users",
+            localField: "author",
+            foreignField: "_id",
+            as: "authorInfo",
+          },
+        },
+        {
+          $addFields: {
+            author: { $arrayElemAt: ["$authorInfo", 0] },
+            relevanceScore: {
+              $add: [
+                {
+                  $cond: [
+                    {
+                      $regexMatch: {
+                        input: "$title",
+                        regex: searchQuery,
+                        options: "i",
+                      },
+                    },
+                    10,
+                    0,
+                  ],
+                },
+                {
+                  $cond: [
+                    {
+                      $regexMatch: {
+                        input: "$summary",
+                        regex: searchQuery,
+                        options: "i",
+                      },
+                    },
+                    8,
+                    0,
+                  ],
+                },
+              ],
+            },
+          },
+        },
+        {
+          $sort:
+            sortBy === "relevance" ? { relevanceScore: -1 } : { createdAt: -1 },
+        },
+        ...(type === "stories"
+          ? [{ $skip: skip }, { $limit: parseInt(limit) }]
+          : []),
+        {
+          $project: {
+            title: 1,
+            summary: 1,
+            content: { $substr: ["$content", 0, 200] },
+            coverImage: 1,
+            tags: 1,
+            views: 1,
+            likesCount: 1,
+            createdAt: 1,
+            author: {
+              _id: "$author._id",
+              username: "$author.username",
+              firstName: "$author.firstName",
+              lastName: "$author.lastName",
+              avatar: "$author.avatar",
+            },
+          },
+        },
+      ]);
+
+      searchResults.stories = stories;
+    }
+
+    // Search dailydrip if type is 'dailydrip' or 'all'
+    if (type === "dailydrip" || type === "all") {
+      // Placeholder for dailydrip search - can be implemented when dailydrip model is available
+      searchResults.dailydrip = [];
+    }
+
     // Apply pagination for specific type searches
     if (type === "users") {
       searchResults = {
