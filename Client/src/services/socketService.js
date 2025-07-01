@@ -36,6 +36,10 @@ class SocketService {
       }
     }
 
+    return this.attemptConnection(serverUrl, token);
+  }
+
+  attemptConnection(serverUrl, token) {
     try {
       console.log(`🔌 Attempting Socket.IO connection:`);
       console.log(`  - Server URL: ${serverUrl}`);
@@ -53,11 +57,12 @@ class SocketService {
         transports: ["polling", "websocket"], // Try polling first, then upgrade to websocket
         upgrade: true,
         rememberUpgrade: false, // Don't remember upgrade in case of issues
-        timeout: 10000, // Reduce timeout to 10 seconds
+        timeout: 15000, // Increase timeout slightly
         forceNew: false,
         reconnection: true,
-        reconnectionAttempts: 3,
+        reconnectionAttempts: 5,
         reconnectionDelay: 1000,
+        autoConnect: true,
       });
 
       this.setupEventHandlers();
