@@ -385,9 +385,9 @@ const Messages = () => {
             <h3 className="text-sm font-medium text-muted-foreground mb-2 px-2">
               People
             </h3>
-            {searchResults.slice(0, 3).map((user) => (
+            {searchResults.slice(0, 3).map((user, index) => (
               <button
-                key={user._id || user.id}
+                key={`search-user-${user._id || user.id || index}`}
                 onClick={() => handleStartNewChat(user)}
                 className="w-full p-2 text-left hover:bg-muted/50 rounded-lg transition-colors"
               >
@@ -443,9 +443,9 @@ const Messages = () => {
               </p>
             </div>
           ) : (
-            filteredConversations.map((conversation) => (
+            filteredConversations.map((conversation, index) => (
               <button
-                key={conversation.id || conversation._id}
+                key={`conversation-${conversation.id || conversation._id || index}`}
                 onClick={() => handleChatSelect(conversation)}
                 className={cn(
                   "w-full p-4 text-left hover:bg-muted/50 transition-colors border-b",
@@ -584,7 +584,7 @@ const Messages = () => {
 
                   return (
                     <div
-                      key={message.id || message._id}
+                      key={`message-${message.id || message._id || index}`}
                       className={cn(
                         "flex items-end gap-2",
                         isOwn ? "justify-end" : "justify-start",
