@@ -37,7 +37,14 @@ class SocketService {
     }
 
     try {
-      console.log(`🔌 Attempting Socket.IO connection to: ${serverUrl}`);
+      console.log(`🔌 Attempting Socket.IO connection:`);
+      console.log(`  - Server URL: ${serverUrl}`);
+      console.log(`  - Current hostname: ${window.location.hostname}`);
+      console.log(`  - Current origin: ${window.location.origin}`);
+      console.log(
+        `  - Is local dev: ${window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"}`,
+      );
+      console.log(`  - Has token: ${!!token}`);
 
       this.socket = io(serverUrl, {
         auth: {
