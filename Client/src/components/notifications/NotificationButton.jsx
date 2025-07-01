@@ -79,8 +79,8 @@ const NotificationButton = () => {
         variant="ghost"
         size="sm"
         onClick={handleToggle}
-        className={`relative p-2 hover:bg-slate-800 transition-colors ${
-          isOpen ? "bg-slate-800" : ""
+        className={`relative p-2 hover:bg-accent transition-colors ${
+          isOpen ? "bg-accent" : ""
         }`}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
       >
