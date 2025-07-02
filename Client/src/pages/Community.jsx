@@ -103,11 +103,18 @@ const Community = () => {
       setHasMore(postsResponse.hasMore || false);
     } catch (error) {
       console.error("Error loading community data:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load community data",
-        variant: "destructive",
-      });
+
+      // Only show error toast for non-404 errors (avoid showing errors for missing endpoints)
+      if (
+        !error.message?.includes("Not Found") &&
+        error.response?.status !== 404
+      ) {
+        toast({
+          title: "Error",
+          description: "Failed to load community data",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
