@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { blogService } from "@/services/blogService";
-import { storyService } from "@/services/storiesService";
+import { storiesService } from "@/services/storiesService";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search,
@@ -632,7 +632,7 @@ export const MyPosts = () => {
         query.status = status;
       }
 
-      const response = await storyService.getMyStories(query);
+      const response = await storiesService.getMyStories(query);
       const storiesData = response.stories || response.data || [];
       setStories(storiesData);
     } catch (err) {
@@ -694,7 +694,7 @@ export const MyPosts = () => {
         await blogService.deleteBlog(postToDelete);
         setBlogs((prev) => prev.filter((blog) => blog._id !== postToDelete));
       } else {
-        await storyService.deleteStory(postToDelete);
+        await storiesService.deleteStory(postToDelete);
         setStories((prev) =>
           prev.filter((story) => story._id !== postToDelete),
         );
@@ -747,7 +747,7 @@ export const MyPosts = () => {
           status: "draft",
         };
 
-        await storyService.createStory(duplicatedStory);
+        await storiesService.createStory(duplicatedStory);
         loadStories();
       }
 
