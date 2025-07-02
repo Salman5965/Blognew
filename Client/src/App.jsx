@@ -36,6 +36,9 @@ const Dashboard = React.lazy(() =>
 const MyBlogs = React.lazy(() =>
   import("./pages/MyBlogs").then((module) => ({ default: module.MyBlogs })),
 );
+const MyPosts = React.lazy(() =>
+  import("./pages/MyPosts").then((module) => ({ default: module.MyPosts })),
+);
 const Profile = React.lazy(() => import("./pages/ProfileSettings"));
 const EditBlog = React.lazy(() =>
   import("./pages/EditBlog").then((module) => ({ default: module.EditBlog })),
@@ -171,6 +174,14 @@ const AppLayout = () => {
               element={
                 <PrivateRoute>
                   <MyBlogs />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path={ROUTES.MY_POSTS}
+              element={
+                <PrivateRoute>
+                  <MyPosts />
                 </PrivateRoute>
               }
             />

@@ -446,9 +446,9 @@ export const Navbar = () => {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to={ROUTES.MY_BLOGS}>
+                      <Link to={ROUTES.MY_POSTS}>
                         <BookOpen className="mr-2 h-4 w-4 text-purple-600 dark:text-purple-400" />
-                        My Blogs
+                        My Posts
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
