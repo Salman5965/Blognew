@@ -143,6 +143,7 @@ app.use("/api/forum", forumRoutes);
 app.use("/api/daily-drip", dailyDripRoutes);
 app.use("/api/stories", storyRoutes);
 app.use("/api/explore", exploreRoutes);
+app.use("/api/community", communityRoutes);
 
 // Welcome route
 app.get("/", (req, res) => {
