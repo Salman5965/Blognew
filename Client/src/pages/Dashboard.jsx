@@ -9,6 +9,7 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { userService } from "@/services/userService";
 import { blogService } from "@/services/blogService";
+import { storiesService } from "@/services/storiesService";
 import { ROUTES } from "@/utils/constant";
 import {
   PlusCircle,
@@ -77,14 +78,18 @@ export const Dashboard = () => {
       });
       setRecentBlogs(blogsResponse.blogs || blogsResponse.data || []);
 
-      // TODO: Load recent stories when story service is available
-      // const storiesResponse = await storyService.getMyStories({
-      //   limit: 5,
-      //   sortBy: "createdAt",
-      //   sortOrder: "desc",
-      // });
-      // setRecentStories(storiesResponse.stories || storiesResponse.data || []);
-      setRecentStories([]); // Placeholder for now
+      // Load recent stories
+      try {
+        const storiesResponse = await storiesService.getMyStories({
+          limit: 5,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        });
+        setRecentStories(storiesResponse.stories || storiesResponse.data || []);
+      } catch (error) {
+        console.warn("Stories not available, using empty array");
+        setRecentStories([]);
+      }
     } catch (error) {
       console.error("Error loading dashboard data:", error);
       setError(error.message);
