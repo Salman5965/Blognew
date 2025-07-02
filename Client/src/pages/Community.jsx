@@ -19,7 +19,6 @@ import {
   Users,
   Hash,
   Clock,
-  Fire,
   Star,
   Loader2,
   RefreshCw,
@@ -323,7 +322,7 @@ const Community = () => {
                 </SelectItem>
                 <SelectItem value="popular">
                   <div className="flex items-center space-x-2">
-                    <Fire className="h-3 w-3" />
+                    <TrendingUp className="h-3 w-3" />
                     <span>Popular</span>
                   </div>
                 </SelectItem>
