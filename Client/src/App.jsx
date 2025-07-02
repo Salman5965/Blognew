@@ -36,7 +36,7 @@ const Dashboard = React.lazy(() =>
 const MyBlogs = React.lazy(() =>
   import("./pages/MyBlogs").then((module) => ({ default: module.MyBlogs })),
 );
-const Profile = React.lazy(() => import("./pages/Profile"));
+const Profile = React.lazy(() => import("./pages/ProfileSettings"));
 const EditBlog = React.lazy(() =>
   import("./pages/EditBlog").then((module) => ({ default: module.EditBlog })),
 );
