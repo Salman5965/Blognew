@@ -561,6 +561,7 @@ export const getTopAuthors = async (req, res, next) => {
           totalViews: 1,
           totalLikes: 1,
           authorScore: 1,
+          createdAt: 1,
         },
       },
     ]);
