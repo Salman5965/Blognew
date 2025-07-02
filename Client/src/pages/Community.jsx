@@ -328,10 +328,7 @@ const Community = () => {
               Refresh
             </Button>
 
-            <Button
-              onClick={() => setIsCreatePostOpen(true)}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            >
+            <Button onClick={() => setIsCreatePostOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               New Post
             </Button>
@@ -371,10 +368,7 @@ const Community = () => {
                   ? "Try adjusting your search terms or filters"
                   : "Be the first to start a discussion in the community!"}
               </p>
-              <Button
-                onClick={() => setIsCreatePostOpen(true)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
+              <Button onClick={() => setIsCreatePostOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Create First Post
               </Button>
