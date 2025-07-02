@@ -12,8 +12,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { userService } from "@/services/userService";
-import { ImageUpload } from "@/components/profile/ImageUpload";
-import { SuggestedUsers } from "@/components/profile/SuggestedUsers";
 import {
   User,
   Users,
@@ -24,7 +22,6 @@ import {
   Shield,
   BookOpen,
   TrendingUp,
-  Award,
   Github,
   Twitter,
   Linkedin,
@@ -210,51 +207,6 @@ const ProfileSettings = () => {
     }
   };
 
-  const handleImageUpload = async (imageUrl, uploadResult) => {
-    try {
-      setLoading(true);
-
-      const updatedProfile = {
-        ...profileForm,
-        avatar: imageUrl,
-      };
-
-      await updateProfile(updatedProfile);
-      setProfileForm((prev) => ({ ...prev, avatar: imageUrl }));
-
-      toast({
-        title: "Success",
-        description: "Profile picture updated successfully!",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update profile picture",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleImageRemove = async () => {
-    try {
-      setLoading(true);
-
-      const updatedProfile = {
-        ...profileForm,
-        avatar: "",
-      };
-
-      await updateProfile(updatedProfile);
-      setProfileForm((prev) => ({ ...prev, avatar: "" }));
-    } catch (error) {
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSaveProfile = async () => {
     try {
       setLoading(true);
@@ -432,13 +384,25 @@ const ProfileSettings = () => {
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row gap-6 items-center">
               {/* Profile Image */}
-              <ImageUpload
-                currentImage={profileForm.avatar}
-                onImageUpload={handleImageUpload}
-                onImageRemove={handleImageRemove}
-                userId={user._id}
-                size="xl"
-              />
+              <div className="relative">
+                <Avatar className="w-32 h-32 border-4 border-background shadow-lg">
+                  <AvatarImage
+                    src={profileForm.avatar}
+                    alt="Profile picture"
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
+                    {getInitials(profileForm.firstName, profileForm.lastName)}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="absolute bottom-0 right-0 rounded-full w-10 h-10 p-0 bg-background shadow-lg border-2 hover:scale-105 transition-transform"
+                >
+                  <Camera className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </Button>
+              </div>
 
               {/* Profile Info */}
               <div className="flex-1 text-center md:text-left space-y-4">
@@ -501,7 +465,7 @@ const ProfileSettings = () => {
 
         {/* Settings Tabs */}
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile" className="flex items-center gap-2">
               <User className="h-4 w-4" />
               Profile
@@ -520,10 +484,6 @@ const ProfileSettings = () => {
             <TabsTrigger value="account" className="flex items-center gap-2">
               <Lock className="h-4 w-4" />
               Account
-            </TabsTrigger>
-            <TabsTrigger value="suggested" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Suggested
             </TabsTrigger>
           </TabsList>
 
@@ -1150,11 +1110,6 @@ const ProfileSettings = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          {/* Suggested Users Tab */}
-          <TabsContent value="suggested" className="space-y-6">
-            <SuggestedUsers limit={8} className="w-full" />
           </TabsContent>
         </Tabs>
       </div>
