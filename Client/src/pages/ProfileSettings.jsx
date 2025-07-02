@@ -794,11 +794,7 @@ const ProfileSettings = () => {
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleSavePrivacySettings}
-                  disabled={loading}
-                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-                >
+                <Button onClick={handleSavePrivacySettings} disabled={loading}>
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : (
@@ -969,7 +965,6 @@ const ProfileSettings = () => {
                 <Button
                   onClick={handleSaveNotificationSettings}
                   disabled={loading}
-                  className="bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700"
                 >
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
