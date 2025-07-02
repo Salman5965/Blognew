@@ -454,7 +454,7 @@ export const Navbar = () => {
                     <DropdownMenuItem asChild>
                       <Link to={ROUTES.PROFILE}>
                         <Settings className="mr-2 h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        Profile
+                        Profile Settings
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/community")}>
