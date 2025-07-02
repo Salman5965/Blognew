@@ -62,6 +62,7 @@ import {
 const ProfileSettings = () => {
   const { user, updateProfile, changePassword } = useAuthContext();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // State management
   const [loading, setLoading] = useState(false);
