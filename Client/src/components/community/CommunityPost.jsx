@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { communityService } from "@/services/communityService";
-import { CommunityReply } from "./CommunityReply";
+import CommunityReply from "./CommunityReply";
 import {
   Heart,
   MessageCircle,
