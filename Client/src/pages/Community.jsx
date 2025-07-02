@@ -78,21 +78,18 @@ const Community = () => {
     try {
       setLoading(true);
 
-      const [postsResponse, categoriesResponse, statsResponse] =
-        await Promise.all([
-          communityService.getPosts({
-            category: selectedCategory === "all" ? undefined : selectedCategory,
-            sortBy,
-            page: 1,
-            limit: 20,
-          }),
-          communityService.getCategories(),
-          communityService.getStats(),
-        ]);
+      const [postsResponse, categoriesResponse] = await Promise.all([
+        communityService.getPosts({
+          category: selectedCategory === "all" ? undefined : selectedCategory,
+          sortBy,
+          page: 1,
+          limit: 20,
+        }),
+        communityService.getCategories(),
+      ]);
 
       setPosts(postsResponse.posts || []);
       setCategories(categoriesResponse.categories || []);
-      setCommunityStats(statsResponse.stats || communityStats);
       setPage(1);
       setHasMore(postsResponse.hasMore || false);
     } catch (error) {
@@ -237,53 +234,15 @@ const Community = () => {
     <PageWrapper className="py-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Community Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg p-6 text-white">
-          <div className="flex flex-col md:flex-row md:items-center justify-between">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold flex items-center">
-                <MessageSquare className="h-8 w-8 mr-3" />
-                Community Discussions
-              </h1>
-              <p className="text-purple-100">
-                Share ideas, ask questions, and connect with developers
-                worldwide
-              </p>
-            </div>
-
-            {/* Real-time Stats */}
-            <div className="mt-4 md:mt-0 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-              <div className="bg-white/10 rounded-lg p-3">
-                <div className="text-2xl font-bold">
-                  {formatStats(communityStats.totalPosts)}
-                </div>
-                <div className="text-xs text-purple-100">Total Posts</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-3">
-                <div className="text-2xl font-bold">
-                  {formatStats(communityStats.activePosts)}
-                </div>
-                <div className="text-xs text-purple-100">Active Today</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-3 flex items-center justify-center">
-                <div className="flex items-center space-x-1">
-                  {isConnected ? (
-                    <Wifi className="h-3 w-3 text-green-300" />
-                  ) : (
-                    <WifiOff className="h-3 w-3 text-red-300" />
-                  )}
-                  <div className="text-lg font-bold">
-                    {formatStats(communityStats.onlineUsers)}
-                  </div>
-                </div>
-                <div className="text-xs text-purple-100 ml-2">Online</div>
-              </div>
-              <div className="bg-white/10 rounded-lg p-3">
-                <div className="text-2xl font-bold">
-                  {formatStats(communityStats.totalUsers)}
-                </div>
-                <div className="text-xs text-purple-100">Members</div>
-              </div>
-            </div>
+        <div className="border rounded-lg p-6 bg-card">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold flex items-center">
+              <MessageSquare className="h-8 w-8 mr-3 text-primary" />
+              Community Discussions
+            </h1>
+            <p className="text-muted-foreground">
+              Share ideas, ask questions, and connect with developers worldwide
+            </p>
           </div>
         </div>
 
