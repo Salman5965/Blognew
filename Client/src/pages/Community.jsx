@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
-import { CommunityPost } from "@/components/community/CommunityPost";
-import { CreatePostDialog } from "@/components/community/CreatePostDialog";
+import CommunityPost from "@/components/community/CommunityPost";
+import CreatePostDialog from "@/components/community/CreatePostDialog";
 import { communityService } from "@/services/communityService";
 import {
   MessageSquare,
