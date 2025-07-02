@@ -96,6 +96,66 @@ const userSchema = new mongoose.Schema(
       enum: ["public", "private"],
       default: "public",
     },
+
+    // Privacy settings
+    privacySettings: {
+      showEmail: {
+        type: Boolean,
+        default: false,
+      },
+      showFollowers: {
+        type: Boolean,
+        default: true,
+      },
+      showFollowing: {
+        type: Boolean,
+        default: true,
+      },
+      allowMessages: {
+        type: Boolean,
+        default: true,
+      },
+      allowFollow: {
+        type: Boolean,
+        default: true,
+      },
+    },
+
+    // Notification settings
+    notificationSettings: {
+      emailNotifications: {
+        type: Boolean,
+        default: true,
+      },
+      pushNotifications: {
+        type: Boolean,
+        default: true,
+      },
+      newFollowers: {
+        type: Boolean,
+        default: true,
+      },
+      blogLikes: {
+        type: Boolean,
+        default: true,
+      },
+      blogComments: {
+        type: Boolean,
+        default: true,
+      },
+      directMessages: {
+        type: Boolean,
+        default: true,
+      },
+      weeklyDigest: {
+        type: Boolean,
+        default: true,
+      },
+      marketingEmails: {
+        type: Boolean,
+        default: false,
+      },
+    },
     privacySettings: {
       showEmail: { type: Boolean, default: false },
       showFollowers: { type: Boolean, default: true },
