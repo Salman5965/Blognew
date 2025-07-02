@@ -41,6 +41,7 @@ import {
   Heart,
   UserPlus,
 } from "lucide-react";
+import { iconColors } from "@/utils/iconColors";
 import {
   Dialog,
   DialogContent,
@@ -365,7 +366,7 @@ const ProfileSettings = () => {
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center">
-            <Settings className="h-8 w-8 mr-3 text-blue-600 dark:text-blue-400" />
+            <Settings className={`h-8 w-8 mr-3 ${iconColors.info}`} />
             Profile Settings
           </h1>
           <p className="text-muted-foreground mt-2">
@@ -402,7 +403,7 @@ const ProfileSettings = () => {
                   variant="outline"
                   className="absolute bottom-0 right-0 rounded-full w-10 h-10 p-0 bg-background shadow-lg border-2 hover:scale-105 transition-transform"
                 >
-                  <Camera className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <Camera className={`h-4 w-4 ${iconColors.info}`} />
                 </Button>
               </div>
 
