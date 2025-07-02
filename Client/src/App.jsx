@@ -49,9 +49,7 @@ const Cookies = React.lazy(() => import("./pages/Cookies"));
 const Gdpr = React.lazy(() => import("./pages/Gdpr"));
 const Help = React.lazy(() => import("./pages/Help"));
 const Feed = React.lazy(() => import("./pages/Feed"));
-const Analytics = React.lazy(() =>
-  import("./pages/Analytics").then((module) => ({ default: module.Analytics })),
-);
+const Analytics = React.lazy(() => import("./pages/Analytics"));
 const BlogAnalytics = React.lazy(() => import("./pages/BlogAnalytics"));
 const StoryAnalytics = React.lazy(() => import("./pages/StoryAnalytics"));
 const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
