@@ -1,175 +1,478 @@
-import { apiService } from "./api";
+import apiService from "./api";
 
 class CommunityService {
-  // Get community statistics
-  async getCommunityStats() {
+  constructor() {
+    this.baseUrl = "/community";
+  }
+
+  // Get community posts with filters and pagination
+  async getPosts(options = {}) {
     try {
-      const response = await apiService.get("/community/stats");
-      return response;
+      const {
+        category,
+        sortBy = "recent",
+        page = 1,
+        limit = 20,
+        search,
+        tags,
+      } = options;
+
+      const params = new URLSearchParams();
+      if (category) params.append("category", category);
+      if (sortBy) params.append("sortBy", sortBy);
+      if (page) params.append("page", page);
+      if (limit) params.append("limit", limit);
+      if (search) params.append("search", search);
+      if (tags && tags.length > 0) params.append("tags", tags.join(","));
+
+      const response = await apiService.get(`${this.baseUrl}/posts?${params}`);
+
+      if (response.status === "success") {
+        return {
+          posts: response.data.posts || [],
+          hasMore: response.data.hasMore || false,
+          total: response.data.total || 0,
+          page: response.data.page || 1,
+        };
+      }
+
+      throw new Error(response.message || "Failed to fetch posts");
     } catch (error) {
-      console.error("Failed to fetch community stats:", error);
-      // Return empty data structure
+      console.error("Error fetching posts:", error);
       return {
-        totalMembers: 0,
-        totalPosts: 0,
-        totalComments: 0,
-        activeToday: 0,
+        posts: [],
+        hasMore: false,
+        total: 0,
+        page: 1,
       };
     }
   }
 
-  // Get top community members/contributors
-  async getTopMembers() {
+  // Search posts
+  async searchPosts(options = {}) {
     try {
-      const response = await apiService.get("/community/top-members");
-      return response;
-    } catch (error) {
-      console.error("Failed to fetch top members:", error);
-      // Return empty array instead of mock data
-      return [];
-    }
-  }
+      const {
+        query,
+        category,
+        sortBy = "relevance",
+        page = 1,
+        limit = 20,
+      } = options;
 
-  // Get recent community activity
-  async getRecentActivity() {
-    try {
-      const response = await apiService.get("/community/recent-activity");
-      return response;
-    } catch (error) {
-      console.error("Failed to fetch recent activity:", error);
-      // Return empty array instead of mock data
-      return [];
-    }
-  }
+      const params = new URLSearchParams();
+      if (query) params.append("q", query);
+      if (category) params.append("category", category);
+      if (sortBy) params.append("sortBy", sortBy);
+      if (page) params.append("page", page);
+      if (limit) params.append("limit", limit);
 
-  // Get community forums/channels
-  async getForums() {
-    try {
-      const response = await apiService.get("/community/forums");
-      return response;
+      const response = await apiService.get(`${this.baseUrl}/search?${params}`);
+
+      if (response.status === "success") {
+        return {
+          posts: response.data.posts || [],
+          hasMore: response.data.hasMore || false,
+          total: response.data.total || 0,
+        };
+      }
+
+      throw new Error(response.message || "Failed to search posts");
     } catch (error) {
-      console.error("Failed to fetch forums:", error);
-      // Return empty data structure
+      console.error("Error searching posts:", error);
       return {
-        channels: [],
-        totalChannels: 0,
-        popularChannels: [],
+        posts: [],
+        hasMore: false,
+        total: 0,
       };
     }
   }
 
-  // Get featured discussions
-  async getFeaturedDiscussions() {
+  // Get single post with replies
+  async getPost(postId) {
     try {
-      const response = await apiService.get("/community/featured-discussions");
-      return response;
-    } catch (error) {
-      console.error("Failed to fetch featured discussions:", error);
-      // Return empty array instead of mock data
-      return [];
-    }
-  }
+      const response = await apiService.get(`${this.baseUrl}/posts/${postId}`);
 
-  // Get community leaderboard
-  async getLeaderboard(timeframe = "month", limit = 10) {
-    try {
-      const response = await apiService.get(
-        `/community/leaderboard?timeframe=${timeframe}&limit=${limit}`,
-      );
-      return response;
-    } catch (error) {
-      console.error("Failed to fetch leaderboard:", error);
-      // Return empty array instead of mock data
-      return [];
-    }
-  }
+      if (response.status === "success") {
+        return response.data.post;
+      }
 
-  // Get user community stats
-  async getUserCommunityStats(userId) {
-    try {
-      const response = await apiService.get(`/community/users/${userId}/stats`);
-      return response;
+      throw new Error(response.message || "Failed to fetch post");
     } catch (error) {
-      console.error("Failed to fetch user community stats:", error);
-      // Return empty data structure
-      return {
-        points: 0,
-        rank: 0,
-        postsCount: 0,
-        commentsCount: 0,
-        likesReceived: 0,
-        level: "Member",
-      };
-    }
-  }
-
-  // Join a community channel
-  async joinChannel(channelId) {
-    try {
-      const response = await apiService.post(
-        `/community/channels/${channelId}/join`,
-      );
-      return response;
-    } catch (error) {
-      console.error("Failed to join channel:", error);
+      console.error("Error fetching post:", error);
       throw error;
     }
   }
 
-  // Leave a community channel
-  async leaveChannel(channelId) {
+  // Create new post
+  async createPost(postData) {
     try {
-      const response = await apiService.post(
-        `/community/channels/${channelId}/leave`,
+      const response = await apiService.post(`${this.baseUrl}/posts`, postData);
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to create post");
+    } catch (error) {
+      console.error("Error creating post:", error);
+      throw error;
+    }
+  }
+
+  // Update post
+  async updatePost(postId, updates) {
+    try {
+      const response = await apiService.put(
+        `${this.baseUrl}/posts/${postId}`,
+        updates,
       );
-      return response;
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to update post");
     } catch (error) {
-      console.error("Failed to leave channel:", error);
+      console.error("Error updating post:", error);
       throw error;
     }
   }
 
-  // Report inappropriate content
-  async reportContent(contentId, contentType, reason) {
+  // Delete post
+  async deletePost(postId) {
     try {
-      const response = await apiService.post("/community/report", {
-        contentId,
-        contentType,
-        reason,
-      });
-      return response;
+      const response = await apiService.delete(
+        `${this.baseUrl}/posts/${postId}`,
+      );
+
+      if (response.status === "success") {
+        return true;
+      }
+
+      throw new Error(response.message || "Failed to delete post");
     } catch (error) {
-      console.error("Failed to report content:", error);
+      console.error("Error deleting post:", error);
       throw error;
     }
   }
 
-  // Search community content
-  async searchCommunity(query, filters = {}) {
+  // Get replies for a post
+  async getReplies(postId, parentReplyId = null) {
     try {
       const params = new URLSearchParams();
-      params.append("q", query);
+      if (parentReplyId) params.append("parent", parentReplyId);
 
-      if (filters.type) params.append("type", filters.type);
-      if (filters.channel) params.append("channel", filters.channel);
-      if (filters.timeframe) params.append("timeframe", filters.timeframe);
+      const response = await apiService.get(
+        `${this.baseUrl}/posts/${postId}/replies?${params}`,
+      );
 
-      const response = await apiService.get(`/community/search?${params}`);
-      return response;
+      if (response.status === "success") {
+        return {
+          replies: response.data.replies || [],
+          total: response.data.total || 0,
+        };
+      }
+
+      throw new Error(response.message || "Failed to fetch replies");
     } catch (error) {
-      console.error("Failed to search community:", error);
-      // Return empty results
+      console.error("Error fetching replies:", error);
       return {
-        results: [],
+        replies: [],
         total: 0,
-        pagination: {
-          currentPage: 1,
-          totalPages: 0,
-          hasNext: false,
-          hasPrev: false,
-        },
       };
     }
+  }
+
+  // Create reply
+  async createReply(postId, replyData) {
+    try {
+      const response = await apiService.post(
+        `${this.baseUrl}/posts/${postId}/replies`,
+        replyData,
+      );
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to create reply");
+    } catch (error) {
+      console.error("Error creating reply:", error);
+      throw error;
+    }
+  }
+
+  // Update reply
+  async updateReply(replyId, updates) {
+    try {
+      const response = await apiService.put(
+        `${this.baseUrl}/replies/${replyId}`,
+        updates,
+      );
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to update reply");
+    } catch (error) {
+      console.error("Error updating reply:", error);
+      throw error;
+    }
+  }
+
+  // Delete reply
+  async deleteReply(replyId) {
+    try {
+      const response = await apiService.delete(
+        `${this.baseUrl}/replies/${replyId}`,
+      );
+
+      if (response.status === "success") {
+        return true;
+      }
+
+      throw new Error(response.message || "Failed to delete reply");
+    } catch (error) {
+      console.error("Error deleting reply:", error);
+      throw error;
+    }
+  }
+
+  // Toggle reaction (like/emoji) on post or reply
+  async toggleReaction(targetId, emoji, type = "post") {
+    try {
+      const endpoint =
+        type === "post"
+          ? `${this.baseUrl}/posts/${targetId}/reactions`
+          : `${this.baseUrl}/replies/${targetId}/reactions`;
+
+      const response = await apiService.post(endpoint, { emoji });
+
+      if (response.status === "success") {
+        return {
+          isLiked: response.data.isLiked,
+          count: response.data.count,
+          reactions: response.data.reactions,
+        };
+      }
+
+      throw new Error(response.message || "Failed to toggle reaction");
+    } catch (error) {
+      console.error("Error toggling reaction:", error);
+      throw error;
+    }
+  }
+
+  // Toggle bookmark
+  async toggleBookmark(postId) {
+    try {
+      const response = await apiService.post(
+        `${this.baseUrl}/posts/${postId}/bookmark`,
+      );
+
+      if (response.status === "success") {
+        return response.data.isBookmarked;
+      }
+
+      throw new Error(response.message || "Failed to toggle bookmark");
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+      throw error;
+    }
+  }
+
+  // Get categories
+  async getCategories() {
+    try {
+      const response = await apiService.get(`${this.baseUrl}/categories`);
+
+      if (response.status === "success") {
+        return {
+          categories: response.data.categories || this.getDefaultCategories(),
+        };
+      }
+
+      // Return default categories if API fails
+      return {
+        categories: this.getDefaultCategories(),
+      };
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      return {
+        categories: this.getDefaultCategories(),
+      };
+    }
+  }
+
+  // Get community statistics
+  async getStats() {
+    try {
+      const response = await apiService.get(`${this.baseUrl}/stats`);
+
+      if (response.status === "success") {
+        return {
+          stats: response.data.stats || this.getDefaultStats(),
+        };
+      }
+
+      return {
+        stats: this.getDefaultStats(),
+      };
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      return {
+        stats: this.getDefaultStats(),
+      };
+    }
+  }
+
+  // Get trending posts
+  async getTrendingPosts(limit = 10) {
+    try {
+      const response = await apiService.get(
+        `${this.baseUrl}/trending?limit=${limit}`,
+      );
+
+      if (response.status === "success") {
+        return response.data.posts || [];
+      }
+
+      return [];
+    } catch (error) {
+      console.error("Error fetching trending posts:", error);
+      return [];
+    }
+  }
+
+  // Get user's bookmarked posts
+  async getBookmarkedPosts(options = {}) {
+    try {
+      const { page = 1, limit = 20 } = options;
+
+      const params = new URLSearchParams();
+      params.append("page", page);
+      params.append("limit", limit);
+
+      const response = await apiService.get(
+        `${this.baseUrl}/bookmarks?${params}`,
+      );
+
+      if (response.status === "success") {
+        return {
+          posts: response.data.posts || [],
+          hasMore: response.data.hasMore || false,
+          total: response.data.total || 0,
+        };
+      }
+
+      return {
+        posts: [],
+        hasMore: false,
+        total: 0,
+      };
+    } catch (error) {
+      console.error("Error fetching bookmarked posts:", error);
+      return {
+        posts: [],
+        hasMore: false,
+        total: 0,
+      };
+    }
+  }
+
+  // Report post or reply
+  async reportContent(targetId, type, reason, details = "") {
+    try {
+      const response = await apiService.post(`${this.baseUrl}/report`, {
+        targetId,
+        type, // "post" or "reply"
+        reason,
+        details,
+      });
+
+      if (response.status === "success") {
+        return true;
+      }
+
+      throw new Error(response.message || "Failed to submit report");
+    } catch (error) {
+      console.error("Error reporting content:", error);
+      throw error;
+    }
+  }
+
+  // Helper methods for default data
+  getDefaultCategories() {
+    return [
+      {
+        id: "general",
+        name: "General Discussion",
+        description: "General topics and discussions",
+      },
+      {
+        id: "development",
+        name: "Development",
+        description: "Programming and development topics",
+      },
+      {
+        id: "help",
+        name: "Help & Support",
+        description: "Get help with your questions",
+      },
+      {
+        id: "career",
+        name: "Career",
+        description: "Career advice and opportunities",
+      },
+      { id: "offtopic", name: "Off Topic", description: "Everything else" },
+    ];
+  }
+
+  getDefaultStats() {
+    return {
+      totalPosts: 0,
+      activePosts: 0,
+      onlineUsers: 0,
+      totalUsers: 0,
+    };
+  }
+
+  // Utility method to format post content for display
+  formatPostContent(content, maxLength = 300) {
+    if (!content) return "";
+
+    if (content.length <= maxLength) {
+      return content;
+    }
+
+    return content.substring(0, maxLength) + "...";
+  }
+
+  // Utility method to extract mentions from content
+  extractMentions(content) {
+    const mentionRegex = /@(\w+)/g;
+    const mentions = [];
+    let match;
+
+    while ((match = mentionRegex.exec(content)) !== null) {
+      mentions.push(match[1]);
+    }
+
+    return mentions;
+  }
+
+  // Utility method to extract hashtags from content
+  extractHashtags(content) {
+    const hashtagRegex = /#(\w+)/g;
+    const hashtags = [];
+    let match;
+
+    while ((match = hashtagRegex.exec(content)) !== null) {
+      hashtags.push(match[1]);
+    }
+
+    return hashtags;
   }
 }
 
