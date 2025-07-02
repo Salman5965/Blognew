@@ -58,13 +58,24 @@ export const CommunityPost = ({
 
   useEffect(() => {
     // Initialize like state
-    setIsLiked(
-      post.reactions?.some(
-        (r) => r.emoji === "👍" && r.users.includes(currentUser?._id),
-      ) || false,
-    );
-
-    setLikeCount(post.reactions?.find((r) => r.emoji === "👍")?.count || 0);
+    // Handle both array format and object format for reactions
+    if (Array.isArray(post.reactions)) {
+      // Array format: [{ emoji: "👍", users: [...], count: 5 }]
+      setIsLiked(
+        post.reactions.some(
+          (r) => r.emoji === "👍" && r.users?.includes(currentUser?._id),
+        ) || false,
+      );
+      setLikeCount(post.reactions.find((r) => r.emoji === "👍")?.count || 0);
+    } else if (post.reactions && typeof post.reactions === "object") {
+      // Object format: { "👍": 5, "❤️": 2 }
+      setIsLiked(post.isLiked || false);
+      setLikeCount(post.reactions["👍"] || post.likes || 0);
+    } else {
+      // Fallback for simple like count
+      setIsLiked(post.isLiked || false);
+      setLikeCount(post.likes || 0);
+    }
 
     // Check if bookmarked (would come from user's bookmarks)
     setIsBookmarked(post.isBookmarked || false);
