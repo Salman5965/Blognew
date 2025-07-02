@@ -562,11 +562,7 @@ const ProfileSettings = () => {
                   </div>
                 </div>
 
-                <Button
-                  onClick={handleSaveProfile}
-                  disabled={loading}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                >
+                <Button onClick={handleSaveProfile} disabled={loading}>
                   {loading ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : (
@@ -1079,7 +1075,7 @@ const ProfileSettings = () => {
                         <Button
                           onClick={handleChangePassword}
                           disabled={passwordLoading}
-                          className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
+                          variant="destructive"
                         >
                           {passwordLoading && (
                             <Loader2 className="h-4 w-4 animate-spin mr-2" />
