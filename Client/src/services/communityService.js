@@ -27,6 +27,17 @@ class CommunityService {
 
       const response = await apiService.get(`${this.baseUrl}/posts?${params}`);
 
+      // Check if API service returned a 404 error object
+      if (response._isError && response.status === 404) {
+        console.warn("Community posts endpoint not available, using mock data");
+        return {
+          posts: this.getMockPosts(),
+          hasMore: false,
+          total: 2, // Number of mock posts
+          page: 1,
+        };
+      }
+
       if (response.status === "success") {
         return {
           posts: response.data.posts || [],
