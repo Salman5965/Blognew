@@ -441,6 +441,54 @@ class CommunityService {
     }
   }
 
+  // Mock data for development/fallback
+  getMockPosts() {
+    return [
+      {
+        _id: "mock-1",
+        title: "Welcome to the Community!",
+        content:
+          "This is a sample post to demonstrate the community features. The backend API is not yet available, but you can see how the interface works.",
+        author: {
+          _id: "user-1",
+          username: "developer",
+          firstName: "Community",
+          lastName: "Admin",
+          avatar: null,
+          role: "admin",
+        },
+        category: "general",
+        createdAt: new Date().toISOString(),
+        reactions: [{ emoji: "👍", count: 5, users: [] }],
+        replyCount: 3,
+        views: 42,
+        tags: ["welcome", "community"],
+        isPinned: true,
+      },
+      {
+        _id: "mock-2",
+        title: "How to get started with development?",
+        content:
+          "I'm new to programming and would love some advice on where to start. What programming language should I learn first?",
+        author: {
+          _id: "user-2",
+          username: "newbie",
+          firstName: "New",
+          lastName: "Developer",
+          avatar: null,
+          role: "user",
+        },
+        category: "help",
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+        reactions: [{ emoji: "👍", count: 8, users: [] }],
+        replyCount: 12,
+        views: 156,
+        tags: ["beginner", "advice"],
+        isPinned: false,
+      },
+    ];
+  }
+
   // Helper methods for default data
   getDefaultCategories() {
     return [
