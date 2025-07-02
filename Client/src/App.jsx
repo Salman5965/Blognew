@@ -75,25 +75,12 @@ const CreateStory = React.lazy(() => import("./pages/CreateStory"));
 const Explore = React.lazy(() => import("./pages/Explore"));
 const Messages = React.lazy(() => import("./pages/Messages"));
 
-// Loading component for suspense
+// Optimized loading component for better perceived performance
 const PageLoader = () => (
-  <div className="container mx-auto px-4 py-8 max-w-4xl">
-    <div className="space-y-6">
-      <Skeleton className="h-8 w-64" />
-      <div className="space-y-4">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="border rounded-lg p-4">
-            <Skeleton className="h-32 w-full mb-4" />
-            <Skeleton className="h-4 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/2" />
-          </div>
-        ))}
-      </div>
+  <div className="container mx-auto px-4 py-8 max-w-4xl min-h-[50vh] flex items-center justify-center">
+    <div className="text-center space-y-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+      <p className="text-muted-foreground">Loading...</p>
     </div>
   </div>
 );
