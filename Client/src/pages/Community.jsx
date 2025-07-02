@@ -171,6 +171,18 @@ const Community = () => {
       setHasMore(response.hasMore || false);
     } catch (error) {
       console.error("Error searching posts:", error);
+
+      // Only show error toast for actual errors, not missing endpoints
+      if (
+        !error.message?.includes("Not Found") &&
+        error.response?.status !== 404
+      ) {
+        toast({
+          title: "Search Error",
+          description: "Failed to search posts",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
