@@ -59,8 +59,18 @@ class CommunityService {
         limit = 20,
       } = options;
 
+      // Validate query
+      if (!query || query.trim().length < 2) {
+        console.warn("Search query too short, returning empty results");
+        return {
+          posts: [],
+          hasMore: false,
+          total: 0,
+        };
+      }
+
       const params = new URLSearchParams();
-      if (query) params.append("q", query);
+      params.append("q", query.trim());
       if (category) params.append("category", category);
       if (sortBy) params.append("sortBy", sortBy);
       if (page) params.append("page", page);
@@ -79,6 +89,20 @@ class CommunityService {
       throw new Error(response.message || "Failed to search posts");
     } catch (error) {
       console.error("Error searching posts:", error);
+
+      // Check if it's a 404 (endpoint doesn't exist) and provide graceful fallback
+      if (
+        error.response?.status === 404 ||
+        error.message?.includes("Not Found")
+      ) {
+        console.warn("Community search endpoint not available, using fallback");
+        return {
+          posts: [],
+          hasMore: false,
+          total: 0,
+        };
+      }
+
       return {
         posts: [],
         hasMore: false,
