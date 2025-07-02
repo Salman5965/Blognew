@@ -408,9 +408,9 @@ export const Navbar = () => {
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
                   {isMobileMenuOpen ? (
-                    <X className="h-4 w-4" />
+                    <X className="h-4 w-4 text-red-600 dark:text-red-400" />
                   ) : (
-                    <Menu className="h-4 w-4" />
+                    <Menu className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                   )}
                 </Button>
 
