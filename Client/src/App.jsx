@@ -52,16 +52,8 @@ const Feed = React.lazy(() => import("./pages/Feed"));
 const Analytics = React.lazy(() =>
   import("./pages/Analytics").then((module) => ({ default: module.Analytics })),
 );
-const BlogAnalytics = React.lazy(() =>
-  import("./pages/BlogAnalytics").then((module) => ({
-    default: module.BlogAnalytics,
-  })),
-);
-const StoryAnalytics = React.lazy(() =>
-  import("./pages/StoryAnalytics").then((module) => ({
-    default: module.StoryAnalytics,
-  })),
-);
+const BlogAnalytics = React.lazy(() => import("./pages/BlogAnalytics"));
+const StoryAnalytics = React.lazy(() => import("./pages/StoryAnalytics"));
 const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 
