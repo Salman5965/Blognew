@@ -202,6 +202,34 @@ const Community = () => {
     });
   };
 
+  const handleCategoryChange = async (category) => {
+    setSelectedCategory(category);
+
+    try {
+      setLoading(true);
+      const response = await communityService.getPosts({
+        category: category === "all" ? undefined : category,
+        sortBy,
+        page: 1,
+        limit: 20,
+        search: searchQuery,
+      });
+
+      setPosts(response.posts || []);
+      setPage(1);
+      setHasMore(response.hasMore || false);
+    } catch (error) {
+      console.error("Error filtering by category:", error);
+      toast({
+        title: "Error",
+        description: "Failed to filter posts by category",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <PageWrapper className="py-8">
@@ -258,7 +286,7 @@ const Community = () => {
             {/* Category Filter */}
             <Select
               value={selectedCategory}
-              onValueChange={setSelectedCategory}
+              onValueChange={handleCategoryChange}
             >
               <SelectTrigger className="w-48">
                 <SelectValue />
