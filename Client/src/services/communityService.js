@@ -39,6 +39,21 @@ class CommunityService {
       throw new Error(response.message || "Failed to fetch posts");
     } catch (error) {
       console.error("Error fetching posts:", error);
+
+      // Check if it's a 404 (endpoint doesn't exist) and provide graceful fallback
+      if (
+        error.response?.status === 404 ||
+        error.message?.includes("Not Found")
+      ) {
+        console.warn("Community posts endpoint not available, using mock data");
+        return {
+          posts: this.getMockPosts(),
+          hasMore: false,
+          total: 0,
+          page: 1,
+        };
+      }
+
       return {
         posts: [],
         hasMore: false,
