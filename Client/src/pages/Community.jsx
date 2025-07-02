@@ -72,8 +72,11 @@ const Community = () => {
 
   // Search effect
   useEffect(() => {
-    if (searchQuery.length > 2 || searchQuery.length === 0) {
+    if (searchQuery.length > 2) {
       handleSearch();
+    } else if (searchQuery.length === 0) {
+      // Reset to initial data when search is cleared
+      loadInitialData();
     }
   }, [searchQuery]);
 
@@ -141,11 +144,15 @@ const Community = () => {
   };
 
   const handleSearch = async () => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      return;
+    }
+
     try {
       setLoading(true);
 
       const response = await communityService.searchPosts({
-        query: searchQuery,
+        query: searchQuery.trim(),
         category: selectedCategory === "all" ? undefined : selectedCategory,
         sortBy,
         page: 1,
