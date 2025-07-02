@@ -555,7 +555,7 @@ export const Navbar = () => {
                   setIsMobileMenuOpen(false);
                 }}
               >
-                <Bell className="mr-2 h-4 w-4" />
+                <Bell className="mr-2 h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                 Notifications
               </Button>
               <Button
@@ -566,7 +566,7 @@ export const Navbar = () => {
                   setIsMobileMenuOpen(false);
                 }}
               >
-                <MessageCircle className="mr-2 h-4 w-4" />
+                <MessageCircle className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                 Messages
               </Button>
             </div>
