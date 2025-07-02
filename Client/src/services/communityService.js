@@ -18,7 +18,7 @@ class CommunityService {
       } = options;
 
       const params = new URLSearchParams();
-      if (category) params.append("category", category);
+      if (category && category !== "all") params.append("category", category);
       if (sortBy) params.append("sortBy", sortBy);
       if (page) params.append("page", page);
       if (limit) params.append("limit", limit);
@@ -27,82 +27,40 @@ class CommunityService {
 
       const response = await apiService.get(`${this.baseUrl}/posts?${params}`);
 
-      // Check if API service returned a 404 error object
-      if (response._isError && response.status === 404) {
-        console.warn("Community posts endpoint not available, using mock data");
-        return {
-          posts: this.getMockPosts(),
-          hasMore: false,
-          total: 2, // Number of mock posts
-          page: 1,
-        };
-      }
-
       if (response.status === "success") {
         return {
           posts: response.data.posts || [],
-          hasMore: response.data.hasMore || false,
-          total: response.data.total || 0,
-          page: response.data.page || 1,
+          hasMore: response.data.pagination?.hasMore || false,
+          total: response.data.pagination?.total || 0,
+          page: response.data.pagination?.page || 1,
+          totalPages: response.data.pagination?.totalPages || 1,
         };
       }
 
       throw new Error(response.message || "Failed to fetch posts");
     } catch (error) {
-      console.error("Error fetching posts:", error);
-
-      // Check if it's a 404 (endpoint doesn't exist) and provide graceful fallback
-      // Handle different error formats from axios and custom API errors
-      const is404Error =
-        error.response?.status === 404 ||
-        error.status === 404 ||
-        error.message?.includes("Not Found") ||
-        error.message?.includes("404") ||
-        (error.code && error.code.includes("404"));
-
-      if (is404Error) {
-        console.warn("Community posts endpoint not available, using mock data");
-        return {
-          posts: this.getMockPosts(),
-          hasMore: false,
-          total: 2, // Number of mock posts
-          page: 1,
-        };
-      }
-
-      return {
-        posts: [],
-        hasMore: false,
-        total: 0,
-        page: 1,
-      };
+      console.error("Error fetching community posts:", error);
+      throw new Error("Failed to load community posts");
     }
   }
 
-  // Search posts
-  async searchPosts(options = {}) {
-    try {
-      const {
-        query,
-        category,
-        sortBy = "relevance",
-        page = 1,
-        limit = 20,
-      } = options;
+  // Search community posts
+  async searchPosts(query, options = {}) {
+    // Prevent searching with empty queries to avoid 400 errors
+    if (!query || query.trim().length < 2) {
+      return {
+        posts: [],
+        total: 0,
+        hasMore: false,
+      };
+    }
 
-      // Validate query
-      if (!query || query.trim().length < 2) {
-        console.warn("Search query too short, returning empty results");
-        return {
-          posts: [],
-          hasMore: false,
-          total: 0,
-        };
-      }
+    try {
+      const { category, sortBy = "relevance", page = 1, limit = 20 } = options;
 
       const params = new URLSearchParams();
       params.append("q", query.trim());
-      if (category) params.append("category", category);
+      if (category && category !== "all") params.append("category", category);
       if (sortBy) params.append("sortBy", sortBy);
       if (page) params.append("page", page);
       if (limit) params.append("limit", limit);
@@ -112,33 +70,15 @@ class CommunityService {
       if (response.status === "success") {
         return {
           posts: response.data.posts || [],
-          hasMore: response.data.hasMore || false,
           total: response.data.total || 0,
+          hasMore: response.data.hasMore || false,
         };
       }
 
-      throw new Error(response.message || "Failed to search posts");
+      throw new Error(response.message || "Search failed");
     } catch (error) {
       console.error("Error searching posts:", error);
-
-      // Check if it's a 404 (endpoint doesn't exist) and provide graceful fallback
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn("Community search endpoint not available, using fallback");
-        return {
-          posts: [],
-          hasMore: false,
-          total: 0,
-        };
-      }
-
-      return {
-        posts: [],
-        hasMore: false,
-        total: 0,
-      };
+      throw new Error("Failed to search posts");
     }
   }
 
@@ -169,38 +109,13 @@ class CommunityService {
 
       throw new Error(response.message || "Failed to create post");
     } catch (error) {
-      // Handle 404 error gracefully when API endpoint doesn't exist
-      if (error.response?.status === 404 || error.status === 404) {
-        console.warn(
-          "Create post API endpoint not available, using mock response",
-        );
-        // Return mock created post
-        return {
-          post: {
-            _id: `mock_${Date.now()}`,
-            title: postData.title,
-            content: postData.content,
-            category: postData.category,
-            tags: postData.tags || [],
-            author: {
-              _id: "current_user",
-              username: "You",
-              avatar: null,
-            },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            likes: 0,
-            replies: 0,
-            views: 0,
-            isLiked: false,
-            isBookmarked: false,
-            status: "published",
-          },
-        };
-      }
-
       console.error("Error creating post:", error);
-      throw new Error("Post creation temporarily unavailable");
+      if (error.response?.data?.errors) {
+        throw new Error(
+          error.response.data.errors.map((e) => e.msg).join(", "),
+        );
+      }
+      throw new Error("Failed to create post");
     }
   }
 
@@ -219,7 +134,7 @@ class CommunityService {
       throw new Error(response.message || "Failed to update post");
     } catch (error) {
       console.error("Error updating post:", error);
-      throw error;
+      throw new Error("Failed to update post");
     }
   }
 
@@ -231,21 +146,21 @@ class CommunityService {
       );
 
       if (response.status === "success") {
-        return true;
+        return response.data;
       }
 
       throw new Error(response.message || "Failed to delete post");
     } catch (error) {
       console.error("Error deleting post:", error);
-      throw error;
+      throw new Error("Failed to delete post");
     }
   }
 
   // Get replies for a post
-  async getReplies(postId, parentReplyId = null) {
+  async getReplies(postId, parentId = null) {
     try {
       const params = new URLSearchParams();
-      if (parentReplyId) params.append("parent", parentReplyId);
+      if (parentId) params.append("parent", parentId);
 
       const response = await apiService.get(
         `${this.baseUrl}/posts/${postId}/replies?${params}`,
@@ -261,10 +176,7 @@ class CommunityService {
       throw new Error(response.message || "Failed to fetch replies");
     } catch (error) {
       console.error("Error fetching replies:", error);
-      return {
-        replies: [],
-        total: 0,
-      };
+      throw new Error("Failed to load replies");
     }
   }
 
@@ -282,34 +194,13 @@ class CommunityService {
 
       throw new Error(response.message || "Failed to create reply");
     } catch (error) {
-      // Handle 404 error gracefully when API endpoint doesn't exist
-      if (error.response?.status === 404 || error.status === 404) {
-        console.warn(
-          "Create reply API endpoint not available, using mock response",
-        );
-        // Return mock created reply
-        return {
-          reply: {
-            _id: `mock_reply_${Date.now()}`,
-            content: replyData.content,
-            parentId: replyData.parentId || null,
-            author: {
-              _id: "current_user",
-              username: "You",
-              avatar: null,
-            },
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            likes: 0,
-            replies: [],
-            isLiked: false,
-            level: replyData.parentId ? 2 : 1,
-          },
-        };
-      }
-
       console.error("Error creating reply:", error);
-      throw new Error("Reply creation temporarily unavailable");
+      if (error.response?.data?.errors) {
+        throw new Error(
+          error.response.data.errors.map((e) => e.msg).join(", "),
+        );
+      }
+      throw new Error("Failed to create reply");
     }
   }
 
@@ -328,7 +219,7 @@ class CommunityService {
       throw new Error(response.message || "Failed to update reply");
     } catch (error) {
       console.error("Error updating reply:", error);
-      throw error;
+      throw new Error("Failed to update reply");
     }
   }
 
@@ -340,13 +231,13 @@ class CommunityService {
       );
 
       if (response.status === "success") {
-        return true;
+        return response.data;
       }
 
       throw new Error(response.message || "Failed to delete reply");
     } catch (error) {
       console.error("Error deleting reply:", error);
-      throw error;
+      throw new Error("Failed to delete reply");
     }
   }
 
@@ -370,30 +261,19 @@ class CommunityService {
 
       throw new Error(response.message || "Failed to toggle reaction");
     } catch (error) {
-      // Handle 404 error gracefully when API endpoint doesn't exist
-      if (error.response?.status === 404 || error.status === 404) {
-        console.warn(
-          "Reaction API endpoint not available, using mock behavior",
-        );
-        // Return mock reaction state
-        return {
-          isLiked: Math.random() > 0.5,
-          count: Math.floor(Math.random() * 20),
-          reactions: { [emoji]: Math.floor(Math.random() * 10) },
-        };
-      }
-
       console.error("Error toggling reaction:", error);
-      throw new Error("Reaction feature temporarily unavailable");
+      throw new Error("Failed to toggle reaction");
     }
   }
 
-  // Toggle bookmark
+  // Toggle bookmark using the existing bookmark service
   async toggleBookmark(postId) {
     try {
-      const response = await apiService.post(
-        `${this.baseUrl}/posts/${postId}/bookmark`,
-      );
+      // Use the existing bookmark service endpoint
+      const response = await apiService.post(`/bookmarks`, {
+        itemId: postId,
+        itemType: "post",
+      });
 
       if (response.status === "success") {
         return response.data.isBookmarked;
@@ -401,17 +281,8 @@ class CommunityService {
 
       throw new Error(response.message || "Failed to toggle bookmark");
     } catch (error) {
-      // Handle 404 error gracefully when API endpoint doesn't exist
-      if (error.response?.status === 404 || error.status === 404) {
-        console.warn(
-          "Bookmark API endpoint not available, using mock behavior",
-        );
-        // Return a mock toggle state
-        return Math.random() > 0.5; // Simulate toggle
-      }
-
       console.error("Error toggling bookmark:", error);
-      throw new Error("Bookmark feature temporarily unavailable");
+      throw new Error("Failed to toggle bookmark");
     }
   }
 
@@ -426,22 +297,10 @@ class CommunityService {
         };
       }
 
-      // Return default categories if API fails
-      return {
-        categories: this.getDefaultCategories(),
-      };
+      throw new Error(response.message || "Failed to fetch categories");
     } catch (error) {
-      // Silently handle 404 errors for missing endpoints
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn(
-          "Community categories endpoint not available, using defaults",
-        );
-      } else {
-        console.error("Error fetching categories:", error);
-      }
+      console.error("Error fetching categories:", error);
+      // Fallback to default categories
       return {
         categories: this.getDefaultCategories(),
       };
@@ -454,156 +313,24 @@ class CommunityService {
       const response = await apiService.get(`${this.baseUrl}/stats`);
 
       if (response.status === "success") {
-        return {
-          stats: response.data.stats || this.getMockStats(),
-        };
+        return response.data.stats;
       }
 
-      return {
-        stats: this.getMockStats(),
-      };
+      throw new Error(response.message || "Failed to fetch stats");
     } catch (error) {
-      // Silently handle 404 errors for missing endpoints
-      if (
-        error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
-        console.warn("Community stats endpoint not available, using mock data");
-      } else {
-        console.error("Error fetching stats:", error);
-      }
-      return {
-        stats: this.getMockStats(),
-      };
+      console.error("Error fetching stats:", error);
+      throw new Error("Failed to load community statistics");
     }
   }
 
-  // Get trending posts
-  async getTrendingPosts(limit = 10) {
-    try {
-      const response = await apiService.get(
-        `${this.baseUrl}/trending?limit=${limit}`,
-      );
-
-      if (response.status === "success") {
-        return response.data.posts || [];
-      }
-
-      return [];
-    } catch (error) {
-      console.error("Error fetching trending posts:", error);
-      return [];
-    }
-  }
-
-  // Get user's bookmarked posts
-  async getBookmarkedPosts(options = {}) {
-    try {
-      const { page = 1, limit = 20 } = options;
-
-      const params = new URLSearchParams();
-      params.append("page", page);
-      params.append("limit", limit);
-
-      const response = await apiService.get(
-        `${this.baseUrl}/bookmarks?${params}`,
-      );
-
-      if (response.status === "success") {
-        return {
-          posts: response.data.posts || [],
-          hasMore: response.data.hasMore || false,
-          total: response.data.total || 0,
-        };
-      }
-
-      return {
-        posts: [],
-        hasMore: false,
-        total: 0,
-      };
-    } catch (error) {
-      console.error("Error fetching bookmarked posts:", error);
-      return {
-        posts: [],
-        hasMore: false,
-        total: 0,
-      };
-    }
-  }
-
-  // Report post or reply
-  async reportContent(targetId, type, reason, details = "") {
-    try {
-      const response = await apiService.post(`${this.baseUrl}/report`, {
-        targetId,
-        type, // "post" or "reply"
-        reason,
-        details,
-      });
-
-      if (response.status === "success") {
-        return true;
-      }
-
-      throw new Error(response.message || "Failed to submit report");
-    } catch (error) {
-      console.error("Error reporting content:", error);
-      throw error;
-    }
-  }
-
-  // Mock data for development/fallback
-  getMockPosts() {
-    return [
-      {
-        _id: "mock-1",
-        title: "Welcome to the Community!",
-        content:
-          "This is a sample post to demonstrate the community features. The backend API is not yet available, but you can see how the interface works.",
-        author: {
-          _id: "user-1",
-          username: "developer",
-          firstName: "Community",
-          lastName: "Admin",
-          avatar: null,
-          role: "admin",
-        },
-        category: "general",
-        createdAt: new Date().toISOString(),
-        reactions: [{ emoji: "👍", count: 5, users: [] }],
-        replyCount: 3,
-        views: 42,
-        tags: ["welcome", "community"],
-        isPinned: true,
-      },
-      {
-        _id: "mock-2",
-        title: "How to get started with development?",
-        content:
-          "I'm new to programming and would love some advice on where to start. What programming language should I learn first?",
-        author: {
-          _id: "user-2",
-          username: "newbie",
-          firstName: "New",
-          lastName: "Developer",
-          avatar: null,
-          role: "user",
-        },
-        category: "help",
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        reactions: [{ emoji: "👍", count: 8, users: [] }],
-        replyCount: 12,
-        views: 156,
-        tags: ["beginner", "advice"],
-        isPinned: false,
-      },
-    ];
-  }
-
-  // Helper methods for default data
+  // Helper method to get default categories
   getDefaultCategories() {
     return [
+      {
+        id: "all",
+        name: "All Categories",
+        description: "View all community posts",
+      },
       {
         id: "general",
         name: "General Discussion",
@@ -624,63 +351,12 @@ class CommunityService {
         name: "Career",
         description: "Career advice and opportunities",
       },
-      { id: "offtopic", name: "Off Topic", description: "Everything else" },
+      {
+        id: "offtopic",
+        name: "Off Topic",
+        description: "Everything else",
+      },
     ];
-  }
-
-  getMockStats() {
-    return {
-      totalPosts: 42,
-      activePosts: 8,
-      onlineUsers: 12,
-      totalUsers: 156,
-    };
-  }
-
-  getDefaultStats() {
-    return {
-      totalPosts: 0,
-      activePosts: 0,
-      onlineUsers: 0,
-      totalUsers: 0,
-    };
-  }
-
-  // Utility method to format post content for display
-  formatPostContent(content, maxLength = 300) {
-    if (!content) return "";
-
-    if (content.length <= maxLength) {
-      return content;
-    }
-
-    return content.substring(0, maxLength) + "...";
-  }
-
-  // Utility method to extract mentions from content
-  extractMentions(content) {
-    const mentionRegex = /@(\w+)/g;
-    const mentions = [];
-    let match;
-
-    while ((match = mentionRegex.exec(content)) !== null) {
-      mentions.push(match[1]);
-    }
-
-    return mentions;
-  }
-
-  // Utility method to extract hashtags from content
-  extractHashtags(content) {
-    const hashtagRegex = /#(\w+)/g;
-    const hashtags = [];
-    let match;
-
-    while ((match = hashtagRegex.exec(content)) !== null) {
-      hashtags.push(match[1]);
-    }
-
-    return hashtags;
   }
 }
 
