@@ -68,6 +68,7 @@ const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
+const Community = React.lazy(() => import("./pages/Community"));
 const DailyDrip = React.lazy(() => import("./pages/DailyDrip"));
 const Stories = React.lazy(() => import("./pages/Stories"));
 const StoryDetails = React.lazy(() => import("./pages/StoryDetails"));
@@ -254,10 +255,20 @@ const AppLayout = () => {
 
             {/* Community Forum */}
             <Route
-              path="/community"
+              path="/forum"
               element={
                 <PrivateRoute>
                   <CommunityForum />
+                </PrivateRoute>
+              }
+            />
+
+            {/* Community Discussions */}
+            <Route
+              path="/community"
+              element={
+                <PrivateRoute>
+                  <Community />
                 </PrivateRoute>
               }
             />
