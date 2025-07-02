@@ -174,6 +174,9 @@ export const updateProfile = async (req, res, next) => {
       "avatar",
       "socialLinks",
       "preferences",
+      "profileVisibility",
+      "privacySettings",
+      "notificationSettings",
     ];
     const updates = {};
 
