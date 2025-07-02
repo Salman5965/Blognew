@@ -54,12 +54,6 @@ const Community = () => {
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
   const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
-  const [communityStats, setCommunityStats] = useState({
-    totalPosts: 0,
-    activePosts: 0,
-    onlineUsers: 0,
-    totalUsers: 0,
-  });
 
   // Real-time connection state
   const [isConnected, setIsConnected] = useState(true);
