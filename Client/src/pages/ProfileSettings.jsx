@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -440,8 +441,11 @@ const ProfileSettings = () => {
                     </div>
                     <div className="text-xs text-muted-foreground">Stories</div>
                   </div>
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                  <button
+                    className="text-center p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/users/${user._id}/followers`)}
+                  >
+                    <div className="text-lg font-bold text-primary">
                       {statsLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       ) : (
@@ -451,9 +455,12 @@ const ProfileSettings = () => {
                     <div className="text-xs text-muted-foreground">
                       Followers
                     </div>
-                  </div>
-                  <div className="text-center p-3 bg-muted/50 rounded-lg">
-                    <div className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                  </button>
+                  <button
+                    className="text-center p-3 bg-muted/50 rounded-lg hover:bg-muted/70 transition-colors cursor-pointer"
+                    onClick={() => navigate(`/users/${user._id}/following`)}
+                  >
+                    <div className="text-lg font-bold text-primary">
                       {statsLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       ) : (
@@ -463,7 +470,7 @@ const ProfileSettings = () => {
                     <div className="text-xs text-muted-foreground">
                       Following
                     </div>
-                  </div>
+                  </button>
                 </div>
 
                 <div className="flex items-center justify-center md:justify-start text-sm text-muted-foreground">
