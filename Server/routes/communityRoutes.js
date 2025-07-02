@@ -13,7 +13,7 @@ import {
   deletePost,
   deleteReply,
 } from "../controllers/communityController.js";
-import { protect } from "../middlewares/authMiddleware.js";
+import { protect } from "../middlewares/auth.js";
 import { rateLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
