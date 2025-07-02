@@ -380,7 +380,7 @@ const ProfileSettings = () => {
         )}
 
         {/* Profile Overview Card */}
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
+        <Card>
           <CardContent className="pt-6">
             <div className="flex flex-col md:flex-row gap-6 items-center">
               {/* Profile Image */}
@@ -391,7 +391,7 @@ const ProfileSettings = () => {
                     alt="Profile picture"
                     className="object-cover"
                   />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xl font-bold">
                     {getInitials(profileForm.firstName, profileForm.lastName)}
                   </AvatarFallback>
                 </Avatar>
@@ -419,8 +419,8 @@ const ProfileSettings = () => {
                 </div>
 
                 {/* Quick Stats */}
-                <div className="grid grid-cols-3 gap-4 max-w-md mx-auto md:mx-0">
-                  <div className="text-center p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+                <div className="grid grid-cols-4 gap-4 max-w-lg mx-auto md:mx-0">
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
                       {statsLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin mx-auto" />
@@ -428,29 +428,41 @@ const ProfileSettings = () => {
                         userStats?.blogs?.totalBlogs || 0
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground">Blogs</div>
+                    <div className="text-xs text-muted-foreground">Blogs</div>
                   </div>
-                  <div className="text-center p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <div className="text-lg font-bold text-green-600 dark:text-green-400">
+                      {statsLoading ? (
+                        <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                      ) : (
+                        userStats?.stories?.totalStories || 0
+                      )}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Stories</div>
+                  </div>
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                    <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
                       {statsLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       ) : (
                         followStats?.followersCount || 0
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-xs text-muted-foreground">
                       Followers
                     </div>
                   </div>
-                  <div className="text-center p-3 bg-white/50 dark:bg-black/20 rounded-lg">
-                    <div className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                  <div className="text-center p-3 bg-muted/50 rounded-lg">
+                    <div className="text-lg font-bold text-orange-600 dark:text-orange-400">
                       {statsLoading ? (
                         <Loader2 className="h-5 w-5 animate-spin mx-auto" />
                       ) : (
-                        (userStats?.blogs?.totalViews || 0).toLocaleString()
+                        followStats?.followingCount || 0
                       )}
                     </div>
-                    <div className="text-sm text-muted-foreground">Views</div>
+                    <div className="text-xs text-muted-foreground">
+                      Following
+                    </div>
                   </div>
                 </div>
 
