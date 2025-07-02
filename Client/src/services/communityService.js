@@ -41,15 +41,20 @@ class CommunityService {
       console.error("Error fetching posts:", error);
 
       // Check if it's a 404 (endpoint doesn't exist) and provide graceful fallback
-      if (
+      // Handle different error formats from axios and custom API errors
+      const is404Error =
         error.response?.status === 404 ||
-        error.message?.includes("Not Found")
-      ) {
+        error.status === 404 ||
+        error.message?.includes("Not Found") ||
+        error.message?.includes("404") ||
+        (error.code && error.code.includes("404"));
+
+      if (is404Error) {
         console.warn("Community posts endpoint not available, using mock data");
         return {
           posts: this.getMockPosts(),
           hasMore: false,
-          total: 0,
+          total: 2, // Number of mock posts
           page: 1,
         };
       }
