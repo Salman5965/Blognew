@@ -34,6 +34,7 @@ import {
   BookOpen,
   HelpCircle,
 } from "lucide-react";
+import { iconColors } from "@/utils/iconColors";
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuthContext();
@@ -181,7 +182,9 @@ export const Navbar = () => {
           {/* Enhanced Search Bar */}
           <div className="flex-1 max-w-md mx-8">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-blue-600 dark:text-blue-400" />
+              <Search
+                className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${iconColors.info}`}
+              />
               <Input
                 placeholder="Search users, blogs, stories, everything..."
                 className="pl-10 pr-4"
@@ -360,7 +363,7 @@ export const Navbar = () => {
                   onClick={handleCreatePost}
                   className="hidden md:flex items-center space-x-2"
                 >
-                  <Plus className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <Plus className={`h-4 w-4 ${iconColors.success}`} />
                   <span>Create</span>
                 </Button>
 
@@ -371,7 +374,7 @@ export const Navbar = () => {
                   className="relative hidden md:flex"
                   onClick={() => navigate("/notifications")}
                 >
-                  <Bell className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                  <Bell className={`h-4 w-4 ${iconColors.notification}`} />
                   {unreadNotifications > 0 && (
                     <Badge
                       variant="destructive"
@@ -389,7 +392,7 @@ export const Navbar = () => {
                   className="relative hidden md:flex"
                   onClick={() => navigate("/messages")}
                 >
-                  <MessageCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <MessageCircle className={`h-4 w-4 ${iconColors.message}`} />
                   {unreadMessages > 0 && (
                     <Badge
                       variant="destructive"

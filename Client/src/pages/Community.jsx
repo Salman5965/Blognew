@@ -30,6 +30,7 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
+import { iconColors } from "@/utils/iconColors";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -260,7 +261,7 @@ const Community = () => {
         <div className="border rounded-lg p-6 bg-card">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold flex items-center">
-              <MessageSquare className="h-8 w-8 mr-3 text-primary" />
+              <MessageSquare className={`h-8 w-8 mr-3 ${iconColors.primary}`} />
               Community Discussions
             </h1>
             <p className="text-muted-foreground">
