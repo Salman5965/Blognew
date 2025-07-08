@@ -49,14 +49,11 @@ export const FollowersPage = () => {
 
         // Load follow stats - continue even if user profile failed
         try {
-          const [followersResponse, followingResponse] = await Promise.all([
-            userService.getFollowers(userId, { page: 1, limit: 1 }),
-            userService.getFollowing(userId, { page: 1, limit: 1 }),
-          ]);
-
+          const followStatsResponse =
+            await followService.getFollowStats(userId);
           setFollowStats({
-            followersCount: followersResponse.pagination?.totalFollowers || 0,
-            followingCount: followingResponse.pagination?.totalFollowing || 0,
+            followersCount: followStatsResponse.followersCount || 0,
+            followingCount: followStatsResponse.followingCount || 0,
           });
         } catch (followError) {
           console.warn("Failed to load follow stats:", followError);
