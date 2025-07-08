@@ -90,8 +90,9 @@ router.post(
       const userId = req.user.id;
 
       // For now, treat all item types the same way as blogs
-      // In the future, you could add specific logic for different item types
-      const result = await Bookmark.toggleBookmark(itemId, userId, collection);
+      // Map itemId to blogId for the Bookmark model
+      const blogId = itemId;
+      const result = await Bookmark.toggleBookmark(blogId, userId, collection);
 
       res.status(200).json({
         status: "success",
