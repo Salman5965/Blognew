@@ -80,13 +80,16 @@ export const CommentNew = ({
       // Create notification for comment author (if not replying to self)
       if (authorId !== userId) {
         try {
-          await notificationService.createNotification({
+          const result = await notificationService.createNotification({
             recipientId: authorId,
             type: "comment_reply",
             title: "New reply to your comment",
             message: `${user.username} replied to your comment`,
             data: { commentId, blogId: comment.blog },
           });
+          if (!result.success) {
+            console.error("Failed to create notification:", result.error);
+          }
         } catch (notifError) {
           console.error("Failed to create notification:", notifError);
         }
@@ -96,13 +99,19 @@ export const CommentNew = ({
       for (const mentionedUser of mentionedUsers) {
         if (mentionedUser._id !== userId) {
           try {
-            await notificationService.createNotification({
+            const result = await notificationService.createNotification({
               recipientId: mentionedUser._id,
               type: "mention",
               title: "You were mentioned in a reply",
               message: `${user.username} mentioned you in a reply`,
               data: { commentId, blogId: comment.blog },
             });
+            if (!result.success) {
+              console.error(
+                "Failed to create mention notification:",
+                result.error,
+              );
+            }
           } catch (notifError) {
             console.error("Failed to create mention notification:", notifError);
           }
@@ -142,13 +151,16 @@ export const CommentNew = ({
       // Create notification for comment author (if not liking own comment)
       if (authorId !== userId && !isLiked) {
         try {
-          await notificationService.createNotification({
+          const result = await notificationService.createNotification({
             recipientId: authorId,
             type: "comment_like",
             title: "Someone liked your comment",
             message: `${user.username} liked your comment`,
             data: { commentId, blogId: comment.blog },
           });
+          if (!result.success) {
+            console.error("Failed to create like notification:", result.error);
+          }
         } catch (notifError) {
           console.error("Failed to create like notification:", notifError);
         }
