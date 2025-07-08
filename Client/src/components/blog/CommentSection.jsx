@@ -1,13 +1,14 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Comment } from "./Comment";
+import { CommentNew } from "./CommentNew";
+import { UserMention } from "@/components/shared/UserMention";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { ROUTES } from "@/utils/constant";
 import apiService from "@/services/api";
+import notificationService from "@/services/notificationService";
 import {
   MessageCircle,
   Loader2,
@@ -15,6 +16,8 @@ import {
   RefreshCw,
   SortAsc,
   SortDesc,
+  AtSign,
+  Heart,
 } from "lucide-react";
 import {
   Select,
@@ -24,7 +27,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const CommentSection = ({ blogId, allowComments = true }) => {
+export const CommentSection = ({
+  blogId,
+  allowComments = true,
+  blogAuthorId,
+}) => {
   const { user, isAuthenticated } = useAuthContext();
   const navigate = useNavigate();
 
@@ -34,6 +41,9 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
   const [error, setError] = useState(null);
   const [newComment, setNewComment] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
+  const [showMention, setShowMention] = useState(false);
+  const [mentionedUsers, setMentionedUsers] = useState([]);
+  const [totalLikes, setTotalLikes] = useState(0);
 
   useEffect(() => {
     if (blogId) {
@@ -51,7 +61,23 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       );
 
       if (response.status === "success") {
-        setComments(response.data.comments || []);
+        const commentsData = response.data.comments || [];
+        setComments(commentsData);
+
+        // Calculate total likes across all comments and replies
+        const calculateTotalLikes = (comments) => {
+          return comments.reduce((total, comment) => {
+            const commentLikes = comment.likes?.length || 0;
+            const replyLikes =
+              comment.replies?.reduce(
+                (replyTotal, reply) => replyTotal + (reply.likes?.length || 0),
+                0,
+              ) || 0;
+            return total + commentLikes + replyLikes;
+          }, 0);
+        };
+
+        setTotalLikes(calculateTotalLikes(commentsData));
       } else {
         throw new Error(response.message || "Failed to fetch comments");
       }
@@ -82,8 +108,45 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
 
       if (response.status === "success") {
         setNewComment("");
+        setMentionedUsers([]);
+
         // Add new comment to the beginning of the list
         setComments((prev) => [response.data.comment, ...prev]);
+
+        // Create notification for blog author (if not commenting on own blog)
+        if (blogAuthorId && blogAuthorId !== (user._id || user.id)) {
+          try {
+            await notificationService.createNotification({
+              recipientId: blogAuthorId,
+              type: "comment",
+              title: "New comment on your blog",
+              message: `${user.username} commented on your blog`,
+              data: { commentId: response.data.comment._id, blogId },
+            });
+          } catch (notifError) {
+            console.error("Failed to create notification:", notifError);
+          }
+        }
+
+        // Create notifications for mentioned users
+        for (const mentionedUser of mentionedUsers) {
+          if (mentionedUser._id !== (user._id || user.id)) {
+            try {
+              await notificationService.createNotification({
+                recipientId: mentionedUser._id,
+                type: "mention",
+                title: "You were mentioned in a comment",
+                message: `${user.username} mentioned you in a comment`,
+                data: { commentId: response.data.comment._id, blogId },
+              });
+            } catch (notifError) {
+              console.error(
+                "Failed to create mention notification:",
+                notifError,
+              );
+            }
+          }
+        }
       } else {
         throw new Error(response.message || "Failed to post comment");
       }
@@ -144,6 +207,16 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       throw new Error(response.message || "Failed to delete comment");
     }
   };
+
+  const handleMention = (user) => {
+    const newMention = `@${user.username} `;
+    setNewComment((prev) => prev + newMention);
+    setMentionedUsers((prev) => [
+      ...prev.filter((u) => u._id !== user._id),
+      user,
+    ]);
+    setShowMention(false);
+  };
   const handleLikeComment = async (commentId) => {
     const response = await apiService.post(`/comments/${commentId}/like`);
 
@@ -178,7 +251,15 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Comments ({comments.length})</h2>
+        <div className="flex items-center space-x-4">
+          <h2 className="text-2xl font-bold">Comments ({comments.length})</h2>
+          {totalLikes > 0 && (
+            <div className="flex items-center space-x-1 text-muted-foreground">
+              <Heart className="h-4 w-4" />
+              <span className="text-sm">{totalLikes} likes</span>
+            </div>
+          )}
+        </div>
 
         <div className="flex items-center space-x-2">
           <Select value={sortOrder} onValueChange={setSortOrder}>
@@ -217,13 +298,31 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
       {/* Comment Form */}
       {isAuthenticated ? (
         <div className="space-y-3">
-          <Textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Share your thoughts..."
-            className="min-h-[100px] resize-none"
-            maxLength={1000}
-          />
+          <div className="relative">
+            <Textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Share your thoughts..."
+              className="min-h-[100px] resize-none pr-12"
+              maxLength={1000}
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowMention(!showMention)}
+              className="absolute top-2 right-2 h-8 w-8 p-0"
+            >
+              <AtSign className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {showMention && (
+            <UserMention
+              onMention={handleMention}
+              className="border rounded-md p-3 bg-muted/50"
+            />
+          )}
+
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
               {newComment.length}/1000 characters
@@ -265,9 +364,9 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
           <span>Loading comments...</span>
         </div>
       ) : comments.length > 0 ? (
-        <div className="space-y-6">
+        <div className="space-y-2">
           {comments.map((comment) => (
-            <Comment
+            <CommentNew
               key={comment._id || comment.id}
               comment={comment}
               onReply={handleReply}
@@ -275,6 +374,7 @@ export const CommentSection = ({ blogId, allowComments = true }) => {
               onDelete={handleDeleteComment}
               onLike={handleLikeComment}
               canModerate={user?.role === "admin"}
+              blogAuthorId={blogAuthorId}
             />
           ))}
         </div>
