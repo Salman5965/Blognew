@@ -215,56 +215,64 @@ export const InstagramComment = ({
             )}
           </div>
 
-          {/* Reply Form */}
+          {/* Reply Form - Consistent styling with main comment form */}
           {isReplying && (
-            <div className="mt-3 space-y-2">
+            <div className="mt-3 space-y-3 animate-in slide-in-from-top-2 duration-200">
               <Textarea
                 value={replyContent}
                 onChange={(e) => setReplyContent(e.target.value)}
                 placeholder="Write a reply..."
-                className="min-h-[60px] text-sm border-0 bg-muted/50 resize-none"
+                className="min-h-[60px] text-sm border-0 bg-muted/50 resize-none rounded-lg p-3 focus:bg-muted/70 transition-colors"
                 autoFocus
               />
-              <div className="flex items-center space-x-2">
-                <Button
-                  size="sm"
-                  onClick={handleReply}
-                  disabled={isSubmitting || !replyContent.trim()}
-                  className="h-7 px-3 text-xs"
-                >
-                  {isSubmitting ? (
-                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                  ) : null}
-                  Reply
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setIsReplying(false);
-                    setReplyContent("");
-                  }}
-                  className="h-7 px-3 text-xs"
-                >
-                  Cancel
-                </Button>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
+                  {replyContent.length}/1000
+                </span>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setIsReplying(false);
+                      setReplyContent("");
+                    }}
+                    className="h-7 px-3 text-xs"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleReply}
+                    disabled={isSubmitting || !replyContent.trim()}
+                    className="h-7 px-3 text-xs"
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                    ) : null}
+                    Reply
+                  </Button>
+                </div>
               </div>
             </div>
           )}
 
-          {/* View Replies Button */}
+          {/* View Replies Button - Only show if replies exist */}
           {!isReply && comment.replies && comment.replies.length > 0 && (
             <div className="mt-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowReplies(!showReplies)}
-                className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground font-medium"
+                className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground font-medium transition-colors duration-200"
               >
                 {showReplies ? (
                   <>Hide replies</>
                 ) : (
-                  <>View replies ({comment.replies.length})</>
+                  <>
+                    View replies (
+                    {comment.repliesCount || comment.replies.length})
+                  </>
                 )}
               </Button>
             </div>
