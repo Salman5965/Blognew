@@ -278,12 +278,14 @@ export const InstagramComment = ({
             </div>
           )}
 
-          {/* Collapsible Replies */}
-          {!isReply &&
-            showReplies &&
-            comment.replies &&
-            comment.replies.length > 0 && (
-              <div className="mt-3 ml-6 space-y-3 border-l-2 border-border/30 pl-4">
+          {/* Collapsible Replies with Smooth Animation */}
+          {!isReply && comment.replies && comment.replies.length > 0 && (
+            <div
+              className={`mt-3 overflow-hidden transition-all duration-300 ease-in-out ${
+                showReplies ? "max-h-none opacity-100" : "max-h-0 opacity-0"
+              }`}
+            >
+              <div className="ml-6 space-y-2 border-l-2 border-border/30 pl-4 pt-2">
                 {comment.replies.map((reply) => (
                   <InstagramComment
                     key={reply._id || reply.id}
@@ -295,7 +297,8 @@ export const InstagramComment = ({
                   />
                 ))}
               </div>
-            )}
+            </div>
+          )}
         </div>
       </div>
     </div>
