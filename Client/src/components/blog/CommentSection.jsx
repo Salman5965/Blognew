@@ -51,11 +51,32 @@ export const CommentSection = ({
       setError(null);
 
       const response = await apiService.get(
-        `/comments/blog/${blogId}?sort=${sortOrder}`,
+        `/comments/blog/${blogId}?sort=${sortOrder}&includeReplies=true`,
       );
 
       if (response.status === "success") {
-        setComments(response.data.comments || []);
+        const commentsData = response.data.comments || [];
+
+        // Structure comments with threaded replies
+        const structuredComments = commentsData
+          .filter((comment) => !comment.parentId) // Get top-level comments only
+          .map((comment) => ({
+            ...comment,
+            replies: commentsData
+              .filter((reply) => reply.parentId === (comment._id || comment.id))
+              .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
+            repliesCount: commentsData.filter(
+              (reply) => reply.parentId === (comment._id || comment.id),
+            ).length,
+          }))
+          .sort((a, b) => {
+            if (sortOrder === "newest") {
+              return new Date(b.createdAt) - new Date(a.createdAt);
+            }
+            return new Date(a.createdAt) - new Date(b.createdAt);
+          });
+
+        setComments(structuredComments);
       } else {
         throw new Error(response.message || "Failed to fetch comments");
       }
@@ -121,17 +142,54 @@ export const CommentSection = ({
   const handleReply = async (parentCommentId, content) => {
     if (!content.trim()) return;
 
-    const response = await apiService.post("/comments", {
-      content: content.trim(),
-      blog: blogId,
-      parentComment: parentCommentId,
-    });
+    try {
+      const response = await apiService.post("/comments", {
+        content: content.trim(),
+        blog: blogId,
+        parentId: parentCommentId, // Use parentId for threaded structure
+      });
 
-    if (response.status === "success") {
-      // Refresh comments to show the new reply
-      fetchComments();
-    } else {
-      throw new Error(response.message || "Failed to post reply");
+      if (response.status === "success") {
+        // Update comments state to include the new reply
+        setComments((prevComments) =>
+          prevComments.map((comment) => {
+            if ((comment._id || comment.id) === parentCommentId) {
+              return {
+                ...comment,
+                replies: [...(comment.replies || []), response.data.comment],
+                repliesCount: (comment.repliesCount || 0) + 1,
+              };
+            }
+            return comment;
+          }),
+        );
+
+        // Create notification for parent comment author
+        const parentComment = comments.find(
+          (c) => (c._id || c.id) === parentCommentId,
+        );
+        if (
+          parentComment &&
+          parentComment.author._id !== (user._id || user.id)
+        ) {
+          try {
+            await notificationService.createNotification({
+              recipientId: parentComment.author._id,
+              type: "comment_reply",
+              title: "New reply to your comment",
+              message: `${user.username} replied to your comment`,
+              data: { commentId: parentCommentId, blogId },
+            });
+          } catch (notifError) {
+            console.error("Failed to create reply notification:", notifError);
+          }
+        }
+      } else {
+        throw new Error(response.message || "Failed to post reply");
+      }
+    } catch (error) {
+      console.error("Error posting reply:", error);
+      throw error;
     }
   };
 
