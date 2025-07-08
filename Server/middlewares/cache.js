@@ -1,7 +1,46 @@
-import NodeCache from "node-cache";
+// Simple in-memory cache implementation
+class SimpleCache {
+  constructor() {
+    this.cache = new Map();
+    this.timers = new Map();
+  }
 
-// Create cache instance with 5 minute TTL
-const cache = new NodeCache({ stdTTL: 300, checkperiod: 60 });
+  set(key, value, ttl = 300) {
+    // Clear existing timer
+    if (this.timers.has(key)) {
+      clearTimeout(this.timers.get(key));
+    }
+
+    // Set value
+    this.cache.set(key, value);
+
+    // Set expiration timer
+    const timer = setTimeout(() => {
+      this.cache.delete(key);
+      this.timers.delete(key);
+    }, ttl * 1000);
+
+    this.timers.set(key, timer);
+  }
+
+  get(key) {
+    return this.cache.get(key);
+  }
+
+  keys() {
+    return Array.from(this.cache.keys());
+  }
+
+  del(key) {
+    if (this.timers.has(key)) {
+      clearTimeout(this.timers.get(key));
+      this.timers.delete(key);
+    }
+    return this.cache.delete(key);
+  }
+}
+
+const cache = new SimpleCache();
 
 // Simple response caching middleware
 export const cacheResponse = (duration = 300) => {
