@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { CommentNew } from "./CommentNew";
-import { UserMention } from "@/components/shared/UserMention";
+import { InstagramComment } from "./InstagramComment";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { ROUTES } from "@/utils/constant";
 import apiService from "@/services/api";
@@ -16,8 +15,6 @@ import {
   RefreshCw,
   SortAsc,
   SortDesc,
-  AtSign,
-  Heart,
 } from "lucide-react";
 import {
   Select,
@@ -41,9 +38,6 @@ export const CommentSection = ({
   const [error, setError] = useState(null);
   const [newComment, setNewComment] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
-  const [showMention, setShowMention] = useState(false);
-  const [mentionedUsers, setMentionedUsers] = useState([]);
-  const [totalLikes, setTotalLikes] = useState(0);
 
   useEffect(() => {
     if (blogId) {
@@ -299,45 +293,26 @@ export const CommentSection = ({
       {/* Comment Form */}
       {isAuthenticated ? (
         <div className="space-y-3">
-          <div className="relative">
-            <Textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Share your thoughts..."
-              className="min-h-[100px] resize-none pr-12"
-              maxLength={1000}
-            />
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowMention(!showMention)}
-              className="absolute top-2 right-2 h-8 w-8 p-0"
-            >
-              <AtSign className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {showMention && (
-            <UserMention
-              onMention={handleMention}
-              className="border rounded-md p-3 bg-muted/50"
-            />
-          )}
-
+          <Textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="min-h-[80px] resize-none border-0 bg-muted/50 text-sm"
+            maxLength={1000}
+          />
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
-              {newComment.length}/1000 characters
+              {newComment.length}/1000
             </span>
             <Button
               onClick={handleSubmitComment}
               disabled={isSubmitting || !newComment.trim()}
+              size="sm"
             >
               {isSubmitting ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <MessageCircle className="h-4 w-4 mr-2" />
-              )}
-              Post Comment
+              ) : null}
+              Post
             </Button>
           </div>
         </div>
@@ -365,17 +340,15 @@ export const CommentSection = ({
           <span>Loading comments...</span>
         </div>
       ) : comments.length > 0 ? (
-        <div className="space-y-2">
+        <div className="space-y-1">
           {comments.map((comment) => (
-            <CommentNew
+            <InstagramComment
               key={comment._id || comment.id}
               comment={comment}
               onReply={handleReply}
               onEdit={handleEditComment}
               onDelete={handleDeleteComment}
-              onLike={handleLikeComment}
               canModerate={user?.role === "admin"}
-              blogAuthorId={blogAuthorId}
             />
           ))}
         </div>
