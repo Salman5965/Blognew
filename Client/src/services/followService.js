@@ -216,11 +216,18 @@ class FollowService {
         return response.data;
       }
 
-      throw new Error(response.message || "Failed to fetch follow stats");
+      // If response is not successful, return default stats
+      return {
+        followersCount: 0,
+        followingCount: 0,
+        mutualFollowsCount: 0,
+        isFollowing: false,
+        isFollowedBy: false,
+      };
     } catch (error) {
       console.error("Error fetching follow stats:", error);
 
-      // Return default stats with better structure
+      // Always return default stats instead of throwing
       return {
         followersCount: 0,
         followingCount: 0,

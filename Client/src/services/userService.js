@@ -34,21 +34,20 @@ class UserService {
       if (response.status === "success") {
         return response.data;
       }
-      throw new Error(response.message || "Failed to fetch user");
+      // If response is not successful, return null (will be handled by UserProfile)
+      return null;
     } catch (error) {
-      // Handle specific error types
+      console.error("Error fetching user:", error);
+
+      // For debugging - log the specific error
       if (error.response?.status === 404) {
-        throw new Error("User not found");
-      } else if (error.response?.status === 400) {
-        throw new Error("Invalid user identifier");
-      } else if (error.response?.status >= 500) {
-        throw new Error("Server error. Please try again later.");
-      } else if (error.message === "Network Error") {
-        throw new Error("Network error. Please check your connection.");
+        console.warn(
+          "User not found - this might be expected for username lookup",
+        );
       }
 
-      // Re-throw the original error if it's already a custom error
-      throw error;
+      // Return null instead of throwing - let the calling component handle it
+      return null;
     }
   }
 
