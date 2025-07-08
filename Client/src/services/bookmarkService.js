@@ -92,16 +92,22 @@ class BookmarkService {
   // Toggle bookmark status
   async toggleBookmark(blogId) {
     try {
-      const isCurrentlyBookmarked = await this.isBookmarked(blogId);
+      const response = await apiService.post(`/bookmarks`, {
+        itemId: blogId,
+        itemType: "blog",
+        collection: "default",
+      });
 
-      if (isCurrentlyBookmarked) {
-        await this.removeBookmark(blogId);
-        return { bookmarked: false };
-      } else {
-        await this.addBookmark(blogId);
-        return { bookmarked: true };
+      if (response.status === "success") {
+        return {
+          bookmarked: response.data.isBookmarked,
+          collection: response.data.collection,
+        };
       }
+
+      throw new Error(response.message || "Failed to toggle bookmark");
     } catch (error) {
+      console.error("Error toggling bookmark:", error);
       throw new Error("Failed to toggle bookmark");
     }
   }
