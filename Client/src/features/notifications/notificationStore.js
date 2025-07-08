@@ -17,6 +17,8 @@ const useNotificationStore = create((set, get) => ({
   },
   preferences: null,
   isPreferencesLoading: false,
+  realtimeAlerts: [], // For showing toast notifications
+  lastNotificationCheck: null,
 
   // Actions
 
