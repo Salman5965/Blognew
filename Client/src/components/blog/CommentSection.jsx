@@ -108,32 +108,6 @@ export const CommentSection = ({
             console.error("Failed to create notification:", notifError);
           }
         }
-
-        // Create notifications for mentioned users
-        for (const mentionedUser of mentionedUsers) {
-          if (mentionedUser._id !== (user._id || user.id)) {
-            try {
-              const result = await notificationService.createNotification({
-                recipientId: mentionedUser._id,
-                type: "mention",
-                title: "You were mentioned in a comment",
-                message: `${user.username} mentioned you in a comment`,
-                data: { commentId: response.data.comment._id, blogId },
-              });
-              if (!result.success) {
-                console.error(
-                  "Failed to create mention notification:",
-                  result.error,
-                );
-              }
-            } catch (notifError) {
-              console.error(
-                "Failed to create mention notification:",
-                notifError,
-              );
-            }
-          }
-        }
       } else {
         throw new Error(response.message || "Failed to post comment");
       }
