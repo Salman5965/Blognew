@@ -116,13 +116,16 @@ export const CommentSection = ({
         // Create notification for blog author (if not commenting on own blog)
         if (blogAuthorId && blogAuthorId !== (user._id || user.id)) {
           try {
-            await notificationService.createNotification({
+            const result = await notificationService.createNotification({
               recipientId: blogAuthorId,
               type: "comment",
               title: "New comment on your blog",
               message: `${user.username} commented on your blog`,
               data: { commentId: response.data.comment._id, blogId },
             });
+            if (!result.success) {
+              console.error("Failed to create notification:", result.error);
+            }
           } catch (notifError) {
             console.error("Failed to create notification:", notifError);
           }
@@ -132,13 +135,19 @@ export const CommentSection = ({
         for (const mentionedUser of mentionedUsers) {
           if (mentionedUser._id !== (user._id || user.id)) {
             try {
-              await notificationService.createNotification({
+              const result = await notificationService.createNotification({
                 recipientId: mentionedUser._id,
                 type: "mention",
                 title: "You were mentioned in a comment",
                 message: `${user.username} mentioned you in a comment`,
                 data: { commentId: response.data.comment._id, blogId },
               });
+              if (!result.success) {
+                console.error(
+                  "Failed to create mention notification:",
+                  result.error,
+                );
+              }
             } catch (notifError) {
               console.error(
                 "Failed to create mention notification:",
