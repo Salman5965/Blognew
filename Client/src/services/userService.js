@@ -92,16 +92,30 @@ class UserService {
         }
       }
       if (response.status === "success") {
-        return response.data.stats;
+        return response.data.stats || response.data;
       }
-      throw new Error(response.message || "Failed to fetch user stats");
+
+      // Return default stats if response is not successful
+      return {
+        blogsCount: 0,
+        storiesCount: 0,
+        totalViews: 0,
+        totalLikes: 0,
+        followerCount: 0,
+        followingCount: 0,
+      };
     } catch (error) {
-      if (error.response?.status === 404) {
-        throw new Error("User not found");
-      } else if (error.response?.status >= 500) {
-        throw new Error("Server error. Please try again later.");
-      }
-      throw error;
+      console.error("Error fetching user stats:", error);
+
+      // Always return default stats instead of throwing
+      return {
+        blogsCount: 0,
+        storiesCount: 0,
+        totalViews: 0,
+        totalLikes: 0,
+        followerCount: 0,
+        followingCount: 0,
+      };
     }
   }
 
