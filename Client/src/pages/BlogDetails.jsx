@@ -248,7 +248,7 @@ export const BlogDetails = () => {
               )}
             </div>
 
-            <BlogMeta blog={currentBlog} />
+            <BlogMeta blog={currentBlog} showActions={false} />
           </header>
 
           {/* Content */}
