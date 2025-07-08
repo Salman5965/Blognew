@@ -79,13 +79,24 @@ export const UserProfile = () => {
         blogService.getUserBlogs(userId, { limit: 20, status: "published" }),
       ]);
 
+      // Check if user data was found
+      if (!userData) {
+        setError("User not found");
+        toast({
+          title: "User Not Found",
+          description: "The user profile you're looking for doesn't exist.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       setUser(userData);
       setUserStats(stats);
       setFollowStats(followStatsData);
       setUserBlogs(blogsData.blogs || blogsData.data || []);
     } catch (error) {
       console.error("Error loading user data:", error);
-      setError(error.message);
+      setError(error.message || "Failed to load user profile");
       toast({
         title: "Error",
         description: "Failed to load user profile",
