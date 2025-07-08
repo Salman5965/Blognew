@@ -4,17 +4,10 @@ import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FollowersList } from "@/components/users/FollowersList";
-import { FollowSuggestions } from "@/components/users/FollowSuggestions";
 import { userService } from "@/services/userService";
 import { followService } from "@/services/followService";
 import { ROUTES } from "@/utils/constant";
-import {
-  ArrowLeft,
-  Users,
-  UserCheck,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+import { Users, UserCheck, Loader2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { isValidObjectId } from "@/utils/validation";
 
@@ -166,16 +159,6 @@ export const FollowersPage = () => {
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-start space-x-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="flex-shrink-0"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-
           <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
             <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">
               <AvatarImage src={user.avatar} alt={user.username} />
@@ -241,16 +224,8 @@ export const FollowersPage = () => {
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
-          {/* Main Content */}
-          <div className="xl:col-span-3">
-            <FollowersList userId={userId} />
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <FollowSuggestions limit={4} />
-          </div>
+        <div className="w-full">
+          <FollowersList userId={userId} />
         </div>
       </div>
     </PageWrapper>
