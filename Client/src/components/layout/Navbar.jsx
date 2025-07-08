@@ -363,6 +363,40 @@ export const Navbar = () => {
                                   </p>
                                 </div>
                               </>
+                            ) : result.type === "dailydrip" ? (
+                              <>
+                                <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                                  <MessageCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">
+                                    {result.title || "Daily Drip"}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    Community • Daily Drip
+                                  </p>
+                                </div>
+                              </>
+                            ) : null}
+                          </div>
+                        </div>
+                      );
+                                <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                                  <BookOpen className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">
+                                    {result.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    By{" "}
+                                    {result.author?.firstName ||
+                                      result.author?.username ||
+                                      "Unknown"}{" "}
+                                    • Story
+                                  </p>
+                                </div>
+                              </>
                             ) : (
                               <>
                                 <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
