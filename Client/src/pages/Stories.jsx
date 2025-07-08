@@ -201,6 +201,26 @@ const Stories = () => {
         });
       } catch (error) {
         console.error("Share failed:", error);
+
+        // If Web Share API fails, fallback to clipboard
+        if (error.name !== "AbortError") {
+          try {
+            await navigator.clipboard.writeText(shareUrl);
+            toast({
+              title: "Link Copied",
+              description:
+                "Share dialog failed, but story link copied to clipboard!",
+            });
+          } catch (clipboardError) {
+            console.error("Copy failed:", clipboardError);
+            toast({
+              title: "Share Failed",
+              description:
+                "Unable to share or copy link. Please copy the URL manually.",
+              variant: "destructive",
+            });
+          }
+        }
       }
     } else {
       try {
@@ -211,6 +231,12 @@ const Stories = () => {
         });
       } catch (error) {
         console.error("Copy failed:", error);
+        toast({
+          title: "Copy Failed",
+          description:
+            "Unable to copy link to clipboard. Please copy the URL manually.",
+          variant: "destructive",
+        });
       }
     }
   };
