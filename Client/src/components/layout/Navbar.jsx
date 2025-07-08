@@ -155,18 +155,13 @@ export const Navbar = () => {
         console.error("Search failed:", error);
 
         // Handle rate limiting gracefully
-        if (
-          error.message?.includes("Too many requests") ||
-          error.status === 429
-        ) {
-          setSearchResults([
-            {
-              type: "error",
-              id: "rate-limit",
-              title: "Search rate limited",
-              message: "Please slow down your search. Try again in a moment.",
-            },
-          ]);
+        if (error.message?.includes("Too many requests") || error.status === 429) {
+          setSearchResults([{
+            type: "error",
+            id: "rate-limit",
+            title: "Search rate limited",
+            message: "Please slow down your search. Try again in a moment."
+          }]);
         } else {
           setSearchResults([]);
         }
@@ -271,32 +266,50 @@ export const Navbar = () => {
                     </div>
                   ) : searchResults.length > 0 ? (
                     <div className="py-2">
-                      {searchResults.map((result, index) => (
-                        <div
-                          key={`${result.type}-${result.id || result._id}-${index}`}
-                          className="px-4 py-3 hover:bg-muted cursor-pointer border-b last:border-b-0"
-                          onClick={() => {
-                            setShowSearchResults(false);
-                            switch (result.type) {
-                              case "user":
-                                navigate(`/users/${result.id || result._id}`);
-                                break;
-                              case "blog":
-                                navigate(
-                                  `/blog/${result.slug || result.id || result._id}`,
-                                );
-                                break;
-                              case "story":
-                                navigate(`/stories/${result.id || result._id}`);
-                                break;
-                              case "dailydrip":
-                                navigate(`/daily-drip`);
-                                break;
-                              default:
-                                navigate("/explore");
-                            }
-                          }}
-                        >
+                      {searchResults.map((result, index) => {
+                        // Handle error messages
+                        if (result.type === "error") {
+                          return (
+                            <div
+                              key={`${result.type}-${result.id}-${index}`}
+                              className="px-4 py-3 text-center border-b last:border-b-0"
+                            >
+                              <div className="text-amber-600 font-medium text-sm">
+                                {result.title}
+                              </div>
+                              <div className="text-amber-500 text-xs mt-1">
+                                {result.message}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div
+                            key={`${result.type}-${result.id || result._id}-${index}`}
+                            className="px-4 py-3 hover:bg-muted cursor-pointer border-b last:border-b-0"
+                            onClick={() => {
+                              setShowSearchResults(false);
+                              switch (result.type) {
+                                case "user":
+                                  navigate(`/users/${result.id || result._id}`);
+                                  break;
+                                case "blog":
+                                  navigate(
+                                    `/blog/${result.slug || result.id || result._id}`,
+                                  );
+                                  break;
+                                case "story":
+                                  navigate(`/stories/${result.id || result._id}`);
+                                  break;
+                                case "dailydrip":
+                                  navigate(`/daily-drip`);
+                                  break;
+                                default:
+                                  navigate("/explore");
+                              }
+                            }}
+                          >
                           <div className="flex items-center gap-3">
                             {result.type === "user" ? (
                               <>
