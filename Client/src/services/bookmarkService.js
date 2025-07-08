@@ -35,7 +35,11 @@ class BookmarkService {
   // Add a blog to bookmarks
   async addBookmark(blogId) {
     try {
-      const response = await apiService.post(`/bookmarks`, { blogId });
+      const response = await apiService.post(`/bookmarks`, {
+        itemId: blogId,
+        itemType: "blog",
+        collection: "default",
+      });
 
       if (response.status === "success") {
         return response.data;
@@ -51,7 +55,12 @@ class BookmarkService {
   // Remove a blog from bookmarks
   async removeBookmark(blogId) {
     try {
-      const response = await apiService.delete(`/bookmarks/${blogId}`);
+      // Use the same toggle endpoint - it will remove if already bookmarked
+      const response = await apiService.post(`/bookmarks`, {
+        itemId: blogId,
+        itemType: "blog",
+        collection: "default",
+      });
 
       if (response.status === "success") {
         return response.data;
