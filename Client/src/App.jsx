@@ -15,6 +15,7 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PrivateRoute } from "@/components/shared/PrivateRoute";
+import NotificationAlert from "@/components/notifications/NotificationAlert";
 import { ROUTES } from "@/utils/constant";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -103,6 +104,8 @@ const AppLayout = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      {/* Global notification alerts */}
+      <NotificationAlert />
       <main className="flex-1">
         <Suspense fallback={<PageLoader />}>
           <Routes>
