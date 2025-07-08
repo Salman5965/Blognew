@@ -10,6 +10,7 @@ import {
 } from "../controllers/authController.js";
 import { protect } from "../middlewares/auth.js";
 import { loginRateLimiter, rateLimiter } from "../middlewares/rateLimiter.js";
+import { cacheResponse } from "../middlewares/cache.js";
 import {
   validateRegister,
   validateLogin,
