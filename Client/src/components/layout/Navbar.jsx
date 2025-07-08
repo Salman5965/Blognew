@@ -155,13 +155,18 @@ export const Navbar = () => {
         console.error("Search failed:", error);
 
         // Handle rate limiting gracefully
-        if (error.message?.includes("Too many requests") || error.status === 429) {
-          setSearchResults([{
-            type: "error",
-            id: "rate-limit",
-            title: "Search rate limited",
-            message: "Please slow down your search. Try again in a moment."
-          }]);
+        if (
+          error.message?.includes("Too many requests") ||
+          error.status === 429
+        ) {
+          setSearchResults([
+            {
+              type: "error",
+              id: "rate-limit",
+              title: "Search rate limited",
+              message: "Please slow down your search. Try again in a moment.",
+            },
+          ]);
         } else {
           setSearchResults([]);
         }
@@ -300,7 +305,9 @@ export const Navbar = () => {
                                   );
                                   break;
                                 case "story":
-                                  navigate(`/stories/${result.id || result._id}`);
+                                  navigate(
+                                    `/stories/${result.id || result._id}`,
+                                  );
                                   break;
                                 case "dailydrip":
                                   navigate(`/daily-drip`);
@@ -382,113 +389,6 @@ export const Navbar = () => {
                           </div>
                         );
                       })}
-                          <div className="flex items-center gap-3">
-                            {result.type === "user" ? (
-                              <>
-                                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                                  <User className="h-4 w-4" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">
-                                    {result.firstName || result.lastName
-                                      ? `${result.firstName || ""} ${result.lastName || ""}`.trim()
-                                      : result.username}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground truncate">
-                                    @{result.username} • User
-                                  </p>
-                                </div>
-                              </>
-                            ) : result.type === "blog" ? (
-                              <>
-                                <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                                  <FileText className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">
-                                    {result.title}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground truncate">
-                                    By{" "}
-                                    {result.author?.firstName ||
-                                      result.author?.username ||
-                                      "Unknown"}{" "}
-                                    • Blog
-                                  </p>
-                                </div>
-                              </>
-                            ) : result.type === "story" ? (
-                              <>
-                                <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                                  <BookOpen className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">
-                                    {result.title}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground truncate">
-                                    By{" "}
-                                    {result.author?.firstName ||
-                                      result.author?.username ||
-                                      "Unknown"}{" "}
-                                    • Story
-                                  </p>
-                                </div>
-                              </>
-                            ) : result.type === "dailydrip" ? (
-                              <>
-                                <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                  <MessageCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">
-                                    {result.title || "Daily Drip"}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground truncate">
-                                    Community • Daily Drip
-                                  </p>
-                                </div>
-                              </>
-                            ) : null}
-                          </div>
-                        </div>
-                      );
-                                <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
-                                  <BookOpen className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">
-                                    {result.title}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground truncate">
-                                    By{" "}
-                                    {result.author?.firstName ||
-                                      result.author?.username ||
-                                      "Unknown"}{" "}
-                                    • Story
-                                  </p>
-                                </div>
-                              </>
-                            ) : (
-                              <>
-                                <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                                  <MessageCircle className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate">
-                                    {result.title ||
-                                      result.content?.substring(0, 50) + "..."}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground truncate">
-                                    Daily Drip •{" "}
-                                    {result.type?.toUpperCase() || "CONTENT"}
-                                  </p>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      ))}
                       <div className="px-4 py-3 border-t">
                         <button
                           className="text-sm text-primary hover:underline"
