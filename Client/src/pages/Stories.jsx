@@ -188,76 +188,17 @@ const Stories = () => {
     }
   };
 
-  const handleShareStory = async (story) => {
+  const handleShareStory = (story) => {
     const shareUrl =
       window.location.origin + `/stories/${story.id || story._id}`;
 
-    // Try Web Share API first
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: story.title,
-          text: story.excerpt,
-          url: shareUrl,
-        });
-        return; // Success, exit early
-      } catch (error) {
-        console.error("Share failed:", error);
-        // If user cancelled, don't try fallbacks
-        if (error.name === "AbortError") {
-          return;
-        }
-        // Continue to fallbacks for other errors
-      }
-    }
-
-    // Try Clipboard API as fallback
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      toast({
-        title: "Link Copied",
-        description: "Story link copied to clipboard!",
-      });
-      return; // Success, exit early
-    } catch (error) {
-      console.error("Copy failed:", error);
-      // Continue to manual fallback
-    }
-
-    // Final fallback: Show URL in alert/prompt for manual copying
-    try {
-      // Create a temporary input element to select text
-      const tempInput = document.createElement("input");
-      tempInput.value = shareUrl;
-      tempInput.style.position = "fixed";
-      tempInput.style.left = "-9999px";
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      tempInput.setSelectionRange(0, 99999);
-
-      // Try old-school copy command
-      const successful = document.execCommand("copy");
-      document.body.removeChild(tempInput);
-
-      if (successful) {
-        toast({
-          title: "Link Copied",
-          description: "Story link copied to clipboard!",
-        });
-      } else {
-        throw new Error("execCommand failed");
-      }
-    } catch (error) {
-      // Ultimate fallback: Show URL to user
-      toast({
-        title: "Share Story",
-        description: `Copy this link: ${shareUrl}`,
-        duration: 10000, // Longer duration so user can copy
-      });
-
-      // Also log for debugging
-      console.log("Share URL:", shareUrl);
-    }
+    // Skip APIs entirely to avoid permission issues
+    // Show URL directly for manual copying
+    toast({
+      title: "Share Story",
+      description: `Copy this link: ${shareUrl}`,
+      duration: 15000, // Long duration so user can copy
+    });
   };
 
   const toggleAudio = (storyId) => {
