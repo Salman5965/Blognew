@@ -1,3 +1,29 @@
+/**
+ * CommentSection Component - Handles threaded comments and replies
+ *
+ * Expected Backend Data Structure:
+ * - Comment Model should include:
+ *   - _id/id: Unique identifier
+ *   - content: Comment text content
+ *   - author: User object with _id, username, avatar
+ *   - blog: Blog post ID
+ *   - parentId: Parent comment ID (null for top-level comments)
+ *   - createdAt: Timestamp
+ *   - updatedAt: Timestamp
+ *   - isEdited: Boolean flag
+ *
+ * - API should support:
+ *   - GET /comments/blog/:blogId?includeReplies=true&sort=newest
+ *   - POST /comments with { content, blog, parentId? }
+ *   - PUT /comments/:id with { content }
+ *   - DELETE /comments/:id
+ *
+ * - Response Structure:
+ *   - Top-level comments: parentId === null
+ *   - Replies: parentId !== null
+ *   - Frontend groups replies under parent comments
+ */
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
