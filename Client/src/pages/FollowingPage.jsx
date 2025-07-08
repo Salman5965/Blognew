@@ -165,10 +165,7 @@ export const FollowingPage = () => {
           <p className="text-muted-foreground mb-4">
             {error || "The user you're looking for doesn't exist."}
           </p>
-          <Button onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Go Back
-          </Button>
+          <Button onClick={() => navigate("/")}>Go to Home</Button>
         </div>
       </PageWrapper>
     );
