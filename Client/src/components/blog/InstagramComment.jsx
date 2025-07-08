@@ -6,6 +6,7 @@ import { formatBlogDate, getTimeAgo } from "@/utils/formatDate";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/utils/constant";
+import { parseMentions } from "@/utils/mentionParser";
 import { MoreHorizontal, Edit, Trash2, Flag, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
@@ -35,28 +36,6 @@ export const InstagramComment = ({
   const authorId = comment.author._id || comment.author.id;
   const userId = user?._id || user?.id;
   const isOwner = user && authorId === userId;
-
-  // Parse @mentions and create profile links
-  const parseContentWithMentions = (content) => {
-    const mentionRegex = /@(\w+)/g;
-    const parts = content.split(mentionRegex);
-
-    return parts.map((part, index) => {
-      if (index % 2 === 1) {
-        // This is a username
-        return (
-          <Link
-            key={index}
-            to={`${ROUTES.USER_PROFILE}/${part}`}
-            className="text-blue-600 hover:text-blue-800 font-medium"
-          >
-            @{part}
-          </Link>
-        );
-      }
-      return part;
-    });
-  };
 
   const handleReplyClick = () => {
     if (!isAuthenticated) return;
@@ -172,7 +151,7 @@ export const InstagramComment = ({
                   {comment.author.username}
                 </Link>
                 <span className="ml-2 text-foreground">
-                  {parseContentWithMentions(comment.content)}
+                  {parseMentions(comment.content)}
                 </span>
               </span>
             </div>
