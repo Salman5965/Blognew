@@ -286,29 +286,30 @@ export const CommentSection = ({
         </div>
       </div>
 
-      {/* Comment Form */}
+      {/* Comment Form - Clean and consistent styling */}
       {isAuthenticated ? (
-        <div className="space-y-3">
+        <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
           <Textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Add a comment..."
-            className="min-h-[80px] resize-none border-0 bg-muted/50 text-sm"
+            className="min-h-[80px] resize-none border-0 bg-background/50 text-sm rounded-lg p-3 focus:bg-background/70 transition-colors"
             maxLength={1000}
           />
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">
-              {newComment.length}/1000
+              {newComment.length}/1000 characters
             </span>
             <Button
               onClick={handleSubmitComment}
               disabled={isSubmitting || !newComment.trim()}
               size="sm"
+              className="px-6"
             >
               {isSubmitting ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
               ) : null}
-              Post
+              Post Comment
             </Button>
           </div>
         </div>
@@ -336,7 +337,7 @@ export const CommentSection = ({
           <span>Loading comments...</span>
         </div>
       ) : comments.length > 0 ? (
-        <div className="space-y-1">
+        <div className="space-y-4 divide-y divide-border/30">
           {comments.map((comment) => (
             <InstagramComment
               key={comment._id || comment.id}
