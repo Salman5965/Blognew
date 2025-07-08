@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { AtSign, Loader2 } from "lucide-react";
-import apiService from "@/services/api";
+import userSearchService from "@/services/userSearchService";
 import { cn } from "@/lib/utils";
 
 export const UserMention = ({ onMention, className }) => {
@@ -24,13 +24,13 @@ export const UserMention = ({ onMention, className }) => {
 
       setIsLoading(true);
       try {
-        const response = await apiService.get(
-          `/users/search?q=${query}&limit=5`,
-        );
-        if (response.status === "success") {
-          setUsers(response.data.users || []);
+        const result = await userSearchService.searchUsers(query, 5);
+        if (result.success) {
+          setUsers(result.users || []);
           setShowSuggestions(true);
           setSelectedIndex(0);
+        } else {
+          setUsers([]);
         }
       } catch (error) {
         console.error("Error searching users:", error);
