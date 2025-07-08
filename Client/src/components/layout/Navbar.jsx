@@ -75,7 +75,8 @@ export const Navbar = () => {
   const [debouncedSearch] = useDebouncedCallback(async (value) => {
     setFilters((prev) => ({ ...prev, search: value }));
 
-    if (value.trim()) {
+    if (value.trim() && value.length >= 2) {
+      // Minimum 2 characters
       setIsSearching(true);
       setShowSearchResults(true);
 
