@@ -1,10 +1,36 @@
 import apiService from "./api";
 
 class UserService {
-  // Get user profile by ID
-  async getUserById(userId) {
+  // Get user profile by ID or username
+  async getUserById(userIdOrUsername) {
     try {
-      const response = await apiService.get(`/users/${userId}`);
+      let response;
+
+      try {
+        // First try as ObjectId
+        response = await apiService.get(`/users/${userIdOrUsername}`);
+      } catch (firstError) {
+        // If that fails, try as username
+        try {
+          response = await apiService.get(
+            `/users/username/${userIdOrUsername}`,
+          );
+        } catch (secondError) {
+          // If both fail, check if it's a 400/500 error on ObjectId or username issue
+          if (
+            firstError.response?.status === 400 ||
+            firstError.response?.data?.message?.includes(
+              "Cast to ObjectId failed",
+            )
+          ) {
+            // This means it was a username passed to ObjectId endpoint, try username endpoint
+            throw secondError;
+          }
+          // Otherwise throw the original error
+          throw firstError;
+        }
+      }
+
       if (response.status === "success") {
         return response.data;
       }
@@ -14,7 +40,7 @@ class UserService {
       if (error.response?.status === 404) {
         throw new Error("User not found");
       } else if (error.response?.status === 400) {
-        throw new Error("Invalid user ID");
+        throw new Error("Invalid user identifier");
       } else if (error.response?.status >= 500) {
         throw new Error("Server error. Please try again later.");
       } else if (error.message === "Network Error") {
@@ -45,7 +71,7 @@ class UserService {
   }
 
   // Get user statistics
-  async getUserStats(userId) {
+  async getUserStats(userIdOrUsername) {
     try {
       const response = await apiService.get(`/users/${userId}/stats`);
       if (response.status === "success") {
