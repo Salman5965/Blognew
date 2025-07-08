@@ -178,27 +178,7 @@ export const CommentSection = ({
     ]);
     setShowMention(false);
   };
-  const handleLikeComment = async (commentId) => {
-    const response = await apiService.post(`/comments/${commentId}/like`);
 
-    if (response.status === "success") {
-      // Update the comment like status
-      setComments((prev) =>
-        prev.map((comment) =>
-          (comment._id || comment.id) === commentId
-            ? {
-                ...comment,
-                likes: response.data.isLiked
-                  ? [...(comment.likes || []), { user: user._id || user.id }]
-                  : (comment.likes || []).filter(
-                      (like) => like.user !== (user._id || user.id),
-                    ),
-              }
-            : comment,
-        ),
-      );
-    }
-  };
   if (!allowComments) {
     return (
       <div className="text-center py-8 text-muted-foreground">
