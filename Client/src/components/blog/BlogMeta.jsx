@@ -231,23 +231,6 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
             </div>
           )}
         </div>
-
-        {showActions && (
-          <div className="flex items-center space-x-2">
-            <LikeButton
-              blogId={blog.id || blog._id}
-              likeCount={blog.likeCount || 0}
-              isLiked={blog.isLiked}
-              blogLikes={blog.likes || []}
-            />
-            <Button variant="ghost" size="sm" onClick={handleShare}>
-              <Share2 className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleBookmark}>
-              <Bookmark className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
       </div>
     );
   }
@@ -348,26 +331,6 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
               {tag}
             </Badge>
           ))}
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      {showActions && (
-        <div className="flex items-center space-x-4 pt-4 border-t">
-          <LikeButton
-            blogId={blog.id || blog._id}
-            likeCount={blog.likeCount || 0}
-            isLiked={blog.isLiked}
-            blogLikes={blog.likes || []}
-          />
-          <Button variant="outline" size="sm" onClick={handleShare}>
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleBookmark}>
-            <Bookmark className="h-4 w-4 mr-2" />
-            Bookmark
-          </Button>
         </div>
       )}
 
