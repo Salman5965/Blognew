@@ -55,23 +55,7 @@ export const CommentSection = ({
       );
 
       if (response.status === "success") {
-        const commentsData = response.data.comments || [];
-        setComments(commentsData);
-
-        // Calculate total likes across all comments and replies
-        const calculateTotalLikes = (comments) => {
-          return comments.reduce((total, comment) => {
-            const commentLikes = comment.likes?.length || 0;
-            const replyLikes =
-              comment.replies?.reduce(
-                (replyTotal, reply) => replyTotal + (reply.likes?.length || 0),
-                0,
-              ) || 0;
-            return total + commentLikes + replyLikes;
-          }, 0);
-        };
-
-        setTotalLikes(calculateTotalLikes(commentsData));
+        setComments(response.data.comments || []);
       } else {
         throw new Error(response.message || "Failed to fetch comments");
       }
