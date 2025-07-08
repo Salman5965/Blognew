@@ -100,7 +100,8 @@ export const Navbar = () => {
             })
             .catch(() => ({ results: {} })),
           blogService
-            .searchBlogs(value, {
+            .getBlogs({
+              search: value,
               limit: 8,
               sortBy: "relevance",
             })
