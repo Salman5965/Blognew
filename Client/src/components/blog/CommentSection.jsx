@@ -260,15 +260,7 @@ export const CommentSection = ({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-2xl font-bold">Comments ({comments.length})</h2>
-          {totalLikes > 0 && (
-            <div className="flex items-center space-x-1 text-muted-foreground">
-              <Heart className="h-4 w-4" />
-              <span className="text-sm">{totalLikes} likes</span>
-            </div>
-          )}
-        </div>
+        <h2 className="text-xl font-semibold">Comments ({comments.length})</h2>
 
         <div className="flex items-center space-x-2">
           <Select value={sortOrder} onValueChange={setSortOrder}>
