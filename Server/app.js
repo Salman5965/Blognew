@@ -72,6 +72,20 @@ app.use(compression());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// Add request timeout middleware
+app.use((req, res, next) => {
+  // Set timeout for requests (45 seconds)
+  res.setTimeout(45000, () => {
+    if (!res.headersSent) {
+      res.status(408).json({
+        status: "error",
+        message: "Request timeout",
+      });
+    }
+  });
+  next();
+});
+
 // Static file serving for uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
