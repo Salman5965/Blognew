@@ -39,6 +39,13 @@ const Notifications = () => {
     if (isAuthenticated) {
       fetchNotifications();
       fetchPreferences();
+
+      // Set up auto-refresh every 30 seconds
+      const interval = setInterval(() => {
+        fetchNotifications();
+      }, 30000);
+
+      return () => clearInterval(interval);
     }
   }, [isAuthenticated, fetchNotifications, fetchPreferences]);
 
