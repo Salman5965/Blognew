@@ -80,22 +80,49 @@ export const Navbar = () => {
       setShowSearchResults(true);
 
       try {
-        // Import exploreService dynamically to avoid circular dependencies
-        const { default: exploreService } = await import(
-          "@/services/exploreService"
-        );
+        // Import services dynamically to avoid circular dependencies
+        const [
+          { default: exploreService },
+          { default: blogService },
+          { default: userService },
+        ] = await Promise.all([
+          import("@/services/exploreService"),
+          import("@/services/blogService"),
+          import("@/services/userService"),
+        ]);
 
-        // Search across all content types with higher limits for better results
-        const results = await exploreService.searchContent(value, "all", {
-          limit: 15,
-          sortBy: "relevance",
-        });
+        // Search across all content types with parallel requests for better performance
+        const [exploreResults, blogResults, userResults] = await Promise.all([
+          exploreService
+            .searchContent(value, "all", {
+              limit: 10,
+              sortBy: "relevance",
+            })
+            .catch(() => ({ results: {} })),
+          blogService
+            .searchBlogs(value, {
+              limit: 8,
+              sortBy: "relevance",
+            })
+            .catch(() => ({ blogs: [] })),
+          userService.searchUsers(value, 8).catch(() => []),
+        ]);
 
         // Combine and format results with better distribution
         const combinedResults = [
-          // Users (up to 4)
-          ...(results.results?.users || [])
+          // Users (up to 4 from direct search)
+          ...(userResults || [])
             .slice(0, 4)
+            .map((user) => ({ ...user, type: "user" })),
+          // Additional users from explore if needed
+          ...(exploreResults.results?.users || [])
+            .slice(0, 2)
+            .filter(
+              (user) =>
+                !(userResults || []).some(
+                  (u) => (u._id || u.id) === (user._id || user.id),
+                ),
+            )
             .map((user) => ({ ...user, type: "user" })),
           // Blogs (up to 4)
           ...(results.results?.blogs || [])
