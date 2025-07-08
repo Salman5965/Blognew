@@ -269,6 +269,7 @@ export const BlogDetails = () => {
             <CommentSection
               blogId={currentBlog._id || currentBlog.id}
               allowComments={currentBlog.allowComments}
+              blogAuthorId={currentBlog.author._id || currentBlog.author.id}
             />
           </div>
         </section>
