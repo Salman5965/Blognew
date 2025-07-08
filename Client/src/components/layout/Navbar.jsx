@@ -124,19 +124,29 @@ export const Navbar = () => {
                 ),
             )
             .map((user) => ({ ...user, type: "user" })),
-          // Blogs (up to 4)
-          ...(results.results?.blogs || [])
-            .slice(0, 4)
+          // Blogs (up to 6 from direct search)
+          ...(blogResults.blogs || [])
+            .slice(0, 6)
             .map((blog) => ({ ...blog, type: "blog" })),
-          // Stories (up to 3)
-          ...(results.results?.stories || [])
+          // Additional blogs from explore if needed
+          ...(exploreResults.results?.blogs || [])
             .slice(0, 3)
+            .filter(
+              (blog) =>
+                !(blogResults.blogs || []).some(
+                  (b) => (b._id || b.id) === (blog._id || blog.id),
+                ),
+            )
+            .map((blog) => ({ ...blog, type: "blog" })),
+          // Stories (up to 4)
+          ...(exploreResults.results?.stories || [])
+            .slice(0, 4)
             .map((story) => ({ ...story, type: "story" })),
           // Daily Drip content (up to 2)
-          ...(results.results?.dailydrip || [])
+          ...(exploreResults.results?.dailydrip || [])
             .slice(0, 2)
             .map((drip) => ({ ...drip, type: "dailydrip" })),
-        ];
+        ].slice(0, 15); // Limit total results to 15
 
         setSearchResults(combinedResults);
       } catch (error) {
