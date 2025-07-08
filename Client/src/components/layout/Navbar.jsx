@@ -153,7 +153,23 @@ export const Navbar = () => {
         setSearchResults(combinedResults);
       } catch (error) {
         console.error("Search failed:", error);
-        setSearchResults([]);
+
+        // Handle rate limiting gracefully
+        if (
+          error.message?.includes("Too many requests") ||
+          error.status === 429
+        ) {
+          setSearchResults([
+            {
+              type: "error",
+              id: "rate-limit",
+              title: "Search rate limited",
+              message: "Please slow down your search. Try again in a moment.",
+            },
+          ]);
+        } else {
+          setSearchResults([]);
+        }
       } finally {
         setIsSearching(false);
       }
@@ -161,7 +177,7 @@ export const Navbar = () => {
       setSearchResults([]);
       setShowSearchResults(false);
     }
-  }, DEBOUNCE_DELAY);
+  }, 800); // Increased debounce delay to 800ms
 
   const handleCreatePost = () => {
     navigate(ROUTES.CREATE_BLOG);
