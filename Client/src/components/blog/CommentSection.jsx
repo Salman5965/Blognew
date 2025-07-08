@@ -146,7 +146,12 @@ export const CommentSection = ({
               type: "comment",
               title: "New comment on your blog",
               message: `${user.username} commented on your blog`,
-              data: { commentId: response.data.comment._id, blogId },
+              data: {
+                commentId: response.data.comment._id,
+                blogId,
+                blogTitle: response.data.comment.blog?.title || "your blog",
+                commenterUsername: user.username,
+              },
             });
             if (!result.success) {
               console.error("Failed to create notification:", result.error);
@@ -199,13 +204,24 @@ export const CommentSection = ({
           parentComment.author._id !== (user._id || user.id)
         ) {
           try {
-            await notificationService.createNotification({
+            const result = await notificationService.createNotification({
               recipientId: parentComment.author._id,
               type: "comment_reply",
               title: "New reply to your comment",
               message: `${user.username} replied to your comment`,
-              data: { commentId: parentCommentId, blogId },
+              data: {
+                commentId: parentCommentId,
+                blogId,
+                blogTitle: parentComment.blog?.title || "a blog post",
+                replierUsername: user.username,
+              },
             });
+            if (!result.success) {
+              console.error(
+                "Failed to create reply notification:",
+                result.error,
+              );
+            }
           } catch (notifError) {
             console.error("Failed to create reply notification:", notifError);
           }
