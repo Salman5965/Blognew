@@ -192,6 +192,7 @@ const Stories = () => {
     const shareUrl =
       window.location.origin + `/stories/${story.id || story._id}`;
 
+    // Try Web Share API first
     if (navigator.share) {
       try {
         await navigator.share({
@@ -199,45 +200,63 @@ const Stories = () => {
           text: story.excerpt,
           url: shareUrl,
         });
+        return; // Success, exit early
       } catch (error) {
         console.error("Share failed:", error);
-
-        // If Web Share API fails, fallback to clipboard
-        if (error.name !== "AbortError") {
-          try {
-            await navigator.clipboard.writeText(shareUrl);
-            toast({
-              title: "Link Copied",
-              description:
-                "Share dialog failed, but story link copied to clipboard!",
-            });
-          } catch (clipboardError) {
-            console.error("Copy failed:", clipboardError);
-            toast({
-              title: "Share Failed",
-              description:
-                "Unable to share or copy link. Please copy the URL manually.",
-              variant: "destructive",
-            });
-          }
+        // If user cancelled, don't try fallbacks
+        if (error.name === "AbortError") {
+          return;
         }
+        // Continue to fallbacks for other errors
       }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
+    }
+
+    // Try Clipboard API as fallback
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({
+        title: "Link Copied",
+        description: "Story link copied to clipboard!",
+      });
+      return; // Success, exit early
+    } catch (error) {
+      console.error("Copy failed:", error);
+      // Continue to manual fallback
+    }
+
+    // Final fallback: Show URL in alert/prompt for manual copying
+    try {
+      // Create a temporary input element to select text
+      const tempInput = document.createElement("input");
+      tempInput.value = shareUrl;
+      tempInput.style.position = "fixed";
+      tempInput.style.left = "-9999px";
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      tempInput.setSelectionRange(0, 99999);
+
+      // Try old-school copy command
+      const successful = document.execCommand("copy");
+      document.body.removeChild(tempInput);
+
+      if (successful) {
         toast({
           title: "Link Copied",
           description: "Story link copied to clipboard!",
         });
-      } catch (error) {
-        console.error("Copy failed:", error);
-        toast({
-          title: "Copy Failed",
-          description:
-            "Unable to copy link to clipboard. Please copy the URL manually.",
-          variant: "destructive",
-        });
+      } else {
+        throw new Error("execCommand failed");
       }
+    } catch (error) {
+      // Ultimate fallback: Show URL to user
+      toast({
+        title: "Share Story",
+        description: `Copy this link: ${shareUrl}`,
+        duration: 10000, // Longer duration so user can copy
+      });
+
+      // Also log for debugging
+      console.log("Share URL:", shareUrl);
     }
   };
 
