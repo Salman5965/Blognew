@@ -6,7 +6,7 @@ import { formatBlogDate, getTimeAgo } from "@/utils/formatDate";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/utils/constant";
-import { parseMentions } from "@/utils/mentionParser.jsx";
+import { parseMentions } from "@/utils/mentionParser";
 import { MoreHorizontal, Edit, Trash2, Flag, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
