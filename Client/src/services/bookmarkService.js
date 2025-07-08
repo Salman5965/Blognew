@@ -76,10 +76,10 @@ class BookmarkService {
   // Check if a blog is bookmarked
   async isBookmarked(blogId) {
     try {
-      const response = await apiService.get(`/bookmarks/check/${blogId}`);
+      const response = await apiService.get(`/bookmarks/${blogId}/status`);
 
       if (response.status === "success") {
-        return response.data.isBookmarked;
+        return response.data.bookmarked;
       }
 
       return false;
