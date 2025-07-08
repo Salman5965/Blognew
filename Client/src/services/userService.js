@@ -73,7 +73,25 @@ class UserService {
   // Get user statistics
   async getUserStats(userIdOrUsername) {
     try {
-      const response = await apiService.get(`/users/${userId}/stats`);
+      let response;
+      try {
+        // Try as ObjectId first
+        response = await apiService.get(`/users/${userIdOrUsername}/stats`);
+      } catch (firstError) {
+        // If that fails due to ObjectId casting, try username endpoint
+        if (
+          firstError.response?.status === 400 ||
+          firstError.response?.data?.message?.includes(
+            "Cast to ObjectId failed",
+          )
+        ) {
+          response = await apiService.get(
+            `/users/username/${userIdOrUsername}/stats`,
+          );
+        } else {
+          throw firstError;
+        }
+      }
       if (response.status === "success") {
         return response.data.stats;
       }
