@@ -165,33 +165,40 @@ export const FollowersPage = () => {
   }
 
   return (
-    <PageWrapper>
-      <div className="max-w-4xl mx-auto space-y-6">
+    <PageWrapper className="px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+        <div className="flex items-start space-x-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(-1)}
+            className="flex-shrink-0"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
 
-          <div className="flex items-center space-x-4 flex-1">
-            <Avatar className="h-16 w-16">
+          <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
+            <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">
               <AvatarImage src={user.avatar} alt={user.username} />
               <AvatarFallback className="text-lg">
                 {getInitials()}
               </AvatarFallback>
             </Avatar>
 
-            <div>
-              <h1 className="text-2xl font-bold">{getDisplayName()}</h1>
-              <p className="text-muted-foreground">@{user.username}</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold truncate">
+                {getDisplayName()}
+              </h1>
+              <p className="text-muted-foreground truncate">@{user.username}</p>
 
               {/* Follow Stats */}
               {followStats && (
-                <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+                <div className="flex items-center space-x-3 sm:space-x-4 mt-2 text-sm text-muted-foreground">
                   <Link
                     to={`/users/${userId}/followers`}
-                    className="hover:text-foreground font-medium"
+                    className="hover:text-foreground font-medium flex-shrink-0"
                   >
                     <span className="text-foreground">
                       {followStats.followersCount}
@@ -200,7 +207,7 @@ export const FollowersPage = () => {
                   </Link>
                   <Link
                     to={`/users/${userId}/following`}
-                    className="hover:text-foreground font-medium"
+                    className="hover:text-foreground font-medium flex-shrink-0"
                   >
                     <span className="text-foreground">
                       {followStats.followingCount}
@@ -214,8 +221,8 @@ export const FollowersPage = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center space-x-6 border-b">
-          <div className="flex items-center space-x-2 pb-3 border-b-2 border-primary">
+        <div className="flex items-center space-x-4 sm:space-x-6 border-b overflow-x-auto">
+          <div className="flex items-center space-x-2 pb-3 border-b-2 border-primary flex-shrink-0">
             <Users className="h-4 w-4" />
             <span className="font-medium">Followers</span>
             {followStats && (
@@ -226,7 +233,7 @@ export const FollowersPage = () => {
           </div>
           <Link
             to={`/users/${userId}/following`}
-            className="flex items-center space-x-2 pb-3 text-muted-foreground hover:text-foreground"
+            className="flex items-center space-x-2 pb-3 text-muted-foreground hover:text-foreground flex-shrink-0"
           >
             <UserCheck className="h-4 w-4" />
             <span>Following</span>
@@ -237,9 +244,9 @@ export const FollowersPage = () => {
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="xl:col-span-3">
             <FollowersList userId={userId} />
           </div>
 
