@@ -13,6 +13,7 @@ import {
   Share2,
   Bookmark,
   MoreHorizontal,
+  Heart,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -285,6 +286,10 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
         <div className="flex items-center space-x-1">
           <MessageCircle className="h-4 w-4" />
           <span>{blog.commentCount || 0} comments</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <Heart className="h-4 w-4" />
+          <span>{blog.likeCount || 0} likes</span>
         </div>
       </div>
 

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -261,10 +260,7 @@ export const BlogDetails = () => {
             />
           </div>
 
-          {/* Footer Actions */}
-          <footer className="mt-12 pt-8 border-t">
-            <BlogMeta blog={currentBlog} variant="compact" />
-          </footer>
+          {/* Footer Actions - Removed redundant author details */}
         </article>
 
         {/* Comments Section */}
