@@ -275,6 +275,11 @@ class ExploreService {
       },
     };
   }
+
+  // Get explore stats (alias for getStats for consistency)
+  async getExploreStats() {
+    return await this.getStats();
+  }
 }
 
 export const exploreService = new ExploreService();
