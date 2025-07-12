@@ -203,20 +203,12 @@ export const Login = () => {
               <Button
                 type="submit"
                 className="w-full h-11 text-base font-medium"
-                disabled={!canSubmit}
+                disabled={isSubmitting}
               >
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                {isLocked
-                  ? rateLimitCountdown > 0
-                    ? `Locked (${Math.floor(rateLimitCountdown / 60)}:${(rateLimitCountdown % 60).toString().padStart(2, "0")})`
-                    : "Account Locked"
-                  : isRateLimited
-                    ? `Wait ${rateLimitCountdown}s`
-                    : isSubmitting
-                      ? "Signing In..."
-                      : "Sign In"}
+                {isSubmitting ? "Signing In..." : "Sign In"}
               </Button>
 
               {/* OAuth buttons */}
