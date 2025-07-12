@@ -262,7 +262,7 @@ const AppLayout = () => {
             />
             <Route path={ROUTES.LOGIN} element={<Login />} />
             <Route path={ROUTES.REGISTER} element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path={ROUTES.HELP} element={<Help />} />
 
