@@ -1,97 +1,212 @@
 import express from "express";
-import {
-  registerUser,
-  loginUser,
-  getProfile,
-  updateProfile,
-  changePassword,
-  deleteAccount,
-  logoutUser,
-} from "../controllers/authController.js";
-import { protect } from "../middlewares/auth.js";
-import { loginRateLimiter, rateLimiter } from "../middlewares/rateLimiter.js";
-import { cacheResponse } from "../middlewares/cache.js";
-import {
-  validateRegister,
-  validateLogin,
-  validateUpdateProfile,
-  validateChangePassword,
-} from "../validators/authValidator.js";
-import { handleValidationErrors } from "../validators/authValidator.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import { auth } from "../middlewares/auth.js";
+import { validateInput } from "../middlewares/validateInput.js";
 
 const router = express.Router();
 
-/**
- * @route   POST /api/auth/register
- * @desc    Register a new user
- * @access  Public
- */
-router.post(
-  "/register",
-  rateLimiter("register", 10, 300), // 10 registrations per 5 minutes
-  validateRegister,
-  handleValidationErrors,
-  registerUser,
-);
+// Get available OAuth providers
+router.get("/providers", (req, res) => {
+  try {
+    // For now, return empty array since OAuth is not implemented on backend
+    // When implementing OAuth, check environment variables for each provider
+    const providers = [];
 
-/**
- * @route   POST /api/auth/login
- * @desc    Login user and return JWT token
- * @access  Public
- */
-router.post(
-  "/login",
-  loginRateLimiter, // Apply login rate limiting
-  validateLogin,
-  handleValidationErrors,
-  loginUser,
-);
+    // Example of how to check if providers are configured:
+    // if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    //   providers.push("google");
+    // }
+    // if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+    //   providers.push("github");
+    // }
+    // if (process.env.APPLE_CLIENT_ID && process.env.APPLE_CLIENT_SECRET) {
+    //   providers.push("apple");
+    // }
 
-/**
- * @route   POST /api/auth/logout
- * @desc    Logout user (client-side token removal)
- * @access  Private
- */
-router.post("/logout", protect, logoutUser);
+    res.json({
+      status: "success",
+      providers,
+      message: "OAuth providers not configured yet",
+    });
+  } catch (error) {
+    console.error("Error checking OAuth providers:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to check OAuth provider availability",
+    });
+  }
+});
 
-/**
- * @route   GET /api/auth/profile
- * @desc    Get current user profile
- * @access  Private
- */
-router.get("/profile", protect, cacheResponse(60), getProfile); // Cache for 1 minute
+// Check specific provider availability
+router.get("/providers/:provider", (req, res) => {
+  try {
+    const { provider } = req.params;
 
-/**
- * @route   PUT /api/auth/profile
- * @desc    Update user profile
- * @access  Private
- */
-router.put(
-  "/profile",
-  protect,
-  validateUpdateProfile,
-  handleValidationErrors,
-  updateProfile,
-);
+    // For now, all providers are unavailable since OAuth is not implemented
+    const available = false;
 
-/**
- * @route   PUT /api/auth/change-password
- * @desc    Change user password
- * @access  Private
- */
-router.put(
-  "/change-password",
-  protect,
-  validateChangePassword,
-  handleValidationErrors,
-  changePassword,
-);
+    // When implementing OAuth, check specific provider configuration:
+    // let available = false;
+    // switch (provider.toLowerCase()) {
+    //   case "google":
+    //     available = !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
+    //     break;
+    //   case "github":
+    //     available = !!(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET);
+    //     break;
+    //   case "apple":
+    //     available = !!(process.env.APPLE_CLIENT_ID && process.env.APPLE_CLIENT_SECRET);
+    //     break;
+    //   default:
+    //     available = false;
+    // }
 
-/**
- * @route   DELETE /api/auth/account
- * @desc    Delete user account
- * @access  Private
- */
-router.delete("/account", protect, deleteAccount);
+    res.json({
+      status: "success",
+      provider,
+      available,
+      message: available ? "Provider is configured" : "Provider not configured",
+    });
+  } catch (error) {
+    console.error(`Error checking ${req.params.provider} provider:`, error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to check provider availability",
+    });
+  }
+});
+
+// Placeholder OAuth routes (to be implemented when OAuth is configured)
+router.get("/google", (req, res) => {
+  res.status(501).json({
+    status: "error",
+    message: "Google OAuth not implemented yet",
+  });
+});
+
+router.get("/github", (req, res) => {
+  res.status(501).json({
+    status: "error",
+    message: "GitHub OAuth not implemented yet",
+  });
+});
+
+router.get("/apple", (req, res) => {
+  res.status(501).json({
+    status: "error",
+    message: "Apple OAuth not implemented yet",
+  });
+});
+
+// Forgot password endpoint
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email is required",
+      });
+    }
+
+    // Check if user exists
+    const user = await User.findOne({ email: email.toLowerCase() });
+
+    // For security, always return success even if user doesn't exist
+    // This prevents email enumeration attacks
+
+    if (user) {
+      // Generate password reset token
+      const resetToken = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" },
+      );
+
+      // In a real implementation, you would:
+      // 1. Save the reset token to the database with expiration
+      // 2. Send an email with the reset link
+      // 3. The reset link would be: /reset-password?token=resetToken
+
+      console.log(`Password reset requested for: ${email}`);
+      console.log(`Reset token (for testing): ${resetToken}`);
+
+      // TODO: Send email with reset link
+      // await emailService.sendPasswordResetEmail(user.email, resetToken);
+    }
+
+    res.json({
+      status: "success",
+      message:
+        "If an account with that email exists, a password reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to process password reset request",
+    });
+  }
+});
+
+// Reset password endpoint
+router.post("/reset-password", async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        status: "error",
+        message: "Token and new password are required",
+      });
+    }
+
+    // Verify reset token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid or expired reset token",
+      });
+    }
+
+    // Hash new password
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Update user's password
+    await User.findByIdAndUpdate(user._id, {
+      password: hashedPassword,
+      // Optionally, increment a password version to invalidate old sessions
+      passwordVersion: (user.passwordVersion || 0) + 1,
+    });
+
+    res.json({
+      status: "success",
+      message: "Password has been reset successfully",
+    });
+  } catch (error) {
+    if (
+      error.name === "JsonWebTokenError" ||
+      error.name === "TokenExpiredError"
+    ) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid or expired reset token",
+      });
+    }
+
+    console.error("Reset password error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to reset password",
+    });
+  }
+});
 
 export default router;
