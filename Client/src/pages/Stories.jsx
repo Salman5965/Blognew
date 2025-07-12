@@ -55,7 +55,6 @@ const Stories = () => {
   const [playingAudio, setPlayingAudio] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [filterBy, setFilterBy] = useState("latest");
->>>>>>> origin/main
 
   useEffect(() => {
     loadStories();
