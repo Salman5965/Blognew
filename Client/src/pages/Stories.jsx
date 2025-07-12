@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { PageWrapper } from "@/components/layout/PageWrapper";
 import {
   Search,
   Plus,
   Heart,
   MessageCircle,
-  Share,
-  Play,
-  Pause,
+  Share2,
+  Bookmark,
+  MoreHorizontal,
   TrendingUp,
   Filter,
   Users,
@@ -15,12 +16,16 @@ import {
   Globe,
   Star,
   Calendar,
-  ArrowUpRight,
+  Clock,
+  Eye,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Select,
   SelectContent,
@@ -28,11 +33,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import storiesService from "@/services/storiesService";
-import exploreService from "@/services/exploreService";
-import { getDisplayName, getInitials } from "@/utils/userUtils";
+import { storyService } from "@/services/storyService";
+import { formatDistanceToNow } from "date-fns";
 
 const Stories = () => {
   const { user, isAuthenticated } = useAuthContext();
