@@ -605,11 +605,7 @@ export const Navbar = () => {
                         onClick={logout}
                         className="flex-1 justify-start h-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
                       >
-<<<<<<< HEAD
                         <LogOut className="mr-2 h-4 w-4" />
-=======
-                        <LogOut className="mr-2 h-4 w-4 text-red-600 dark:text-red-400" />
->>>>>>> origin/main
                         <span className="text-sm">Logout</span>
                       </Button>
                     </div>
