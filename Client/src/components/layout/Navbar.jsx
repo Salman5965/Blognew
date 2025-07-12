@@ -251,6 +251,22 @@ export const Navbar = () => {
     navigate("/stories/create");
   };
 
+  const loadNotifications = async () => {
+    try {
+      const response = await notificationService.getNotifications(1, 5);
+      setNotifications(response.notifications || []);
+    } catch (error) {
+      console.error("Failed to load notifications:", error);
+    }
+  };
+
+  const handleNotificationClick = async () => {
+    setShowNotifications(!showNotifications);
+    if (!showNotifications && notifications.length === 0) {
+      await loadNotifications();
+    }
+  };
+
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4">
