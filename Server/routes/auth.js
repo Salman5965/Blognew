@@ -222,6 +222,23 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Basic validation to catch common mistakes
+    if (email.length < 3) {
+      return res.status(400).json({
+        status: "error",
+        message: "Please enter a valid email address or username",
+      });
+    }
+
+    // Check if someone accidentally put password in email field
+    if (email.length > 50 || (!email.includes("@") && email.length > 30)) {
+      return res.status(400).json({
+        status: "error",
+        message:
+          "Please check your email address - it seems too long or invalid",
+      });
+    }
+
     // Find user by email or username (including password for comparison)
     const user = await User.findOne({
       $or: [{ email: email.toLowerCase() }, { username: email.toLowerCase() }],
