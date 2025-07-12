@@ -318,7 +318,6 @@ class CommunityService {
 
       throw new Error(response.message || "Failed to fetch stats");
     } catch (error) {
-<<<<<<< HEAD
       console.error("Failed to fetch community stats:", error);
       // Return empty data structure
       return {
