@@ -21,35 +21,15 @@ import { useToast } from "@/hooks/use-toast";
 import OAuthButtons from "@/components/auth/OAuthButtons";
 import { Loader2, Eye, EyeOff, AlertTriangle, Mail } from "lucide-react";
 
-// Rate limiting configuration
-const RATE_LIMIT_DELAY = 2000; // 2 seconds between attempts
-const MAX_ATTEMPTS = 5;
-const LOCKOUT_DURATION = 300; // 5 minutes lockout after max attempts
-
 export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated, login } = useAuthContext();
-  const { theme, toggleTheme } = useTheme();
   const { toast } = useToast();
 
-  // State management
+  // Simple state management
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
-  const [attemptCount, setAttemptCount] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
-  const [showCaptcha, setShowCaptcha] = useState(false);
-  const [captchaAnswer, setCaptchaAnswer] = useState("");
-  const [captchaQuestion, setCaptchaQuestion] = useState({
-    question: "",
-    answer: 0,
-  });
-
-  // Refs for rate limiting
-  const lastLoginAttempt = useRef(0);
-  const isLoginInProgress = useRef(false);
-  const countdownInterval = useRef(null);
 
   // Redirect target after login
   const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
