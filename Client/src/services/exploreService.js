@@ -171,7 +171,7 @@ class ExploreService {
       );
 
       if (response?.status === "success") {
-        return response.data.users || [];
+        return response.data.authors || [];
       }
     } catch (error) {
       console.warn("Error fetching recommended users:", error.message);
