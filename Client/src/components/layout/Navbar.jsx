@@ -59,15 +59,29 @@ export const Navbar = () => {
 
     const fetchCounts = async () => {
       try {
-        // TODO: Replace with actual API calls when endpoints are available
-        // const notifications = await notificationService.getUnreadCount();
-        // const messages = await messageService.getUnreadCount();
-        // setUnreadNotifications(notifications.count || 0);
-        // setUnreadMessages(messages.count || 0);
+        // Import services dynamically to avoid circular dependencies
+        const { notificationService } = await import(
+          "@/services/notificationService"
+        );
+        const { messageService } = await import("@/services/messageService");
 
-        // For now, set to 0 to remove hardcoded values
-        setUnreadNotifications(0);
-        setUnreadMessages(0);
+        const [notificationResult, messageResult] = await Promise.allSettled([
+          notificationService.getUnreadCount(),
+          messageService.getUnreadCount(),
+        ]);
+
+        const notificationCount =
+          notificationResult.status === "fulfilled"
+            ? notificationResult.value?.count || 0
+            : 0;
+
+        const messageCount =
+          messageResult.status === "fulfilled"
+            ? messageResult.value?.count || 0
+            : 0;
+
+        setUnreadNotifications(notificationCount);
+        setUnreadMessages(messageCount);
       } catch (error) {
         console.error("Failed to fetch counts:", error);
         setUnreadNotifications(0);
