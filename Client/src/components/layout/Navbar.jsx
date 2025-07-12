@@ -591,15 +591,9 @@ export const Navbar = () => {
                         className="flex-1 justify-start h-8"
                       >
                         {theme === "dark" ? (
-<<<<<<< HEAD
                           <Sun className="mr-2 h-4 w-4" />
                         ) : (
                           <Moon className="mr-2 h-4 w-4" />
-=======
-                          <Sun className="mr-2 h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                        ) : (
-                          <Moon className="mr-2 h-4 w-4 text-indigo-600 dark:text-indigo-400" />
->>>>>>> origin/main
                         )}
                         <span className="text-sm">
                           {theme === "dark" ? "Light" : "Dark"}
