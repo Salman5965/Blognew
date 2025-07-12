@@ -481,6 +481,49 @@ router.post("/debug/create-test-user", async (req, res) => {
   }
 });
 
+// Test password verification endpoint
+router.post("/debug/test-password", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email: email.toLowerCase() }).select(
+      "+password",
+    );
+
+    if (!user) {
+      return res.json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // Test direct password comparison
+    const isValid = await bcrypt.compare(password, user.password);
+
+    // Also test if password was hashed correctly
+    const testHash = await bcrypt.hash(password, 12);
+    const testComparison = await bcrypt.compare(password, testHash);
+
+    res.json({
+      status: "success",
+      email: user.email,
+      passwordProvided: password,
+      storedPasswordLength: user.password.length,
+      storedPasswordPrefix: user.password.substring(0, 10),
+      isValidComparison: isValid,
+      testHashComparison: testComparison,
+      bcryptWorking: testComparison,
+    });
+  } catch (error) {
+    console.error("Test password error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Password test failed",
+      error: error.message,
+    });
+  }
+});
+
 // Get current user profile
 router.get("/me", protect, async (req, res) => {
   try {
