@@ -225,7 +225,7 @@ const ResetPassword = () => {
         <div className="relative z-10 flex flex-col justify-center p-12 text-white">
           <div className="mb-8">
             <BookOpen className="h-12 w-12 mb-4" />
-            <h1 className="text-4xl font-bold mb-4">BlogHub</h1>
+            <h1 className="text-4xl font-bold mb-4">SilentVoice</h1>
             <p className="text-xl text-purple-100 mb-8">
               Create a new password and get back to sharing your stories
             </p>
