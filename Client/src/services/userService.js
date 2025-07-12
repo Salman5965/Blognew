@@ -108,7 +108,7 @@ class UserService {
 
   // Update current user profile (using auth endpoint)
   async updateProfile(userData) {
-    const response = await apiService.put("/auth/profile", userData);
+    const response = await apiService.put("/auth/me", userData);
     if (response.status === "success") {
       return response.data.user;
     }
