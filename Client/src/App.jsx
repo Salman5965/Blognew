@@ -254,6 +254,16 @@ const AppLayout = () => {
               }
             />
 
+            {/* Notification Debug (Development) */}
+            <Route
+              path="/debug/notifications"
+              element={
+                <PrivateRoute>
+                  <NotificationDebug />
+                </PrivateRoute>
+              }
+            />
+
             {/* Community Forum */}
             <Route
               path="/forum"
