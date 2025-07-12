@@ -35,6 +35,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { iconColors } from "@/utils/iconColors";
+import { notificationService } from "@/services/notificationService";
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuthContext();
