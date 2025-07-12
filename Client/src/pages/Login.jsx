@@ -317,10 +317,9 @@ export const Login = () => {
         <div className="relative z-10 flex flex-col justify-center p-12 text-white">
           <div className="mb-8">
             <BookOpen className="h-12 w-12 mb-4" />
-            <h1 className="text-4xl font-bold mb-4">SilentVoice</h1>
+            <h1 className="text-4xl font-bold mb-4">BlogHub</h1>
             <p className="text-xl text-blue-100 mb-8">
-              Where every voice finds its story and every story finds its
-              audience
+              Where stories come to life and writers find their voice
             </p>
           </div>
 
