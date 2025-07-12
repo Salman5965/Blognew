@@ -160,10 +160,11 @@ const Feed = () => {
     await loadPosts(1, filter, searchQuery, false);
   };
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     if (e.key === "Enter") {
       setCurrentPage(1);
-      loadPosts(1, selectedFilter, searchQuery, false);
+      setLoading(true);
+      await loadPosts(1, selectedFilter, searchQuery, false);
     }
   };
 
