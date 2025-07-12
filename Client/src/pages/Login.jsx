@@ -163,7 +163,7 @@ export const Login = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded"
-                    disabled={isSubmitting || isLocked}
+                    disabled={isSubmitting}
                     tabIndex={-1}
                   >
                     {showPassword ? (
