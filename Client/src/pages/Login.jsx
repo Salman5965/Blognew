@@ -20,6 +20,7 @@ import { useForm } from "@/hooks/useForm";
 import { validateEmail, validatePassword } from "@/utils/validators";
 import { ROUTES } from "@/utils/constant";
 import { useToast } from "@/hooks/use-toast";
+import OAuthButtons from "@/components/auth/OAuthButtons";
 import {
   Loader2,
   BookOpen,
@@ -482,7 +483,7 @@ export const Login = () => {
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
                     <Link
-                      to="/forgot-password"
+                      to={ROUTES.FORGOT_PASSWORD}
                       className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
                     >
                       Forgot password?
