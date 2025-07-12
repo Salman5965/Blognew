@@ -233,6 +233,14 @@ router.post("/login", async (req, res) => {
     }
 
     // Check password
+    if (!user.password) {
+      console.error("User found but password field is missing:", user.email);
+      return res.status(500).json({
+        status: "error",
+        message: "User account configuration error",
+      });
+    }
+
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return res.status(401).json({
