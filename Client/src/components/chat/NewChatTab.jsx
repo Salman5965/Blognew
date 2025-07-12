@@ -122,7 +122,7 @@ export const NewChatTab = () => {
                 <div className="space-y-1">
                   {searchResults.map((user) => (
                     <div
-                      key={user.id}
+                      key={user._id || user.id || user.username}
                       className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted cursor-pointer transition-colors"
                       onClick={() => handleUserSelect(user)}
                     >
@@ -162,7 +162,7 @@ export const NewChatTab = () => {
                 <div className="space-y-1">
                   {suggestedUsers.map((user) => (
                     <div
-                      key={user.id}
+                      key={user._id || user.id || user.username}
                       className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted cursor-pointer transition-colors"
                       onClick={() => handleUserSelect(user)}
                     >

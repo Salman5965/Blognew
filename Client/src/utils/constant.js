@@ -11,6 +11,7 @@ export const ROUTES = {
   BLOG_DETAILS: "/blog",
   DASHBOARD: "/dashboard",
   MY_BLOGS: "/dashboard/blogs",
+  MY_POSTS: "/dashboard/posts",
   PROFILE: "/dashboard/profile",
   USER_PROFILE: "/users",
   FOLLOWERS: "/users/:userId/followers",

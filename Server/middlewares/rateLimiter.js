@@ -31,13 +31,16 @@ export const rateLimiter = (identifier, maxRequests, windowMs) => {
 
 // Custom rate limiter for login attempts
 export const loginRateLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 login requests per windowMs
+  windowMs:
+    process.env.NODE_ENV === "development" ? 2 * 60 * 1000 : 15 * 60 * 1000, // 2 minutes in dev, 15 minutes in prod
+  max: process.env.NODE_ENV === "development" ? 20 : 5, // 20 attempts in dev, 5 in prod
   message: {
     status: "error",
     message:
-      "Too many login attempts from this IP, please try again after 15 minutes.",
-    retryAfter: 15 * 60, // seconds
+      process.env.NODE_ENV === "development"
+        ? "Too many login attempts from this IP, please try again in a moment."
+        : "Too many login attempts from this IP, please try again after 15 minutes.",
+    retryAfter: process.env.NODE_ENV === "development" ? 2 * 60 : 15 * 60, // seconds
   },
   standardHeaders: true,
   legacyHeaders: false,

@@ -4,18 +4,12 @@ import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FollowersList } from "@/components/users/FollowersList";
-import { FollowSuggestions } from "@/components/users/FollowSuggestions";
 import { userService } from "@/services/userService";
 import { followService } from "@/services/followService";
 import { ROUTES } from "@/utils/constant";
-import {
-  ArrowLeft,
-  Users,
-  UserCheck,
-  Loader2,
-  AlertCircle,
-} from "lucide-react";
+import { Users, UserCheck, Loader2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { isValidObjectId } from "@/utils/validation";
 
 export const FollowersPage = () => {
   const { userId } = useParams();
@@ -34,19 +28,53 @@ export const FollowersPage = () => {
         setLoading(true);
         setError(null);
 
+        // Validate userId format
+        if (!userId || !isValidObjectId(userId)) {
+          throw new Error("Invalid user ID format");
+        }
+
         // Load user profile
         const userData = await userService.getUserById(userId);
+        if (!userData) {
+          throw new Error("User not found");
+        }
         setUser(userData);
 
-        // Load follow stats
-        const stats = await followService.getFollowStats(userId);
-        setFollowStats(stats);
+        // Load follow stats - continue even if user profile failed
+        try {
+          const followStatsResponse =
+            await followService.getFollowStats(userId);
+          setFollowStats({
+            followersCount: followStatsResponse.followersCount || 0,
+            followingCount: followStatsResponse.followingCount || 0,
+          });
+        } catch (followError) {
+          console.warn("Failed to load follow stats:", followError);
+          // Set default values if follow stats fail
+          setFollowStats({
+            followersCount: 0,
+            followingCount: 0,
+          });
+        }
       } catch (error) {
         console.error("Error loading user data:", error);
         setError(error.message);
+
+        // More specific error messages
+        let errorMessage = "Failed to load user profile";
+        if (error.message === "Invalid user ID format") {
+          errorMessage = "Invalid user ID. Please check the URL.";
+        } else if (
+          error.message === "User not found" ||
+          error.message === "Not Found"
+        ) {
+          errorMessage =
+            "User not found. They may have been deleted or the link is incorrect.";
+        }
+
         toast({
           title: "Error",
-          description: "Failed to load user profile",
+          description: errorMessage,
           variant: "destructive",
         });
       } finally {
@@ -56,15 +84,38 @@ export const FollowersPage = () => {
 
     if (userId) {
       loadUserData();
+    } else {
+      setError("No user ID provided");
+      setLoading(false);
     }
-  }, [userId]);
+  }, [userId, toast]);
 
   const getInitials = () => {
     if (!user) return "";
-    if (user.firstName && user.lastName) {
+
+    // Check if both firstName and lastName exist and are not empty
+    if (
+      user.firstName &&
+      user.lastName &&
+      typeof user.firstName === "string" &&
+      typeof user.lastName === "string" &&
+      user.firstName.length > 0 &&
+      user.lastName.length > 0
+    ) {
       return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
     }
-    return user.username.charAt(0).toUpperCase();
+
+    // Fallback to username if available
+    if (
+      user.username &&
+      typeof user.username === "string" &&
+      user.username.length > 0
+    ) {
+      return user.username.charAt(0).toUpperCase();
+    }
+
+    // Final fallback
+    return "U";
   };
 
   const getDisplayName = () => {
@@ -94,43 +145,37 @@ export const FollowersPage = () => {
           <p className="text-muted-foreground mb-4">
             {error || "The user you're looking for doesn't exist."}
           </p>
-          <Button onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Go Back
-          </Button>
+          <Button onClick={() => navigate("/")}>Go to Home</Button>
         </div>
       </PageWrapper>
     );
   }
 
   return (
-    <PageWrapper>
-      <div className="max-w-4xl mx-auto space-y-6">
+    <PageWrapper className="px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-
-          <div className="flex items-center space-x-4 flex-1">
-            <Avatar className="h-16 w-16">
+        <div className="flex items-start space-x-4">
+          <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
+            <Avatar className="h-12 w-12 sm:h-16 sm:w-16 flex-shrink-0">
               <AvatarImage src={user.avatar} alt={user.username} />
               <AvatarFallback className="text-lg">
                 {getInitials()}
               </AvatarFallback>
             </Avatar>
 
-            <div>
-              <h1 className="text-2xl font-bold">{getDisplayName()}</h1>
-              <p className="text-muted-foreground">@{user.username}</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl sm:text-2xl font-bold truncate">
+                {getDisplayName()}
+              </h1>
+              <p className="text-muted-foreground truncate">@{user.username}</p>
 
               {/* Follow Stats */}
               {followStats && (
-                <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
+                <div className="flex items-center space-x-3 sm:space-x-4 mt-2 text-sm text-muted-foreground">
                   <Link
                     to={`/users/${userId}/followers`}
-                    className="hover:text-foreground font-medium"
+                    className="hover:text-foreground font-medium flex-shrink-0"
                   >
                     <span className="text-foreground">
                       {followStats.followersCount}
@@ -139,7 +184,7 @@ export const FollowersPage = () => {
                   </Link>
                   <Link
                     to={`/users/${userId}/following`}
-                    className="hover:text-foreground font-medium"
+                    className="hover:text-foreground font-medium flex-shrink-0"
                   >
                     <span className="text-foreground">
                       {followStats.followingCount}
@@ -153,8 +198,8 @@ export const FollowersPage = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center space-x-6 border-b">
-          <div className="flex items-center space-x-2 pb-3 border-b-2 border-primary">
+        <div className="flex items-center space-x-4 sm:space-x-6 border-b overflow-x-auto">
+          <div className="flex items-center space-x-2 pb-3 border-b-2 border-primary flex-shrink-0">
             <Users className="h-4 w-4" />
             <span className="font-medium">Followers</span>
             {followStats && (
@@ -165,7 +210,7 @@ export const FollowersPage = () => {
           </div>
           <Link
             to={`/users/${userId}/following`}
-            className="flex items-center space-x-2 pb-3 text-muted-foreground hover:text-foreground"
+            className="flex items-center space-x-2 pb-3 text-muted-foreground hover:text-foreground flex-shrink-0"
           >
             <UserCheck className="h-4 w-4" />
             <span>Following</span>
@@ -176,16 +221,8 @@ export const FollowersPage = () => {
         </div>
 
         {/* Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <FollowersList userId={userId} />
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <FollowSuggestions limit={4} />
-          </div>
+        <div className="w-full">
+          <FollowersList userId={userId} />
         </div>
       </div>
     </PageWrapper>

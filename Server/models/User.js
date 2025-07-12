@@ -96,6 +96,66 @@ const userSchema = new mongoose.Schema(
       enum: ["public", "private"],
       default: "public",
     },
+
+    // Privacy settings
+    privacySettings: {
+      showEmail: {
+        type: Boolean,
+        default: false,
+      },
+      showFollowers: {
+        type: Boolean,
+        default: true,
+      },
+      showFollowing: {
+        type: Boolean,
+        default: true,
+      },
+      allowMessages: {
+        type: Boolean,
+        default: true,
+      },
+      allowFollow: {
+        type: Boolean,
+        default: true,
+      },
+    },
+
+    // Notification settings
+    notificationSettings: {
+      emailNotifications: {
+        type: Boolean,
+        default: true,
+      },
+      pushNotifications: {
+        type: Boolean,
+        default: true,
+      },
+      newFollowers: {
+        type: Boolean,
+        default: true,
+      },
+      blogLikes: {
+        type: Boolean,
+        default: true,
+      },
+      blogComments: {
+        type: Boolean,
+        default: true,
+      },
+      directMessages: {
+        type: Boolean,
+        default: true,
+      },
+      weeklyDigest: {
+        type: Boolean,
+        default: true,
+      },
+      marketingEmails: {
+        type: Boolean,
+        default: false,
+      },
+    },
     privacySettings: {
       showEmail: { type: Boolean, default: false },
       showFollowers: { type: Boolean, default: true },
@@ -274,32 +334,29 @@ userSchema.statics.findByUsername = function (username) {
   return this.findOne({ username });
 };
 
-// Static method to search users
+// Static method to search users - simplified to avoid query planning issues
 userSchema.statics.searchUsers = function (query, options = {}) {
   const { page = 1, limit = 20, excludeIds = [] } = options;
   const skip = (page - 1) * limit;
 
   let searchQuery = {
-    isActive: true,
     _id: { $nin: excludeIds },
   };
 
-  if (query) {
+  if (query && query.trim()) {
     searchQuery.$or = [
-      { username: { $regex: query, $options: "i" } },
-      { firstName: { $regex: query, $options: "i" } },
-      { lastName: { $regex: query, $options: "i" } },
-      { $text: { $search: query } },
+      { username: { $regex: query.trim(), $options: "i" } },
+      { firstName: { $regex: query.trim(), $options: "i" } },
+      { lastName: { $regex: query.trim(), $options: "i" } },
     ];
   }
 
   return this.find(searchQuery)
-    .select(
-      "username firstName lastName avatar bio stats.followersCount isOnline lastSeen",
-    )
-    .sort({ "stats.followersCount": -1, createdAt: -1 })
+    .select("username firstName lastName avatar bio")
+    .sort({ createdAt: -1 })
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .lean();
 };
 
 const User = mongoose.model("User", userSchema);

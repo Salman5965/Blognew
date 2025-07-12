@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
+import { ROUTES } from "@/utils/constant";
 import {
   Heart,
   MessageCircle,
@@ -18,14 +19,18 @@ import useNotificationStore from "@/features/notifications/notificationStore";
 const NotificationItem = ({ notification }) => {
   const [showActions, setShowActions] = useState(false);
   const { markAsRead, deleteNotification } = useNotificationStore();
+  const navigate = useNavigate();
 
   const getNotificationIcon = (type) => {
     const iconProps = { className: "h-4 w-4" };
 
     switch (type) {
       case "like":
+      case "blog_like":
         return <Heart {...iconProps} className="h-4 w-4 text-red-500" />;
       case "comment":
+      case "comment_reply":
+      case "comment_like":
         return (
           <MessageCircle {...iconProps} className="h-4 w-4 text-blue-500" />
         );
@@ -41,18 +46,52 @@ const NotificationItem = ({ notification }) => {
   };
 
   const getNotificationLink = () => {
-    if (notification.relatedBlog) {
-      return `/blog/${notification.relatedBlog.slug}`;
+    const { type, data } = notification;
+
+    if (
+      type === "comment" ||
+      type === "comment_reply" ||
+      type === "comment_like" ||
+      type === "mention"
+    ) {
+      if (data?.blogId) {
+        return `${ROUTES.BLOG_DETAILS}/${data.blogId}#comments`;
+      }
+      if (notification.relatedBlog?.slug) {
+        return `/blog/${notification.relatedBlog.slug}#comments`;
+      }
     }
-    if (notification.relatedUser) {
-      return `/users/${notification.relatedUser.username}`;
+
+    if (type === "like" || type === "blog_like" || type === "bookmark") {
+      if (data?.blogId) {
+        return `${ROUTES.BLOG_DETAILS}/${data.blogId}`;
+      }
+      if (notification.relatedBlog?.slug) {
+        return `/blog/${notification.relatedBlog.slug}`;
+      }
     }
+
+    if (type === "follow") {
+      if (data?.userId) {
+        return `${ROUTES.USER_PROFILE}/${data.userId}`;
+      }
+      if (notification.relatedUser?.username) {
+        return `/users/${notification.relatedUser.username}`;
+      }
+    }
+
     return null;
   };
 
   const handleClick = async () => {
     if (!notification.isRead) {
       await markAsRead(notification._id);
+    }
+
+    // Navigate to the appropriate page
+    const link = getNotificationLink();
+    if (link) {
+      navigate(link);
     }
   };
 
@@ -110,17 +149,38 @@ const NotificationItem = ({ notification }) => {
                   {!notification.relatedUser && "Someone"}
                 </span>
                 <span className="text-slate-300 ml-1">
-                  {notification.type === "like" && "liked your post"}
-                  {notification.type === "comment" && "commented on your post"}
+                  {notification.type === "like" && "liked your blog"}
+                  {notification.type === "blog_like" && "liked your blog"}
+                  {notification.type === "comment" && "commented on your blog"}
+                  {notification.type === "comment_reply" &&
+                    "replied to your comment"}
+                  {notification.type === "comment_like" && "liked your comment"}
                   {notification.type === "follow" && "started following you"}
-                  {notification.type === "mention" && "mentioned you in a post"}
-                  {notification.type === "bookmark" && "bookmarked your post"}
+                  {notification.type === "mention" &&
+                    "mentioned you in a comment"}
+                  {notification.type === "bookmark" && "bookmarked your blog"}
+                  {notification.message &&
+                    ![
+                      "like",
+                      "blog_like",
+                      "comment",
+                      "comment_reply",
+                      "comment_like",
+                      "follow",
+                      "mention",
+                      "bookmark",
+                    ].includes(notification.type) &&
+                    notification.message}
                 </span>
               </p>
 
-              {notification.relatedBlog && (
+              {(notification.relatedBlog?.title ||
+                notification.data?.blogTitle) && (
                 <p className="text-xs text-slate-400 mt-1 truncate">
-                  "{notification.relatedBlog.title}"
+                  "
+                  {notification.relatedBlog?.title ||
+                    notification.data?.blogTitle}
+                  "
                 </p>
               )}
 
@@ -167,15 +227,6 @@ const NotificationItem = ({ notification }) => {
       </div>
     </div>
   );
-
-  // Wrap with Link if there's a destination
-  if (link) {
-    return (
-      <Link to={link} className="block">
-        <NotificationContent />
-      </Link>
-    );
-  }
 
   return <NotificationContent />;
 };

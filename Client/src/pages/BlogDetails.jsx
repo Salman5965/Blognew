@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -249,7 +248,7 @@ export const BlogDetails = () => {
               )}
             </div>
 
-            <BlogMeta blog={currentBlog} />
+            <BlogMeta blog={currentBlog} showActions={false} />
           </header>
 
           {/* Content */}
@@ -261,10 +260,7 @@ export const BlogDetails = () => {
             />
           </div>
 
-          {/* Footer Actions */}
-          <footer className="mt-12 pt-8 border-t">
-            <BlogMeta blog={currentBlog} variant="compact" />
-          </footer>
+          {/* Footer Actions - Removed redundant author details */}
         </article>
 
         {/* Comments Section */}
@@ -273,6 +269,7 @@ export const BlogDetails = () => {
             <CommentSection
               blogId={currentBlog._id || currentBlog.id}
               allowComments={currentBlog.allowComments}
+              blogAuthorId={currentBlog.author._id || currentBlog.author.id}
             />
           </div>
         </section>

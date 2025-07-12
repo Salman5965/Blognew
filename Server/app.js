@@ -21,6 +21,11 @@ import notificationRoutes from "./routes/notifications.js";
 import forumRoutes from "./routes/forum.js";
 import dailyDripRoutes from "./routes/dailyDrip.js";
 import storyRoutes from "./routes/stories.js";
+<<<<<<< HEAD
+=======
+import exploreRoutes from "./routes/explore.js";
+import communityRoutes from "./routes/communityRoutes.js";
+>>>>>>> origin/main
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
@@ -69,6 +74,20 @@ app.use(compression());
 // Body parsing middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Add request timeout middleware
+app.use((req, res, next) => {
+  // Set timeout for requests (45 seconds)
+  res.setTimeout(45000, () => {
+    if (!res.headersSent) {
+      res.status(408).json({
+        status: "error",
+        message: "Request timeout",
+      });
+    }
+  });
+  next();
+});
 
 // Static file serving for uploads
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -140,6 +159,11 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/forum", forumRoutes);
 app.use("/api/daily-drip", dailyDripRoutes);
 app.use("/api/stories", storyRoutes);
+<<<<<<< HEAD
+=======
+app.use("/api/explore", exploreRoutes);
+app.use("/api/community", communityRoutes);
+>>>>>>> origin/main
 
 // Welcome route
 app.get("/", (req, res) => {

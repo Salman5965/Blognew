@@ -169,6 +169,158 @@ class ExploreService {
     };
   }
 
+<<<<<<< HEAD
+  // Search across all content types
+  async searchAll(query, options = {}) {
+=======
+  // Get community impact statistics
+  async getCommunityImpact() {
+    try {
+      const response = await apiService.get("/explore/community-impact");
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn("Error fetching community impact:", error.message);
+    }
+
+    // Return fallback data
+    return {
+      storiesShared: 1247,
+      livesTouched: 3891,
+      countries: 47,
+      recentActivity: {
+        newStories: 23,
+        newUsers: 47,
+        storiesThisMonth: 156,
+      },
+      growth: {
+        storiesGrowth: 15,
+        usersGrowth: 12,
+        countriesGrowth: 8,
+      },
+    };
+  }
+
+  // Search for users
+  async searchUsers(query, options = {}) {
+>>>>>>> origin/main
+    try {
+      const params = new URLSearchParams();
+      params.append("q", query);
+      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
+      params.append("limit", String(options.limit || 10));
+      params.append("type", "users"); // Specify we want to search for users
+
+<<<<<<< HEAD
+      if (options.type) params.append("type", options.type);
+      if (options.category) params.append("category", options.category);
+      if (options.sortBy) params.append("sortBy", options.sortBy);
+      if (options.timeframe) params.append("timeframe", options.timeframe);
+=======
+      if (options.sortBy) params.append("sortBy", options.sortBy);
+>>>>>>> origin/main
+
+      const response = await apiService.get(`/explore/search?${params}`);
+
+      if (response?.status === "success") {
+<<<<<<< HEAD
+        return response.data;
+      }
+    } catch (error) {
+      console.warn("Error searching content:", error.message);
+    }
+
+    // Return empty search results
+    return {
+      results: [],
+      pagination: {
+        currentPage: options.page || 1,
+        totalPages: 0,
+        totalResults: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: options.limit || 10,
+      },
+      filters: {
+        types: [],
+        categories: [],
+        tags: [],
+      },
+    };
+  }
+
+  // Get category-specific content
+  async getContentByCategory(category, options = {}) {
+    try {
+      const params = new URLSearchParams();
+      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
+      params.append("limit", String(options.limit || 10));
+      params.append("sortBy", options.sortBy || "popularity");
+
+      const response = await apiService.get(
+        `/explore/categories/${encodeURIComponent(category)}?${params}`,
+      );
+=======
+        return response.data.results?.users || [];
+      }
+    } catch (error) {
+      console.warn("Error searching users:", error.message);
+    }
+
+    // Return empty search results
+    return [];
+  }
+
+  // Enhanced search with content type support
+  async searchContent(query, type = "all", options = {}) {
+    try {
+      const params = new URLSearchParams();
+      params.append("q", query);
+      params.append("type", type);
+      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
+      params.append("limit", String(options.limit || 10));
+
+      if (options.sortBy) params.append("sortBy", options.sortBy);
+
+      const response = await apiService.get(`/explore/search?${params}`);
+>>>>>>> origin/main
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+<<<<<<< HEAD
+      console.warn(
+        `Error fetching content for category ${category}:`,
+        error.message,
+      );
+    }
+
+=======
+      console.warn("Error searching content:", error.message);
+    }
+
+    // Return empty search results
+    return {
+      results: {
+        users: [],
+        blogs: [],
+        stories: [],
+        dailydrip: [],
+      },
+      pagination: {
+        currentPage: options.page || 1,
+        totalPages: 0,
+        totalResults: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+        limit: options.limit || 10,
+      },
+    };
+  }
+
   // Search across all content types
   async searchAll(query, options = {}) {
     try {
@@ -232,6 +384,7 @@ class ExploreService {
       );
     }
 
+>>>>>>> origin/main
     // Return empty data structure
     return {
       content: [],

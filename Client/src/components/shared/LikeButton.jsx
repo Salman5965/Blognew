@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/utils/constant";
 import { useToast } from "@/hooks/use-toast";
+import notificationService from "@/services/notificationService";
 
 export const LikeButton = ({
   blogId,
@@ -16,6 +17,8 @@ export const LikeButton = ({
   size = "md",
   variant = "ghost",
   showCount = true,
+  blogAuthorId = null,
+  blogTitle = null,
 }) => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthContext();
@@ -91,6 +94,36 @@ export const LikeButton = ({
       // Update with server response
       setLiked(result.isLiked);
       setCount(result.likeCount);
+
+      // Create notification for blog author (only when liking, not unliking)
+      if (
+        result.isLiked &&
+        blogAuthorId &&
+        blogAuthorId !== (user._id || user.id)
+      ) {
+        try {
+          const notificationResult =
+            await notificationService.createNotification({
+              recipientId: blogAuthorId,
+              type: "blog_like",
+              title: "Someone liked your blog",
+              message: `${user.username} liked your blog`,
+              data: {
+                blogId,
+                blogTitle: blogTitle || "your blog post",
+                likerUsername: user.username,
+              },
+            });
+          if (!notificationResult.success) {
+            console.error(
+              "Failed to create like notification:",
+              notificationResult.error,
+            );
+          }
+        } catch (notifError) {
+          console.error("Failed to create like notification:", notifError);
+        }
+      }
     } catch (error) {
       console.error("Failed to toggle like:", error);
 
