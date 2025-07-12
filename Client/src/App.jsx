@@ -224,8 +224,12 @@ const NotificationDebug = React.lazy(
 const PageLoader = () => (
   <div className="container mx-auto px-4 py-8 max-w-4xl min-h-[50vh] flex items-center justify-center">
     <div className="text-center space-y-4">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-      <p className="text-muted-foreground">Loading...</p>
+      <div
+        className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"
+        role="status"
+        aria-label="Loading"
+      ></div>
+      <p className="text-muted-foreground">Loading amazing content...</p>
     </div>
   </div>
 );
