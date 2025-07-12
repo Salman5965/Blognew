@@ -695,12 +695,23 @@ export const Navbar = () => {
                 variant="ghost"
                 className="justify-start"
                 onClick={() => {
-                  handleCreatePost();
+                  handleCreateBlog();
                   setIsMobileMenuOpen(false);
                 }}
               >
-                <Plus className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
-                Create Post
+                <Edit3 className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                Create Blog
+              </Button>
+              <Button
+                variant="ghost"
+                className="justify-start"
+                onClick={() => {
+                  handleCreateStory();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                <FileText className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
+                Create Story
               </Button>
               <Button
                 variant="ghost"
