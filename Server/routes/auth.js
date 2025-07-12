@@ -512,6 +512,24 @@ router.post("/debug/test-password", async (req, res) => {
   }
 });
 
+// Logout endpoint (client-side token invalidation)
+router.post("/logout", protect, async (req, res) => {
+  try {
+    // Note: With JWT tokens, logout is typically handled client-side
+    // This endpoint exists mainly for logging and potential token blacklisting
+    res.json({
+      status: "success",
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Logout failed",
+    });
+  }
+});
+
 // Get current user profile
 router.get("/me", protect, async (req, res) => {
   try {
