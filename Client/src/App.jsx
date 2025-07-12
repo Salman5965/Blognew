@@ -73,20 +73,12 @@ const Stories = React.lazy(() => import("./pages/Stories"));
 const CreateStory = React.lazy(() => import("./pages/CreateStory"));
 const Community = React.lazy(() => import("./pages/Community"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
-<<<<<<< HEAD
-const Explore = React.lazy(() => import("./pages/Explore"));
-=======
-const Community = React.lazy(() => import("./pages/Community"));
 const DailyDrip = React.lazy(() => import("./pages/DailyDrip"));
-const Stories = React.lazy(() => import("./pages/Stories"));
 const StoryDetails = React.lazy(() => import("./pages/StoryDetails"));
-const CreateStory = React.lazy(() => import("./pages/CreateStory"));
 const Explore = React.lazy(() => import("./pages/Explore"));
-const Messages = React.lazy(() => import("./pages/Messages"));
 const NotificationDebug = React.lazy(
   () => import("./components/notifications/NotificationDebug"),
 );
->>>>>>> origin/main
 
 // Optimized loading component for better perceived performance
 const PageLoader = () => (
