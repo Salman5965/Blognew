@@ -75,6 +75,9 @@ const StoryDetails = React.lazy(() => import("./pages/StoryDetails"));
 const CreateStory = React.lazy(() => import("./pages/CreateStory"));
 const Explore = React.lazy(() => import("./pages/Explore"));
 const Messages = React.lazy(() => import("./pages/Messages"));
+const NotificationDebug = React.lazy(
+  () => import("./components/notifications/NotificationDebug"),
+);
 
 // Optimized loading component for better perceived performance
 const PageLoader = () => (
