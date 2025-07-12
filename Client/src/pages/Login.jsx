@@ -49,15 +49,8 @@ export const Login = () => {
     }
   }, []);
 
-  // Form validation and submission
-  const {
-    values,
-    errors,
-    isSubmitting,
-    setValue,
-    handleSubmit,
-    setFieldError,
-  } = useForm({
+  // Simplified form validation and submission
+  const { values, errors, isSubmitting, setValue, handleSubmit } = useForm({
     initialValues: {
       email: "",
       password: "",
@@ -70,146 +63,39 @@ export const Login = () => {
       } else if (values.email.includes("@")) {
         const emailError = validateEmail(values.email);
         if (emailError) errors.email = emailError;
-      } else if (values.email.length < 3) {
-        errors.email = "Username must be at least 3 characters";
       }
 
       if (!values.password) {
         errors.password = "Password is required";
-      } else if (values.password.length < 6) {
-        errors.password = "Password must be at least 6 characters";
-      }
-
-      // Captcha validation if shown
-      if (showCaptcha) {
-        const userAnswer = parseInt(captchaAnswer);
-        if (isNaN(userAnswer) || userAnswer !== captchaQuestion.answer) {
-          errors.captcha = "Incorrect captcha answer";
-        }
       }
 
       return errors;
     },
     onSubmit: async (values) => {
-      // Check if account is locked
-      if (isLocked) {
-        toast({
-          title: "Account Temporarily Locked",
-          description:
-            "Too many failed attempts. Please wait before trying again.",
-          variant: "destructive",
-          duration: 5000,
-        });
-        return;
-      }
-
-      // Rate limiting check
-      const now = Date.now();
-      const timeSinceLastAttempt = now - lastLoginAttempt.current;
-
-      if (timeSinceLastAttempt < RATE_LIMIT_DELAY) {
-        const waitTime = Math.ceil(
-          (RATE_LIMIT_DELAY - timeSinceLastAttempt) / 1000,
-        );
-        startCountdown(waitTime);
-        toast({
-          title: "Please Wait",
-          description: `Please wait ${waitTime} seconds between login attempts.`,
-          variant: "destructive",
-          duration: 3000,
-        });
-        return;
-      }
-
-      // Prevent concurrent requests
-      if (isLoginInProgress.current) {
-        return;
-      }
-
       try {
-        isLoginInProgress.current = true;
-        lastLoginAttempt.current = now;
-
-        // Add remember me to login data
-        const loginData = {
-          ...values,
-          rememberMe,
-        };
-
+        const loginData = { ...values, rememberMe };
         await login(loginData);
-
-        // Success - reset attempt count and save remember preference
-        setAttemptCount(0);
-        setIsLocked(false);
-        setShowCaptcha(false);
 
         localStorage.setItem("rememberLogin", rememberMe.toString());
 
         toast({
           title: "Welcome Back!",
-          description: "Login successful. Redirecting to your dashboard...",
+          description: "Login successful.",
           duration: 3000,
         });
       } catch (error) {
         console.error("Login error:", error);
 
-        // Increment attempt count
-        const newAttemptCount = attemptCount + 1;
-        setAttemptCount(newAttemptCount);
-
-        // Show captcha after 2 failed attempts
-        if (newAttemptCount >= 2) {
-          setShowCaptcha(true);
-          generateCaptcha();
-        }
-
-        // Lock account after max attempts
-        if (newAttemptCount >= MAX_ATTEMPTS) {
-          setIsLocked(true);
-          startCountdown(LOCKOUT_DURATION);
-          toast({
-            title: "Account Temporarily Locked",
-            description: `Too many failed login attempts. Account locked for ${Math.floor(LOCKOUT_DURATION / 60)} minutes.`,
-            variant: "destructive",
-            duration: 10000,
-          });
-          return;
-        }
-
-        // Handle specific error types
-        let title = "Login Failed";
-        let description =
-          "Invalid credentials. Please check your email and password.";
-
-        if (error.response?.status === 429) {
-          title = "Too Many Attempts";
-          description = "Please wait before trying again.";
-          startCountdown(30);
-        } else if (error.response?.status === 401) {
-          description = "Invalid email/username or password.";
-        } else if (error.response?.status >= 500) {
-          title = "Server Error";
-          description =
-            "Our servers are experiencing issues. Please try again later.";
-        } else if (error.message?.toLowerCase().includes("network")) {
-          title = "Connection Error";
-          description = "Please check your internet connection.";
-        }
-
         toast({
-          title,
-          description: `${description} (${MAX_ATTEMPTS - newAttemptCount} attempts remaining)`,
+          title: "Login Failed",
+          description:
+            "Invalid credentials. Please check your email and password.",
           variant: "destructive",
           duration: 5000,
         });
-      } finally {
-        isLoginInProgress.current = false;
       }
     },
   });
-
-  const isRateLimited = rateLimitCountdown > 0;
-  const canSubmit = !isSubmitting && !isRateLimited && !isLocked;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
