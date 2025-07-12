@@ -394,6 +394,72 @@ router.get("/debug/users", async (req, res) => {
   }
 });
 
+// Create test user for debugging
+router.post("/debug/create-test-user", async (req, res) => {
+  try {
+    // Delete existing test user if exists
+    await User.deleteOne({ email: "testuser@silentvoice.com" });
+
+    const testUserData = {
+      firstName: "Test",
+      lastName: "User",
+      username: "silentvoicetest",
+      email: "testuser@silentvoice.com",
+      password: "test123456",
+    };
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [
+        { email: testUserData.email.toLowerCase() },
+        { username: testUserData.username.toLowerCase() },
+      ],
+    });
+
+    if (existingUser) {
+      return res.json({
+        status: "info",
+        message: "Test user already exists",
+        credentials: {
+          email: testUserData.email,
+          password: testUserData.password,
+        },
+      });
+    }
+
+    // Hash password
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(testUserData.password, saltRounds);
+
+    // Create user
+    const user = new User({
+      firstName: testUserData.firstName,
+      lastName: testUserData.lastName,
+      username: testUserData.username.toLowerCase(),
+      email: testUserData.email.toLowerCase(),
+      password: hashedPassword,
+    });
+
+    await user.save();
+
+    res.json({
+      status: "success",
+      message: "Test user created successfully",
+      credentials: {
+        email: testUserData.email,
+        password: testUserData.password,
+      },
+    });
+  } catch (error) {
+    console.error("Create test user error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to create test user",
+      error: error.message,
+    });
+  }
+});
+
 // Get current user profile
 router.get("/me", protect, async (req, res) => {
   try {
