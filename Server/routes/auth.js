@@ -220,10 +220,10 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Find user by email or username
+    // Find user by email or username (including password for comparison)
     const user = await User.findOne({
       $or: [{ email: email.toLowerCase() }, { username: email.toLowerCase() }],
-    });
+    }).select("+password");
 
     if (!user) {
       return res.status(401).json({
