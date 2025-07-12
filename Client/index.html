@@ -26,13 +26,16 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
 
-    <!-- Critical CSS for better LCP -->
+    <!-- Critical CSS for better LCP and loading experience -->
     <style>
+      /* Base critical styles */
       #root {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
       }
+
+      /* Optimized loading screen */
       .loading-fallback {
         display: flex;
         align-items: center;
@@ -42,6 +45,45 @@
           system-ui,
           -apple-system,
           sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      /* Critical above-the-fold styles */
+      nav {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      /* Font display optimization */
+      @font-face {
+        font-family: "Pacifico";
+        font-display: swap;
+        src: url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
+      }
+
+      /* Prevent layout shift */
+      img {
+        height: auto;
+        max-width: 100%;
+      }
+
+      /* Loading animation */
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 12px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
       }
     </style>
 
