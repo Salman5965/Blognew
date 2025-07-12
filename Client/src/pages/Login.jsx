@@ -313,26 +313,7 @@ export const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 bg-background">
-        <div className="mx-auto w-full max-w-md">
-          {/* Theme toggle */}
-          <div className="flex justify-between items-center mb-8">
-            <div className="lg:hidden">
-              <BookOpen className="h-8 w-8 text-primary" />
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="ml-auto"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
+      <div className="w-full max-w-md">
 
           <Card className="border-0 shadow-xl">
             <CardHeader className="space-y-1 pb-6">
