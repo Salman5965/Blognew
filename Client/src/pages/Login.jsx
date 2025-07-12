@@ -108,29 +108,6 @@ export const Login = () => {
             <CardDescription className="text-center text-muted-foreground">
               Sign in to your account to continue your writing journey
             </CardDescription>
-
-            {/* Account status indicators */}
-            {attemptCount > 0 && !isLocked && (
-              <Alert variant="destructive" className="mt-4">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  {attemptCount} failed attempt{attemptCount > 1 ? "s" : ""}.
-                  {MAX_ATTEMPTS - attemptCount} remaining before temporary
-                  lockout.
-                </AlertDescription>
-              </Alert>
-            )}
-
-            {isLocked && (
-              <Alert variant="destructive" className="mt-4">
-                <Shield className="h-4 w-4" />
-                <AlertDescription>
-                  Account temporarily locked due to multiple failed attempts.
-                  {rateLimitCountdown > 0 &&
-                    ` Unlocks in ${Math.floor(rateLimitCountdown / 60)}:${(rateLimitCountdown % 60).toString().padStart(2, "0")}`}
-                </AlertDescription>
-              </Alert>
-            )}
           </CardHeader>
 
           <form onSubmit={handleSubmit}>
