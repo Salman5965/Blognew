@@ -34,6 +34,7 @@ import {
 } from "@/utils/validators";
 import { ROUTES } from "@/utils/constant";
 import { useToast } from "@/hooks/use-toast";
+import OAuthButtons from "@/components/auth/OAuthButtons";
 import {
   Loader2,
   BookOpen,
