@@ -164,9 +164,9 @@ const Help = () => {
     {
       id: 2,
       category: "getting-started",
-      question: "Is WriteNest free to use?",
+      question: "Is BlogHub free to use?",
       answer:
-        "Yes! WriteNest offers a free plan that includes basic blogging features, unlimited posts, and community access. We also offer premium plans with advanced features like custom domains, analytics, and priority support.",
+        "Yes! BlogHub offers a free plan that includes basic blogging features, unlimited posts, and community access. We also offer premium plans with advanced features like custom domains, analytics, and priority support.",
     },
     {
       id: 3,
