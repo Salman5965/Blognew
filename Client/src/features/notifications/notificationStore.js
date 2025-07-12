@@ -265,6 +265,7 @@ const useNotificationStore = create((set, get) => ({
 
   // Real-time notification handling
   addNotification: (notification) => {
+    console.log("📬 Adding new notification to store:", notification);
     set((state) => ({
       notifications: [notification, ...(state.notifications || [])],
       unreadCount: state.unreadCount + 1,
