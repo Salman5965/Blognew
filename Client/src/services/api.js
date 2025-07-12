@@ -53,17 +53,9 @@ class ApiService {
           let errorMessage = "Network connection failed";
           if (
             error.code === "ECONNABORTED" ||
-<<<<<<< HEAD
             error.message.includes("timeout")
           ) {
             errorMessage = "Request timed out. Please try again.";
-=======
-            error.message.includes("timeout") ||
-            error.message.includes("Request timed out")
-          ) {
-            errorMessage =
-              "Request is taking longer than expected. Please wait...";
->>>>>>> origin/main
           } else if (error.message.includes("Network Error")) {
             errorMessage =
               "Unable to connect to server. Please check your internet connection.";
