@@ -168,15 +168,6 @@ const Register = () => {
     }
   };
 
-  // OAuth signup handlers
-  const handleOAuthSignup = (provider) => {
-    toast({
-      title: "OAuth Registration",
-      description: `${provider} signup integration would be implemented here`,
-      duration: 3000,
-    });
-  };
-
   // Form validation and submission
   const { values, errors, isSubmitting, setValue, handleSubmit } = useForm({
     initialValues: {
