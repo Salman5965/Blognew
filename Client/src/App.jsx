@@ -32,6 +32,7 @@ const Login = React.lazy(() =>
   import("./pages/Login").then((module) => ({ default: module.Login })),
 );
 const Register = React.lazy(() => import("./pages/Register"));
+const ForgotPassword = React.lazy(() => import("./pages/ForgotPassword"));
 const CreateBlog = React.lazy(() =>
   import("./pages/CreateBlog").then((module) => ({
     default: module.CreateBlog,
