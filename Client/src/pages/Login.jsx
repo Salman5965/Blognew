@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   Card,
@@ -13,31 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
 import { useAuthContext } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { useForm } from "@/hooks/useForm";
-import { validateEmail, validatePassword } from "@/utils/validators";
+import { validateEmail } from "@/utils/validators";
 import { ROUTES } from "@/utils/constant";
 import { useToast } from "@/hooks/use-toast";
 import OAuthButtons from "@/components/auth/OAuthButtons";
-import {
-  Loader2,
-  BookOpen,
-  Eye,
-  EyeOff,
-  Moon,
-  Sun,
-  AlertTriangle,
-  CheckCircle,
-  Github,
-  Mail,
-  Apple,
-  Shield,
-  Zap,
-  Users,
-  Star,
-} from "lucide-react";
+import { Loader2, Eye, EyeOff, AlertTriangle, Mail } from "lucide-react";
 
 // Rate limiting configuration
 const RATE_LIMIT_DELAY = 2000; // 2 seconds between attempts
