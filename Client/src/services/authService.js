@@ -47,7 +47,7 @@ class AuthService {
 
   async getCurrentUser(retryCount = 0) {
     try {
-      const response = await apiService.get("/auth/profile");
+      const response = await apiService.get("/auth/me");
 
       if (response.status === "success") {
         return response.data.user;
