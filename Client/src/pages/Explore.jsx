@@ -211,8 +211,7 @@ const Explore = () => {
                       <span className="ml-1 opacity-70">({topic.count})</span>
                     )}
                   </Badge>
-                ))}
->>>>>>> origin/main
+                  ))}
               </div>
             )}
           </CardContent>
