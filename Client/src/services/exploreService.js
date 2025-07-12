@@ -121,21 +121,28 @@ class ExploreService {
     };
   }
 
-  // Get featured content (combines blogs, stories, etc.)
+  // Get featured content (using blogs endpoint)
   async getFeaturedContent(options = {}) {
     try {
       const params = new URLSearchParams();
       params.append("page", String(options.page || 1));
       params.append("limit", String(options.limit || 12));
+      params.append("sortBy", "views");
+      params.append("sortOrder", "desc");
 
-      if (options.type) {
-        params.append("type", options.type);
-      }
-
-      const response = await apiService.get(`/explore/featured?${params}`);
+      const response = await apiService.get(`/blogs?${params}`);
 
       if (response?.status === "success") {
-        return response.data;
+        return {
+          content: response.data.blogs || [],
+          pagination: response.data.pagination || {
+            currentPage: options.page || 1,
+            totalPages: 0,
+            totalItems: 0,
+            hasNextPage: false,
+            hasPrevPage: false,
+          },
+        };
       }
     } catch (error) {
       console.warn("Error fetching featured content:", error.message);
