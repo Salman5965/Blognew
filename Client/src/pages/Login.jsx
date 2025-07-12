@@ -212,30 +212,17 @@ export const Login = () => {
               </Button>
 
               {/* OAuth buttons */}
-              <OAuthButtons disabled={isSubmitting || isLocked} type="login" />
+              <OAuthButtons disabled={isSubmitting} type="login" />
 
               {/* Sign up link */}
               <div className="text-center text-sm text-muted-foreground">
                 Don't have an account?{" "}
                 <Link
                   to={ROUTES.REGISTER}
-                  className="text-primary hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                  className="text-primary hover:underline font-medium"
                 >
                   Create one now
                 </Link>
-              </div>
-
-              {/* Security notice */}
-              <div className="text-center text-xs text-muted-foreground pt-4">
-                <div className="flex items-center justify-center space-x-1 mb-2">
-                  <Shield className="h-3 w-3" />
-                  <span>Protected by enterprise-grade security</span>
-                </div>
-                <div className="flex items-center justify-center space-x-4">
-                  <span>• 256-bit SSL encryption</span>
-                  <span>• SOC 2 compliant</span>
-                  <span>• GDPR ready</span>
-                </div>
               </div>
             </CardFooter>
           </form>
