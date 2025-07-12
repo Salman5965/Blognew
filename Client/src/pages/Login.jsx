@@ -34,45 +34,6 @@ export const Login = () => {
   // Redirect target after login
   const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
 
-  // Generate simple math captcha
-  const generateCaptcha = () => {
-    const num1 = Math.floor(Math.random() * 10) + 1;
-    const num2 = Math.floor(Math.random() * 10) + 1;
-    const operations = ["+", "-", "*"];
-    const operation = operations[Math.floor(Math.random() * operations.length)];
-
-    let answer;
-    let question;
-
-    switch (operation) {
-      case "+":
-        answer = num1 + num2;
-        question = `${num1} + ${num2}`;
-        break;
-      case "-":
-        // Ensure positive result
-        const [bigger, smaller] = num1 >= num2 ? [num1, num2] : [num2, num1];
-        answer = bigger - smaller;
-        question = `${bigger} - ${smaller}`;
-        break;
-      case "*":
-        answer = num1 * num2;
-        question = `${num1} × ${num2}`;
-        break;
-      default:
-        answer = num1 + num2;
-        question = `${num1} + ${num2}`;
-    }
-
-    setCaptchaQuestion({ question, answer });
-    setCaptchaAnswer("");
-  };
-
-  // Initialize captcha on mount
-  useEffect(() => {
-    generateCaptcha();
-  }, []);
-
   // Check if user is already authenticated
   useEffect(() => {
     if (isAuthenticated) {
@@ -87,29 +48,6 @@ export const Login = () => {
       setRememberMe(true);
     }
   }, []);
-
-  // Cleanup countdown interval on unmount
-  useEffect(() => {
-    return () => {
-      if (countdownInterval.current) {
-        clearInterval(countdownInterval.current);
-      }
-    };
-  }, []);
-
-  // Rate limiting countdown
-  const startCountdown = (seconds) => {
-    setRateLimitCountdown(seconds);
-    countdownInterval.current = setInterval(() => {
-      setRateLimitCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(countdownInterval.current);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
 
   // Form validation and submission
   const {
