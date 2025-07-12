@@ -399,8 +399,8 @@ router.post("/debug/create-test-user", async (req, res) => {
     const testUserData = {
       firstName: "Test",
       lastName: "User",
-      username: "silentvoicetest",
-      email: "testuser@silentvoice.com",
+      username: "abcduser",
+      email: "abcd@gmail.com",
       password: "test123456",
     };
 
