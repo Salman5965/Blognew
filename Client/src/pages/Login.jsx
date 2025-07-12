@@ -312,7 +312,7 @@ export const Login = () => {
   const canSubmit = !isSubmitting && !isRateLimited && !isLocked;
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       {/* Left side - Branding/Features */}
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
