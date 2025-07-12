@@ -13,22 +13,18 @@ const NotificationButton = () => {
   const panelRef = useRef(null);
 
   const { user, isAuthenticated } = useAuthContext();
-  const { unreadCount, fetchNotifications, fetchUnreadCount, initialize } =
+  const { unreadCount, fetchNotifications, initialize } =
     useNotificationStore();
+
+  // Use the real-time notifications hook
+  const { socketConnected, socketStatus } = useRealTimeNotifications();
 
   // Initialize notifications when authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
       initialize();
-
-      // Set up polling for new notifications
-      const interval = setInterval(() => {
-        fetchUnreadCount();
-      }, 5000); // Check every 5 seconds for real-time updates
-
-      return () => clearInterval(interval);
     }
-  }, [isAuthenticated, user, initialize, fetchUnreadCount]);
+  }, [isAuthenticated, user, initialize]);
 
   // Handle click outside to close panel
   useEffect(() => {
