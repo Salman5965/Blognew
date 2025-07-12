@@ -96,7 +96,7 @@ router.patch(
 );
 
 // Get unread message count
-router.get("/unread-count", getUnreadCount);
+router.get("/unread-count", protect, getUnreadCount);
 
 // Edit a message
 router.patch(
