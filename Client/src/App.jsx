@@ -172,6 +172,7 @@ const Login = React.lazy(() =>
 );
 const Register = React.lazy(() => import("./pages/Register"));
 const ForgotPassword = React.lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = React.lazy(() => import("./pages/ResetPassword"));
 const CreateBlog = React.lazy(() =>
   import("./pages/CreateBlog").then((module) => ({
     default: module.CreateBlog,
@@ -262,6 +263,7 @@ const AppLayout = () => {
             <Route path={ROUTES.LOGIN} element={<Login />} />
             <Route path={ROUTES.REGISTER} element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path={ROUTES.HELP} element={<Help />} />
 
             {/* Public browsing routes */}
