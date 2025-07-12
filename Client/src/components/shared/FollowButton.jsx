@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { followService } from "@/services/followService";
+import notificationService from "@/services/notificationService";
 import { UserPlus, UserMinus, Loader2, UserCheck } from "lucide-react";
 import { isValidObjectId } from "@/utils/validation";
 
