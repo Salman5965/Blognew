@@ -168,7 +168,7 @@ export const Navbar = () => {
       } catch (error) {
         console.error("Search failed:", error);
 
-        // Handle rate limiting gracefully
+        // Handle different types of errors gracefully
         if (
           error.message?.includes("Too many requests") ||
           error.status === 429
@@ -181,8 +181,30 @@ export const Navbar = () => {
               message: "Please slow down your search. Try again in a moment.",
             },
           ]);
+        } else if (
+          error.status === 401 ||
+          error.message?.includes("Access denied")
+        ) {
+          // For authentication errors, show a helpful message
+          setSearchResults([
+            {
+              type: "error",
+              id: "auth-required",
+              title: "Limited search results",
+              message: isAuthenticated
+                ? "Session expired. Please refresh the page."
+                : "Sign in for full search results.",
+            },
+          ]);
         } else {
-          setSearchResults([]);
+          setSearchResults([
+            {
+              type: "error",
+              id: "search-error",
+              title: "Search temporarily unavailable",
+              message: "Please try again in a moment.",
+            },
+          ]);
         }
       } finally {
         setIsSearching(false);
