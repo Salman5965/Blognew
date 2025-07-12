@@ -555,4 +555,41 @@ router.get("/me", protect, async (req, res) => {
   }
 });
 
+// Update current user profile
+router.put("/me", protect, async (req, res) => {
+  try {
+    const updates = req.body;
+
+    // Remove sensitive fields that shouldn't be updated through this endpoint
+    delete updates.password;
+    delete updates.role;
+    delete updates._id;
+    delete updates.id;
+
+    const user = await User.findByIdAndUpdate(req.user._id, updates, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      status: "success",
+      message: "Profile updated successfully",
+      data: { user },
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to update profile",
+    });
+  }
+});
+
 export default router;
