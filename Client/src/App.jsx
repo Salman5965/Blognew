@@ -220,17 +220,10 @@ const NotificationDebug = React.lazy(
   () => import("./components/notifications/NotificationDebug"),
 );
 
-// Optimized loading component for better perceived performance
+// Simplified, fast loading component
 const PageLoader = () => (
-  <div className="container mx-auto px-4 py-8 max-w-4xl min-h-[50vh] flex items-center justify-center">
-    <div className="text-center space-y-4">
-      <div
-        className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"
-        role="status"
-        aria-label="Loading"
-      ></div>
-      <p className="text-muted-foreground">Loading amazing content...</p>
-    </div>
+  <div className="flex items-center justify-center min-h-[200px]">
+    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
   </div>
 );
 
