@@ -502,7 +502,7 @@ const Help = () => {
             <h3 className="text-xl font-bold mb-2">Still need help?</h3>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Can't find what you're looking for? Our support team is here to
-              help you get the most out of WriteNest.
+              help you get the most out of BlogHub.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button onClick={() => handleQuickAction("contact")} size="lg">
