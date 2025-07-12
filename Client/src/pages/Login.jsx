@@ -32,7 +32,7 @@ export const Login = () => {
   const [rememberMe, setRememberMe] = useState(false);
 
   // Redirect target after login
-  const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
+  const from = location.state?.from?.pathname || ROUTES.FEED;
 
   // Check if user is already authenticated
   useEffect(() => {
