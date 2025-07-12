@@ -60,10 +60,13 @@ export const Navbar = () => {
     const fetchCounts = async () => {
       try {
         // Import services dynamically to avoid circular dependencies
-        const { notificationService } = await import(
+        const notificationServiceModule = await import(
           "@/services/notificationService"
         );
-        const { messageService } = await import("@/services/messageService");
+        const messageServiceModule = await import("@/services/messageService");
+
+        const notificationService = notificationServiceModule.default;
+        const messageService = messageServiceModule.default;
 
         const [notificationResult, messageResult] = await Promise.allSettled([
           notificationService.getUnreadCount(),
