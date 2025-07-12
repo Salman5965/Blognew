@@ -370,6 +370,30 @@ router.post("/register", async (req, res) => {
   }
 });
 
+// Debug endpoint to check users (temporary)
+router.get("/debug/users", async (req, res) => {
+  try {
+    const users = await User.find({})
+      .select("email username firstName lastName")
+      .limit(10);
+    res.json({
+      status: "success",
+      count: users.length,
+      users: users.map((u) => ({
+        email: u.email,
+        username: u.username,
+        name: `${u.firstName} ${u.lastName}`.trim(),
+      })),
+    });
+  } catch (error) {
+    console.error("Debug users error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to get users",
+    });
+  }
+});
+
 // Get current user profile
 router.get("/me", protect, async (req, res) => {
   try {
