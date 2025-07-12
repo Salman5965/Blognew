@@ -314,220 +314,215 @@ export const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
+        <Card className="border-0 shadow-xl">
+          <CardHeader className="space-y-1 pb-6">
+            <CardTitle className="text-2xl font-bold text-center">
+              Welcome back
+            </CardTitle>
+            <CardDescription className="text-center text-muted-foreground">
+              Sign in to your account to continue your writing journey
+            </CardDescription>
 
-          <Card className="border-0 shadow-xl">
-            <CardHeader className="space-y-1 pb-6">
-              <CardTitle className="text-2xl font-bold text-center">
-                Welcome back
-              </CardTitle>
-              <CardDescription className="text-center text-muted-foreground">
-                Sign in to your account to continue your writing journey
-              </CardDescription>
+            {/* Account status indicators */}
+            {attemptCount > 0 && !isLocked && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  {attemptCount} failed attempt{attemptCount > 1 ? "s" : ""}.
+                  {MAX_ATTEMPTS - attemptCount} remaining before temporary
+                  lockout.
+                </AlertDescription>
+              </Alert>
+            )}
 
-              {/* Account status indicators */}
-              {attemptCount > 0 && !isLocked && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    {attemptCount} failed attempt{attemptCount > 1 ? "s" : ""}.
-                    {MAX_ATTEMPTS - attemptCount} remaining before temporary
-                    lockout.
-                  </AlertDescription>
-                </Alert>
-              )}
+            {isLocked && (
+              <Alert variant="destructive" className="mt-4">
+                <Shield className="h-4 w-4" />
+                <AlertDescription>
+                  Account temporarily locked due to multiple failed attempts.
+                  {rateLimitCountdown > 0 &&
+                    ` Unlocks in ${Math.floor(rateLimitCountdown / 60)}:${(rateLimitCountdown % 60).toString().padStart(2, "0")}`}
+                </AlertDescription>
+              </Alert>
+            )}
+          </CardHeader>
 
-              {isLocked && (
-                <Alert variant="destructive" className="mt-4">
-                  <Shield className="h-4 w-4" />
-                  <AlertDescription>
-                    Account temporarily locked due to multiple failed attempts.
-                    {rateLimitCountdown > 0 &&
-                      ` Unlocks in ${Math.floor(rateLimitCountdown / 60)}:${(rateLimitCountdown % 60).toString().padStart(2, "0")}`}
-                  </AlertDescription>
-                </Alert>
-              )}
-            </CardHeader>
-
-            <form onSubmit={handleSubmit}>
-              <CardContent className="space-y-4">
-                {/* Email/Username input */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email or Username</Label>
-                  <div className="relative">
-                    <Input
-                      id="email"
-                      type="text"
-                      placeholder="Enter your email or username"
-                      value={values.email}
-                      onChange={(e) => setValue("email", e.target.value)}
-                      disabled={isSubmitting || isLocked}
-                      autoComplete="username"
-                      autoFocus
-                      className="pr-10"
-                    />
-                    <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  </div>
-                  {errors.email && (
-                    <p className="text-sm text-destructive flex items-center">
-                      <AlertTriangle className="h-3 w-3 mr-1" />
-                      {errors.email}
-                    </p>
-                  )}
-                </div>
-
-                {/* Password input */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link
-                      to={ROUTES.FORGOT_PASSWORD}
-                      className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Enter your password"
-                      value={values.password}
-                      onChange={(e) => setValue("password", e.target.value)}
-                      disabled={isSubmitting || isLocked}
-                      autoComplete="current-password"
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded"
-                      disabled={isSubmitting || isLocked}
-                      tabIndex={-1}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-sm text-destructive flex items-center">
-                      <AlertTriangle className="h-3 w-3 mr-1" />
-                      {errors.password}
-                    </p>
-                  )}
-                </div>
-
-                {/* Captcha (shown after failed attempts) */}
-                {showCaptcha && (
-                  <div className="space-y-2">
-                    <Label htmlFor="captcha">Security Check</Label>
-                    <div className="flex items-center space-x-3">
-                      <div className="flex-1">
-                        <div className="bg-muted p-3 rounded text-center font-mono text-lg border">
-                          What is {captchaQuestion.question}?
-                        </div>
-                      </div>
-                      <Input
-                        id="captcha"
-                        type="number"
-                        placeholder="Answer"
-                        value={captchaAnswer}
-                        onChange={(e) => setCaptchaAnswer(e.target.value)}
-                        disabled={isSubmitting || isLocked}
-                        className="w-20"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={generateCaptcha}
-                        disabled={isSubmitting || isLocked}
-                      >
-                        ↻
-                      </Button>
-                    </div>
-                    {errors.captcha && (
-                      <p className="text-sm text-destructive flex items-center">
-                        <AlertTriangle className="h-3 w-3 mr-1" />
-                        {errors.captcha}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {/* Remember me checkbox */}
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="remember"
-                    checked={rememberMe}
-                    onCheckedChange={setRememberMe}
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              {/* Email/Username input */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email or Username</Label>
+                <div className="relative">
+                  <Input
+                    id="email"
+                    type="text"
+                    placeholder="Enter your email or username"
+                    value={values.email}
+                    onChange={(e) => setValue("email", e.target.value)}
                     disabled={isSubmitting || isLocked}
+                    autoComplete="username"
+                    autoFocus
+                    className="pr-10"
                   />
-                  <Label
-                    htmlFor="remember"
-                    className="text-sm font-normal cursor-pointer"
-                  >
-                    Remember me for 30 days
-                  </Label>
+                  <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 </div>
-              </CardContent>
+                {errors.email && (
+                  <p className="text-sm text-destructive flex items-center">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    {errors.email}
+                  </p>
+                )}
+              </div>
 
-              <CardFooter className="flex flex-col space-y-4 pt-6">
-                {/* Main login button */}
-                <Button
-                  type="submit"
-                  className="w-full h-11 text-base font-medium"
-                  disabled={!canSubmit}
-                >
-                  {isSubmitting && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  {isLocked
-                    ? rateLimitCountdown > 0
-                      ? `Locked (${Math.floor(rateLimitCountdown / 60)}:${(rateLimitCountdown % 60).toString().padStart(2, "0")})`
-                      : "Account Locked"
-                    : isRateLimited
-                      ? `Wait ${rateLimitCountdown}s`
-                      : isSubmitting
-                        ? "Signing In..."
-                        : "Sign In"}
-                </Button>
-
-                {/* OAuth buttons */}
-                <OAuthButtons
-                  disabled={isSubmitting || isLocked}
-                  type="login"
-                />
-
-                {/* Sign up link */}
-                <div className="text-center text-sm text-muted-foreground">
-                  Don't have an account?{" "}
+              {/* Password input */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
                   <Link
-                    to={ROUTES.REGISTER}
-                    className="text-primary hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                    to={ROUTES.FORGOT_PASSWORD}
+                    className="text-sm text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
                   >
-                    Create one now
+                    Forgot password?
                   </Link>
                 </div>
-
-                {/* Security notice */}
-                <div className="text-center text-xs text-muted-foreground pt-4">
-                  <div className="flex items-center justify-center space-x-1 mb-2">
-                    <Shield className="h-3 w-3" />
-                    <span>Protected by enterprise-grade security</span>
-                  </div>
-                  <div className="flex items-center justify-center space-x-4">
-                    <span>• 256-bit SSL encryption</span>
-                    <span>• SOC 2 compliant</span>
-                    <span>• GDPR ready</span>
-                  </div>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={values.password}
+                    onChange={(e) => setValue("password", e.target.value)}
+                    disabled={isSubmitting || isLocked}
+                    autoComplete="current-password"
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                    disabled={isSubmitting || isLocked}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
-              </CardFooter>
-            </form>
-          </Card>
-        </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive flex items-center">
+                    <AlertTriangle className="h-3 w-3 mr-1" />
+                    {errors.password}
+                  </p>
+                )}
+              </div>
+
+              {/* Captcha (shown after failed attempts) */}
+              {showCaptcha && (
+                <div className="space-y-2">
+                  <Label htmlFor="captcha">Security Check</Label>
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-1">
+                      <div className="bg-muted p-3 rounded text-center font-mono text-lg border">
+                        What is {captchaQuestion.question}?
+                      </div>
+                    </div>
+                    <Input
+                      id="captcha"
+                      type="number"
+                      placeholder="Answer"
+                      value={captchaAnswer}
+                      onChange={(e) => setCaptchaAnswer(e.target.value)}
+                      disabled={isSubmitting || isLocked}
+                      className="w-20"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={generateCaptcha}
+                      disabled={isSubmitting || isLocked}
+                    >
+                      ↻
+                    </Button>
+                  </div>
+                  {errors.captcha && (
+                    <p className="text-sm text-destructive flex items-center">
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      {errors.captcha}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Remember me checkbox */}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember"
+                  checked={rememberMe}
+                  onCheckedChange={setRememberMe}
+                  disabled={isSubmitting || isLocked}
+                />
+                <Label
+                  htmlFor="remember"
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  Remember me for 30 days
+                </Label>
+              </div>
+            </CardContent>
+
+            <CardFooter className="flex flex-col space-y-4 pt-6">
+              {/* Main login button */}
+              <Button
+                type="submit"
+                className="w-full h-11 text-base font-medium"
+                disabled={!canSubmit}
+              >
+                {isSubmitting && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {isLocked
+                  ? rateLimitCountdown > 0
+                    ? `Locked (${Math.floor(rateLimitCountdown / 60)}:${(rateLimitCountdown % 60).toString().padStart(2, "0")})`
+                    : "Account Locked"
+                  : isRateLimited
+                    ? `Wait ${rateLimitCountdown}s`
+                    : isSubmitting
+                      ? "Signing In..."
+                      : "Sign In"}
+              </Button>
+
+              {/* OAuth buttons */}
+              <OAuthButtons disabled={isSubmitting || isLocked} type="login" />
+
+              {/* Sign up link */}
+              <div className="text-center text-sm text-muted-foreground">
+                Don't have an account?{" "}
+                <Link
+                  to={ROUTES.REGISTER}
+                  className="text-primary hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                >
+                  Create one now
+                </Link>
+              </div>
+
+              {/* Security notice */}
+              <div className="text-center text-xs text-muted-foreground pt-4">
+                <div className="flex items-center justify-center space-x-1 mb-2">
+                  <Shield className="h-3 w-3" />
+                  <span>Protected by enterprise-grade security</span>
+                </div>
+                <div className="flex items-center justify-center space-x-4">
+                  <span>• 256-bit SSL encryption</span>
+                  <span>• SOC 2 compliant</span>
+                  <span>• GDPR ready</span>
+                </div>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
       </div>
     </div>
   );
