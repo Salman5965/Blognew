@@ -47,9 +47,15 @@ export const ThemeProvider = ({ children, defaultTheme = "system" }) => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.THEME, newTheme);
   };
 
+  const toggleTheme = () => {
+    const newTheme = actualTheme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+  };
+
   const value = {
     theme,
     setTheme,
+    toggleTheme,
     actualTheme,
   };
 

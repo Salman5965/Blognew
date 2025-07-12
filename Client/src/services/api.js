@@ -11,7 +11,7 @@ class ApiService {
   constructor() {
     this.instance = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 10000,
+      timeout: 60000, // Increased to 60 seconds for slow responses
       headers: {
         "Content-Type": "application/json",
       },
@@ -39,10 +39,33 @@ class ApiService {
       (error) => {
         // Handle network errors gracefully
         if (!error.response) {
-          // Network error, server down, etc.
-          console.error("Network error:", error.message);
-          const networkError = new Error("Network connection failed");
+          // Network error, server down, timeout, etc.
+          console.error("Network error:", {
+            message: error.message,
+            code: error.code,
+            config: {
+              url: error.config?.url,
+              method: error.config?.method,
+              timeout: error.config?.timeout,
+            },
+          });
+
+          let errorMessage = "Network connection failed";
+          if (
+            error.code === "ECONNABORTED" ||
+            error.message.includes("timeout") ||
+            error.message.includes("Request timed out")
+          ) {
+            errorMessage =
+              "Request is taking longer than expected. Please wait...";
+          } else if (error.message.includes("Network Error")) {
+            errorMessage =
+              "Unable to connect to server. Please check your internet connection.";
+          }
+
+          const networkError = new Error(errorMessage);
           networkError.isNetworkError = true;
+          networkError.originalError = error;
           return Promise.reject(networkError);
         }
 
@@ -93,6 +116,21 @@ class ApiService {
             localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_DATA);
             window.location.href = "/login";
           }
+<<<<<<< HEAD
+=======
+        }
+
+        // Log detailed error information for debugging
+        if (error.response?.status === 400) {
+          console.error("400 Bad Request Error:", {
+            url: error.config?.url,
+            method: error.config?.method,
+            data: JSON.parse(error.config?.data || "{}"),
+            responseData: error.response?.data,
+            status: error.response?.status,
+            statusText: error.response?.statusText,
+          });
+>>>>>>> origin/main
         }
 
         return Promise.reject(error);
@@ -178,6 +216,20 @@ class ApiService {
 
       // Handle network errors gracefully
       if (error.isNetworkError || !error.response) {
+        // Check if it's a timeout error specifically
+        if (
+          error.code === "ECONNABORTED" ||
+          error.message.includes("timeout")
+        ) {
+          const timeoutError = new Error(
+            "Request is taking longer than expected. The server might be slow.",
+          );
+          timeoutError.isNetworkError = true;
+          timeoutError.isTimeout = true;
+          timeoutError.originalError = error;
+          throw timeoutError;
+        }
+
         const networkError = new Error("Failed to fetch data");
         networkError.isNetworkError = true;
         networkError.originalError = error;
@@ -228,18 +280,41 @@ class ApiService {
       const response = await this.instance.delete(url, config);
       return response.data;
     } catch (error) {
-      // Handle network errors gracefully
-      if (error.isNetworkError || !error.response) {
-        throw new Error("Failed to delete data");
+      if (error.response?.status === 404) {
+        // Handle 404 gracefully for delete operations
+        return {
+          status: "success",
+          message: "Resource not found or already deleted",
+        };
       }
       throw error;
     }
-    return response.data;
   }
 
-  async delete(url, config) {
-    const response = await this.instance.delete(url, config);
-    return response.data;
+  // Retry utility for network operations
+  async withRetry(operation, maxRetries = 2, baseDelay = 1000) {
+    let lastError;
+
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+
+        // Only retry network errors
+        if (error.isNetworkError && attempt < maxRetries) {
+          const delay = baseDelay * Math.pow(2, attempt);
+          console.warn(
+            `Operation failed, retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries + 1})`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        } else {
+          break;
+        }
+      }
+    }
+
+    throw lastError;
   }
 
   setAuthToken(token) {

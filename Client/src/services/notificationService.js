@@ -152,9 +152,13 @@ class NotificationService {
   // Update notification preferences
   async updatePreferences(preferences) {
     try {
+<<<<<<< HEAD
       const response = await api.put("/notifications/preferences", {
         preferences,
       });
+=======
+      const response = await api.patch("/notifications/settings", preferences);
+>>>>>>> origin/main
       return {
         success: true,
         data: response?.data || preferences,
@@ -173,7 +177,11 @@ class NotificationService {
   // Get notification preferences
   async getPreferences() {
     try {
+<<<<<<< HEAD
       const response = await api.get("/notifications/preferences");
+=======
+      const response = await api.get("/notifications/settings");
+>>>>>>> origin/main
 
       // Check if this is a 404 response from our API service
       if (response?._isError && response.status === 404) {
@@ -204,6 +212,31 @@ class NotificationService {
     }
   }
 
+<<<<<<< HEAD
+=======
+  // Create a new notification
+  async createNotification(notificationData) {
+    try {
+      const response = await api.post(
+        "/notifications/create",
+        notificationData,
+      );
+      return {
+        success: true,
+        data: response?.data || response,
+      };
+    } catch (error) {
+      if (error.response?.status !== 404) {
+        console.error("Error creating notification:", error);
+      }
+      return {
+        success: false,
+        error: error.response?.data?.message || "Failed to create notification",
+      };
+    }
+  }
+
+>>>>>>> origin/main
   getDefaultPreferences() {
     return {
       email: {

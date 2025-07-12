@@ -180,11 +180,35 @@ const CreateStory = () => {
       setIsSaving(true);
 
       const storyData = {
+<<<<<<< HEAD
         ...formData,
         isPublished: publishNow,
         readTime: Math.ceil(formData.content.split(" ").length / 200), // ~200 WPM
       };
 
+=======
+        title: formData.title.trim(),
+        content: formData.content.trim(),
+        isPublished: publishNow,
+        readTime: Math.ceil(formData.content.split(" ").length / 200), // ~200 WPM
+        visibility: formData.isPublic ? "public" : "private",
+        allowComments: formData.allowComments,
+      };
+
+      // Only include optional fields if they have values
+      if (formData.coverImage && typeof formData.coverImage === "string") {
+        storyData.coverImage = formData.coverImage.trim();
+      }
+
+      // Handle excerpt if provided
+      if (formData.excerpt && formData.excerpt.trim()) {
+        storyData.excerpt = formData.excerpt.trim();
+      }
+
+      console.log("CreateStory: Sending story data:", storyData);
+      console.log("CreateStory: Original form data:", formData);
+
+>>>>>>> origin/main
       await storiesService.createStory(storyData);
 
       toast({

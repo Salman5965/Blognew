@@ -132,7 +132,12 @@ export const loginUser = async (req, res, next) => {
 // @access  Private
 export const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).populate("blogCount");
+    // Use lean query and select only needed fields for better performance
+    const user = await User.findById(req.user.id)
+      .select(
+        "username email firstName lastName bio avatar socialLinks isEmailVerified role isActive createdAt",
+      )
+      .lean();
 
     if (!user) {
       return res.status(404).json({
@@ -144,7 +149,7 @@ export const getProfile = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       data: {
-        user: user.getSafeUserData(),
+        user,
       },
     });
   } catch (error) {
@@ -174,6 +179,9 @@ export const updateProfile = async (req, res, next) => {
       "avatar",
       "socialLinks",
       "preferences",
+      "profileVisibility",
+      "privacySettings",
+      "notificationSettings",
     ];
     const updates = {};
 

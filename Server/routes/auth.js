@@ -10,6 +10,7 @@ import {
 } from "../controllers/authController.js";
 import { protect } from "../middlewares/auth.js";
 import { loginRateLimiter, rateLimiter } from "../middlewares/rateLimiter.js";
+import { cacheResponse } from "../middlewares/cache.js";
 import {
   validateRegister,
   validateLogin,
@@ -58,7 +59,7 @@ router.post("/logout", protect, logoutUser);
  * @desc    Get current user profile
  * @access  Private
  */
-router.get("/profile", protect, getProfile);
+router.get("/profile", protect, cacheResponse(60), getProfile); // Cache for 1 minute
 
 /**
  * @route   PUT /api/auth/profile

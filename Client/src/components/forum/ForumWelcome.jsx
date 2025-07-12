@@ -166,7 +166,7 @@ const ForumWelcome = ({
               <CardContent className="p-4 text-center">
                 <Users className="h-8 w-8 text-primary mx-auto mb-2" />
                 <div className="text-2xl font-bold">
-                  {stats.totalMembers.toLocaleString()}
+                  {(stats?.totalMembers || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground">
                   Total Members
@@ -181,7 +181,7 @@ const ForumWelcome = ({
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
                 </div>
                 <div className="text-2xl font-bold">
-                  {stats.onlineMembers.toLocaleString()}
+                  {(stats?.onlineMembers || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground">Online Now</div>
               </CardContent>
@@ -191,7 +191,7 @@ const ForumWelcome = ({
               <CardContent className="p-4 text-center">
                 <MessageCircle className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                 <div className="text-2xl font-bold">
-                  {stats.totalMessages.toLocaleString()}
+                  {(stats?.totalMessages || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-muted-foreground">Messages</div>
               </CardContent>
@@ -200,7 +200,9 @@ const ForumWelcome = ({
             <Card>
               <CardContent className="p-4 text-center">
                 <Hash className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold">{stats.channelsCount}</div>
+                <div className="text-2xl font-bold">
+                  {stats?.channelsCount || 0}
+                </div>
                 <div className="text-sm text-muted-foreground">Channels</div>
               </CardContent>
             </Card>

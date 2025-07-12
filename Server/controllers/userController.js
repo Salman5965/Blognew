@@ -1,6 +1,8 @@
 import User from "../models/User.js";
 import Blog from "../models/Blog.js";
 import Comment from "../models/Comment.js";
+import Follow from "../models/Follow.js";
+import Story from "../models/Story.js";
 import { validationResult } from "express-validator";
 
 // @desc    Get all users (admin only)
@@ -293,14 +295,67 @@ export const getUserStats = async (req, res, next) => {
       },
     ]);
 
-    // Get comment statistics
+    // Get comments on user's blogs
     const commentStats = await Comment.aggregate([
-      { $match: { author: user._id, status: "active" } },
+      {
+        $lookup: {
+          from: "blogs",
+          localField: "contentId",
+          foreignField: "_id",
+          as: "blog",
+        },
+      },
+      {
+        $match: {
+          "blog.author": user._id,
+          "blog.status": "published",
+          status: "active",
+        },
+      },
       {
         $group: {
           _id: null,
           totalComments: { $sum: 1 },
           totalCommentLikes: { $sum: { $size: "$likes" } },
+        },
+      },
+    ]);
+
+    // Get story statistics
+    const storyStats = await Story.aggregate([
+      { $match: { author: user._id, isPublished: true } },
+      {
+        $group: {
+          _id: null,
+          totalStories: { $sum: 1 },
+          totalViews: { $sum: "$views" },
+          totalLikes: { $sum: { $size: "$likes" } },
+          avgReadTime: { $avg: "$readTime" },
+        },
+      },
+    ]);
+
+    // Get comments on user's stories
+    const storyCommentStats = await Comment.aggregate([
+      {
+        $lookup: {
+          from: "stories",
+          localField: "contentId",
+          foreignField: "_id",
+          as: "story",
+        },
+      },
+      {
+        $match: {
+          "story.author": user._id,
+          "story.isPublished": true,
+          status: "active",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalStoryComments: { $sum: 1 },
         },
       },
     ]);
@@ -337,9 +392,18 @@ export const getUserStats = async (req, res, next) => {
         totalLikes: 0,
         avgReadTime: 0,
       },
-      comments: commentStats[0] || {
-        totalComments: 0,
-        totalCommentLikes: 0,
+      stories: storyStats[0] || {
+        totalStories: 0,
+        totalViews: 0,
+        totalLikes: 0,
+        avgReadTime: 0,
+      },
+      comments: {
+        ...(commentStats[0] || {
+          totalComments: 0,
+          totalCommentLikes: 0,
+        }),
+        totalStoryComments: storyCommentStats[0]?.totalStoryComments || 0,
       },
       monthlyStats,
       joinedDate: user.createdAt,
@@ -497,6 +561,7 @@ export const getTopAuthors = async (req, res, next) => {
           totalViews: 1,
           totalLikes: 1,
           authorScore: 1,
+          createdAt: 1,
         },
       },
     ]);
@@ -505,6 +570,126 @@ export const getTopAuthors = async (req, res, next) => {
       status: "success",
       data: {
         authors: topAuthors,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get user's followers
+// @route   GET /api/users/:id/followers
+// @access  Public
+export const getFollowers = async (req, res, next) => {
+  try {
+    const { id: userId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // Get followers with pagination
+    const followers = await Follow.find({ following: userId })
+      .populate("follower", "username firstName lastName avatar bio")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // Get total count
+    const totalFollowers = await Follow.countDocuments({ following: userId });
+
+    // Format response
+    const formattedFollowers = followers.map((follow) => ({
+      id: follow.follower._id,
+      username: follow.follower.username,
+      firstName: follow.follower.firstName,
+      lastName: follow.follower.lastName,
+      avatar: follow.follower.avatar,
+      bio: follow.follower.bio,
+      followedAt: follow.createdAt,
+    }));
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        followers: formattedFollowers,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalFollowers / limit),
+          totalFollowers,
+          hasNextPage: page < Math.ceil(totalFollowers / limit),
+          hasPrevPage: page > 1,
+          limit,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get user's following
+// @route   GET /api/users/:id/following
+// @access  Public
+export const getFollowing = async (req, res, next) => {
+  try {
+    const { id: userId } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    // Check if user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // Get following with pagination
+    const following = await Follow.find({ follower: userId })
+      .populate("following", "username firstName lastName avatar bio")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    // Get total count
+    const totalFollowing = await Follow.countDocuments({ follower: userId });
+
+    // Format response
+    const formattedFollowing = following.map((follow) => ({
+      id: follow.following._id,
+      username: follow.following.username,
+      firstName: follow.following.firstName,
+      lastName: follow.following.lastName,
+      avatar: follow.following.avatar,
+      bio: follow.following.bio,
+      followedAt: follow.createdAt,
+    }));
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        following: formattedFollowing,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalFollowing / limit),
+          totalFollowing,
+          hasNextPage: page < Math.ceil(totalFollowing / limit),
+          hasPrevPage: page > 1,
+          limit,
+        },
       },
     });
   } catch (error) {

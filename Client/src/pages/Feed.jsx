@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -83,8 +82,24 @@ const Feed = () => {
         sortOrder: "desc",
       };
 
-      if (search) {
-        query.search = search;
+      // Add filter-specific parameters
+      if (filter === "following" && user) {
+        query.following = true;
+        query.userId = user.id;
+      }
+
+      if (filter === "trending") {
+        query.trending = true;
+        query.timeframe = "week"; // trending in the last week
+      }
+
+      if (filter === "popular") {
+        query.popular = true;
+        query.minLikes = 1; // minimum likes for popular posts
+      }
+
+      if (search && search.trim()) {
+        query.search = search.trim();
       }
 
       const response = await blogService.getBlogs(query);
@@ -116,13 +131,14 @@ const Feed = () => {
   const getSortBy = (filter) => {
     switch (filter) {
       case "trending":
-        return "views";
+        return "viewsCount"; // Sort by view count for trending
       case "popular":
-        return "likeCount";
+        return "likesCount"; // Sort by likes count for popular
       case "following":
-        return "createdAt"; // In real app, filter by followed users
+        return "createdAt"; // Sort by creation date for following
+      case "latest":
       default:
-        return "createdAt";
+        return "createdAt"; // Sort by creation date for latest
     }
   };
 
@@ -130,16 +146,18 @@ const Feed = () => {
     loadPosts();
   }, []);
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setRefreshing(true);
     setCurrentPage(1);
-    loadPosts(1, selectedFilter, searchQuery, false);
+    await loadPosts(1, selectedFilter, searchQuery, false);
   };
 
-  const handleFilterChange = (filter) => {
+  const handleFilterChange = async (filter) => {
     setSelectedFilter(filter);
     setCurrentPage(1);
-    loadPosts(1, filter, searchQuery, false);
+    setHasMore(true);
+    setPosts([]); // Clear existing posts
+    await loadPosts(1, filter, searchQuery, false);
   };
 
   const handleSearch = (e) => {
@@ -191,9 +209,15 @@ const Feed = () => {
   };
 
   const getInitials = (name) => {
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
+      return "?";
+    }
+
     return (
       name
-        ?.split(" ")
+        .trim()
+        .split(" ")
+        .filter((n) => n.length > 0) // Filter out empty strings
         .map((n) => n[0])
         .join("")
         .toUpperCase() || "?"

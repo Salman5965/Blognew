@@ -45,14 +45,29 @@ class AuthService {
     }
   }
 
-  async getCurrentUser() {
-    const response = await apiService.get("/auth/profile");
+  async getCurrentUser(retryCount = 0) {
+    try {
+      const response = await apiService.get("/auth/profile");
 
-    if (response.status === "success") {
-      return response.data.user;
+      if (response.status === "success") {
+        return response.data.user;
+      }
+
+      throw new Error(response.message || "Failed to get current user");
+    } catch (error) {
+      // Retry network errors up to 2 times with exponential backoff
+      if (error.isNetworkError && retryCount < 2) {
+        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s
+        console.warn(
+          `getCurrentUser failed, retrying in ${delay}ms (attempt ${retryCount + 1}/3)`,
+        );
+
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        return this.getCurrentUser(retryCount + 1);
+      }
+
+      throw error;
     }
-
-    throw new Error(response.message || "Failed to get current user");
   }
 
   async updateProfile(userData) {

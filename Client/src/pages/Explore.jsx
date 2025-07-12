@@ -47,6 +47,7 @@ const Explore = () => {
   });
 
   const {
+<<<<<<< HEAD
     trendingAuthors,
     featuredContent,
     popularTags,
@@ -54,6 +55,30 @@ const Explore = () => {
     trendingTopics,
     exploreStats,
   } = data;
+=======
+    trendingAuthors = [],
+    featuredContent = [],
+    popularTags = [],
+    recommendedUsers = [],
+    trendingTopics = [],
+    exploreStats = {},
+  } = data || {};
+
+  // Ensure all arrays are actually arrays to prevent map errors
+  const safeTrendingAuthors = Array.isArray(trendingAuthors)
+    ? trendingAuthors
+    : [];
+  const safeFeaturedContent = Array.isArray(featuredContent)
+    ? featuredContent
+    : [];
+  const safePopularTags = Array.isArray(popularTags) ? popularTags : [];
+  const safeRecommendedUsers = Array.isArray(recommendedUsers)
+    ? recommendedUsers
+    : [];
+  const safeTrendingTopics = Array.isArray(trendingTopics)
+    ? trendingTopics
+    : [];
+>>>>>>> origin/main
 
   const {
     authors: isLoadingAuthors,
@@ -177,7 +202,11 @@ const Explore = () => {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
+<<<<<<< HEAD
                 {trendingTopics.slice(0, 10).map((topic, index) => (
+=======
+                {safeTrendingTopics.slice(0, 10).map((topic, index) => (
+>>>>>>> origin/main
                   <Badge
                     key={topic.id || index}
                     variant="secondary"
@@ -226,7 +255,11 @@ const Explore = () => {
                   </Card>
                 ))}
               </div>
+<<<<<<< HEAD
             ) : trendingAuthors.length === 0 ? (
+=======
+            ) : safeTrendingAuthors.length === 0 ? (
+>>>>>>> origin/main
               <div className="text-center py-8">
                 <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
@@ -238,7 +271,11 @@ const Explore = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+<<<<<<< HEAD
                 {trendingAuthors.map((author, index) => (
+=======
+                {safeTrendingAuthors.map((author, index) => (
+>>>>>>> origin/main
                   <Card
                     key={author._id || author.id}
                     className="hover:shadow-lg transition-shadow"
@@ -302,11 +339,21 @@ const Explore = () => {
                         </div>
                       </div>
 
+<<<<<<< HEAD
                       <FollowButton
                         userId={author._id || author.id}
                         className="w-full"
                         size="sm"
                       />
+=======
+                      {(author._id || author.id) && (
+                        <FollowButton
+                          userId={author._id || author.id}
+                          className="w-full"
+                          size="sm"
+                        />
+                      )}
+>>>>>>> origin/main
                     </CardContent>
                   </Card>
                 ))}
@@ -340,7 +387,11 @@ const Explore = () => {
                       </div>
                     ))}
                   </div>
+<<<<<<< HEAD
                 ) : featuredContent.length === 0 ? (
+=======
+                ) : safeFeaturedContent.length === 0 ? (
+>>>>>>> origin/main
                   <div className="text-center py-8">
                     <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">
@@ -352,7 +403,11 @@ const Explore = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
+<<<<<<< HEAD
                     {featuredContent.slice(0, 5).map((content) => (
+=======
+                    {safeFeaturedContent.slice(0, 5).map((content) => (
+>>>>>>> origin/main
                       <div
                         key={content._id || content.id}
                         className="flex space-x-4 p-3 rounded-lg hover:bg-muted/50 transition-colors"
@@ -394,10 +449,27 @@ const Explore = () => {
                             <span className="flex items-center space-x-1">
                               <Clock className="h-3 w-3" />
                               <span>
+<<<<<<< HEAD
                                 {formatDistanceToNow(
                                   new Date(content.createdAt),
                                   { addSuffix: true },
                                 )}
+=======
+                                {(() => {
+                                  try {
+                                    const date = content.createdAt
+                                      ? new Date(content.createdAt)
+                                      : new Date();
+                                    return isNaN(date.getTime())
+                                      ? "Recently"
+                                      : formatDistanceToNow(date, {
+                                          addSuffix: true,
+                                        });
+                                  } catch (error) {
+                                    return "Recently";
+                                  }
+                                })()}
+>>>>>>> origin/main
                               </span>
                             </span>
                           </div>
@@ -433,7 +505,11 @@ const Explore = () => {
                       </div>
                     ))}
                   </div>
+<<<<<<< HEAD
                 ) : recommendedUsers.length === 0 ? (
+=======
+                ) : safeRecommendedUsers.length === 0 ? (
+>>>>>>> origin/main
                   <div className="text-center py-8">
                     <UserPlus className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
                     <p className="text-sm text-muted-foreground">
@@ -442,7 +518,11 @@ const Explore = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
+<<<<<<< HEAD
                     {recommendedUsers.slice(0, 6).map((user) => (
+=======
+                    {safeRecommendedUsers.slice(0, 6).map((user) => (
+>>>>>>> origin/main
                       <div
                         key={user._id || user.id}
                         className="flex items-center space-x-3"
@@ -472,11 +552,21 @@ const Explore = () => {
                           </p>
                         </div>
 
+<<<<<<< HEAD
                         <FollowButton
                           userId={user._id || user.id}
                           size="sm"
                           showText={false}
                         />
+=======
+                        {(user._id || user.id) && (
+                          <FollowButton
+                            userId={user._id || user.id}
+                            size="sm"
+                            showText={false}
+                          />
+                        )}
+>>>>>>> origin/main
                       </div>
                     ))}
                   </div>
@@ -501,7 +591,11 @@ const Explore = () => {
                   <Skeleton key={i} className="h-8 w-16" />
                 ))}
               </div>
+<<<<<<< HEAD
             ) : popularTags.length === 0 ? (
+=======
+            ) : safePopularTags.length === 0 ? (
+>>>>>>> origin/main
               <div className="text-center py-8">
                 <Hash className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
@@ -513,7 +607,11 @@ const Explore = () => {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
+<<<<<<< HEAD
                 {popularTags.map((tag, index) => (
+=======
+                {safePopularTags.map((tag, index) => (
+>>>>>>> origin/main
                   <Badge
                     key={tag.id || index}
                     variant="outline"

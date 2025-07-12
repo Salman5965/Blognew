@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -171,22 +170,41 @@ export const CreateBlog = () => {
       setError(null);
       setIsSaving(true);
 
-      if (publish && !validation.isValid) {
-        setError(`Cannot publish: ${validation.errors.join(", ")}`);
-        setIsSaving(false);
-        return;
+      // Validate before publishing
+      if (publish) {
+        const errors = [];
+        if (!title?.trim()) errors.push("Title is required");
+        if (!content?.trim()) errors.push("Content is required");
+        if (!category?.trim()) errors.push("Category is required");
+
+        if (errors.length > 0) {
+          setError(`Cannot publish: ${errors.join(", ")}`);
+          setIsSaving(false);
+          return;
+        }
       }
 
       const blogData = {
-        title,
-        content,
-        excerpt,
-        tags,
-        category,
-        coverImage,
-        status: isPublished ? "published" : "draft",
-        visibility,
+        title: title.trim(),
+        content: content.trim(),
+        excerpt: excerpt.trim() || undefined,
+        tags: tags.length > 0 ? tags : undefined,
+        category: category.trim(),
+        status: publish ? "published" : "draft",
       };
+
+      // Only include featuredImage if it's a valid URL
+      if (coverImage && coverImage.trim()) {
+        try {
+          new URL(coverImage.trim());
+          blogData.featuredImage = coverImage.trim();
+        } catch (e) {
+          // Skip invalid URLs
+          console.warn("Invalid featured image URL, skipping:", coverImage);
+        }
+      }
+
+      console.log("Sending blog data:", blogData); // Debug log
 
       const createdBlog = await createBlog(blogData);
 
@@ -196,6 +214,7 @@ export const CreateBlog = () => {
         navigate(ROUTES.MY_BLOGS);
       }
     } catch (err) {
+      console.error("Blog creation error:", err); // Debug log
       setError(err instanceof Error ? err.message : "Failed to save blog");
     } finally {
       setIsSaving(false);
@@ -244,7 +263,7 @@ export const CreateBlog = () => {
     title.trim().length > 0 &&
     content.trim().length > 0 &&
     category &&
-    category.length > 0;
+    category.trim().length > 0;
 
   // Helper function to get category label from slug
   const getCategoryLabel = (categorySlug) => {
@@ -275,7 +294,11 @@ export const CreateBlog = () => {
     if (!data.title?.trim()) errors.push("Title is required");
     if (!data.content?.trim()) errors.push("Content is required");
     if (!data.category?.trim()) errors.push("Category is required");
-    return { canPublish: errors.length === 0, errors };
+    return {
+      isValid: errors.length === 0,
+      canPublish: errors.length === 0,
+      errors,
+    };
   };
 
   // Inline publishing checklist

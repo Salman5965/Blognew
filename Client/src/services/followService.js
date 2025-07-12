@@ -109,25 +109,36 @@ class FollowService {
   }
 
   // Check if current user is following a specific user
-  async isFollowing(userId, useCache = true) {
+  async isFollowing(userIdOrUsername, useCache = true) {
     // Return cached value if available and recent
-    if (useCache && this._cachedFollowStatus.has(userId)) {
-      return this._cachedFollowStatus.get(userId);
+    if (useCache && this._cachedFollowStatus.has(userIdOrUsername)) {
+      return this._cachedFollowStatus.get(userIdOrUsername);
     }
 
     try {
-      const response = await apiService.get(`/follow/${userId}/status`, {
-        headers: {
-          "Cache-Control": "no-cache",
-        },
-      });
+      let response;
+      try {
+        // Try status endpoint first
+        response = await apiService.get(`/follow/status/${userIdOrUsername}`, {
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
+      } catch (firstError) {
+        // Fallback to original pattern
+        response = await apiService.get(`/follow/${userIdOrUsername}/status`, {
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
+      }
 
       if (response.status === "success") {
         const isFollowing = response.data.isFollowing;
         // Cache the result
-        this._cachedFollowStatus.set(userId, isFollowing);
+        this._cachedFollowStatus.set(userIdOrUsername, isFollowing);
         setTimeout(() => {
-          this._cachedFollowStatus.delete(userId);
+          this._cachedFollowStatus.delete(userIdOrUsername);
         }, this._cacheTimeout);
         return isFollowing;
       }
@@ -143,7 +154,7 @@ class FollowService {
       ) {
         console.warn("Rate limited on follow status check, using cached data");
         // Return cached value or false
-        return this._cachedFollowStatus.get(userId) ?? false;
+        return this._cachedFollowStatus.get(userIdOrUsername) ?? false;
       }
 
       return false; // Default to not following
@@ -189,21 +200,40 @@ class FollowService {
   }
 
   // Get user's follow stats
-  async getFollowStats(userId) {
+  async getFollowStats(userIdOrUsername) {
     try {
-      const response = await apiService.get(`/follow/${userId}/stats`);
+      // Try multiple endpoint patterns based on backend implementation
+      let response;
+      try {
+        // First try with stats endpoint
+        response = await apiService.get(`/follow/stats/${userIdOrUsername}`);
+      } catch (firstError) {
+        // If that fails, try the original pattern
+        response = await apiService.get(`/follow/${userIdOrUsername}/stats`);
+      }
 
       if (response.status === "success") {
         return response.data;
       }
 
-      throw new Error(response.message || "Failed to fetch follow stats");
-    } catch (error) {
-      console.error("Error fetching follow stats:", error);
+      // If response is not successful, return default stats
       return {
         followersCount: 0,
         followingCount: 0,
         mutualFollowsCount: 0,
+        isFollowing: false,
+        isFollowedBy: false,
+      };
+    } catch (error) {
+      console.error("Error fetching follow stats:", error);
+
+      // Always return default stats instead of throwing
+      return {
+        followersCount: 0,
+        followingCount: 0,
+        mutualFollowsCount: 0,
+        isFollowing: false,
+        isFollowedBy: false,
       };
     }
   }
