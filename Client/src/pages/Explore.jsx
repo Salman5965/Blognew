@@ -207,11 +207,6 @@ const Explore = () => {
                       )}
                     </Badge>
                   ))}
-                    {topic.count && (
-                      <span className="ml-1 opacity-70">({topic.count})</span>
-                    )}
-                  </Badge>
-                ))}
               </div>
             )}
           </CardContent>
