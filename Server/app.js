@@ -156,11 +156,8 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/forum", forumRoutes);
 app.use("/api/daily-drip", dailyDripRoutes);
 app.use("/api/stories", storyRoutes);
-<<<<<<< HEAD
-=======
 app.use("/api/explore", exploreRoutes);
 app.use("/api/community", communityRoutes);
->>>>>>> origin/main
 
 // Welcome route
 app.get("/", (req, res) => {
