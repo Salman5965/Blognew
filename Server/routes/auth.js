@@ -394,7 +394,7 @@ router.get("/debug/users", async (req, res) => {
 router.post("/debug/create-test-user", async (req, res) => {
   try {
     // Delete existing test user if exists
-    await User.deleteOne({ email: "testuser@silentvoice.com" });
+    await User.deleteOne({ email: "abcd@gmail.com" });
 
     const testUserData = {
       firstName: "Test",
