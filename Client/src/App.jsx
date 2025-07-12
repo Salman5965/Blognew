@@ -122,6 +122,7 @@ const AppLayout = () => {
             />
             <Route path={ROUTES.LOGIN} element={<Login />} />
             <Route path={ROUTES.REGISTER} element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path={ROUTES.HELP} element={<Help />} />
 
             {/* Public browsing routes */}
