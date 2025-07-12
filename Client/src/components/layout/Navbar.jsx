@@ -101,6 +101,23 @@ export const Navbar = () => {
     return () => clearInterval(interval);
   }, [user]);
 
+  // Close notifications dropdown when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        showNotifications &&
+        !event.target.closest(".notification-dropdown")
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotifications]);
+
   const [debouncedSearch] = useDebouncedCallback(async (value) => {
     setFilters((prev) => ({ ...prev, search: value }));
 
