@@ -167,7 +167,7 @@ class ExploreService {
       params.append("limit", String(options.limit || 8));
 
       const response = await apiService.get(
-        `/explore/recommended-users?${params}`,
+        `/explore/trending-authors?${params}`,
       );
 
       if (response?.status === "success") {
