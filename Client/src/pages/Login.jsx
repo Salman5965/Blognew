@@ -187,7 +187,7 @@ export const Login = () => {
                   id="remember"
                   checked={rememberMe}
                   onCheckedChange={setRememberMe}
-                  disabled={isSubmitting || isLocked}
+                  disabled={isSubmitting}
                 />
                 <Label
                   htmlFor="remember"
