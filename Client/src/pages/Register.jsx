@@ -282,18 +282,12 @@ const Register = () => {
 
         toast({
           title: "Account Created Successfully!",
-          description: "Please check your email to verify your account.",
+          description: "Welcome to BlogHub! You're now ready to start writing.",
           duration: 5000,
         });
 
-        // Redirect to email verification page or login
-        navigate(ROUTES.LOGIN, {
-          state: {
-            message:
-              "Account created! Please check your email for verification.",
-            email: values.email,
-          },
-        });
+        // Redirect to Feed page after successful registration
+        navigate(ROUTES.FEED);
       } catch (error) {
         console.error("Registration error:", error);
 
