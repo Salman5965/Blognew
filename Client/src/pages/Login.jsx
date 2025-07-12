@@ -170,6 +170,8 @@ export const Login = () => {
       } else if (values.email.includes("@")) {
         const emailError = validateEmail(values.email);
         if (emailError) errors.email = emailError;
+      } else if (values.email.length < 3) {
+        errors.email = "Username must be at least 3 characters";
       }
 
       if (!values.password) {
