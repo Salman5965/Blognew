@@ -4,7 +4,7 @@ export const messageService = {
   // Get unread message count
   getUnreadCount: async () => {
     try {
-      const response = await api.get("/messages/unread-count");
+      const response = await api.get("/chat/unread-count");
       return response.data;
     } catch (error) {
       console.error("Error fetching unread message count:", error);
