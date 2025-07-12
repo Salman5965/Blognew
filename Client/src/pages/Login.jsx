@@ -149,17 +149,6 @@ export const Login = () => {
     }, 1000);
   };
 
-  // OAuth login handlers
-  const handleOAuthLogin = (provider) => {
-    toast({
-      title: "OAuth Login",
-      description: `${provider} login integration would be implemented here`,
-      duration: 3000,
-    });
-    // In a real app, redirect to OAuth provider
-    // window.location.href = `/auth/${provider.toLowerCase()}`;
-  };
-
   // Form validation and submission
   const {
     values,
