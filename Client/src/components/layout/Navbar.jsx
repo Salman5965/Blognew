@@ -93,7 +93,8 @@ export const Navbar = () => {
         ]);
 
         // Search across all content types with parallel requests for better performance
-        const [exploreResults, blogResults, userResults] = await Promise.all([
+        // Only search users if authenticated to avoid 401 errors
+        const searchPromises = [
           exploreService
             .searchContent(value, "all", {
               limit: 10,
@@ -107,8 +108,21 @@ export const Navbar = () => {
               sortBy: "relevance",
             })
             .catch(() => ({ blogs: [] })),
-          userService.searchUsers(value, 8).catch(() => []),
-        ]);
+        ];
+
+        // Only add user search if user is authenticated
+        if (isAuthenticated) {
+          searchPromises.push(
+            userService.searchUsers(value, 8).catch(() => []),
+          );
+        }
+
+        const results = await Promise.all(searchPromises);
+        const [exploreResults, blogResults, userResults] = [
+          results[0],
+          results[1],
+          isAuthenticated ? results[2] : [],
+        ];
 
         // Combine and format results with better distribution
         const combinedResults = [
