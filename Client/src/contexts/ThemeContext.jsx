@@ -48,7 +48,7 @@ export const ThemeProvider = ({ children, defaultTheme = "system" }) => {
   };
 
   const toggleTheme = () => {
-    const newTheme = actualTheme === "light" ? "dark" : "light";
+    const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
   };
 

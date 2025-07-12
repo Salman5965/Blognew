@@ -59,11 +59,19 @@ export const Navbar = () => {
 
     const fetchCounts = async () => {
       try {
-        // For now, simulate with random values
-        setUnreadNotifications(Math.floor(Math.random() * 5));
-        setUnreadMessages(Math.floor(Math.random() * 3));
+        // TODO: Replace with actual API calls when endpoints are available
+        // const notifications = await notificationService.getUnreadCount();
+        // const messages = await messageService.getUnreadCount();
+        // setUnreadNotifications(notifications.count || 0);
+        // setUnreadMessages(messages.count || 0);
+
+        // For now, set to 0 to remove hardcoded values
+        setUnreadNotifications(0);
+        setUnreadMessages(0);
       } catch (error) {
         console.error("Failed to fetch counts:", error);
+        setUnreadNotifications(0);
+        setUnreadMessages(0);
       }
     };
 
