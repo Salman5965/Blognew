@@ -50,9 +50,9 @@ export const useExplore = (options = {}) => {
         exploreService.getFeaturedContent({
           type: contentType === "all" ? null : contentType,
         }),
-        exploreService.getPopularTags(20),
+        exploreService.getPopularTags({ limit: 20 }),
         exploreService.getRecommendedUsers({ limit: 8 }),
-        exploreService.getTrendingTopics(10),
+        exploreService.getTrendingTopics({ limit: 10 }),
         exploreService.getExploreStats(),
       ]);
 
