@@ -154,6 +154,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PrivateRoute } from "@/components/shared/PrivateRoute";
 import NotificationAlert from "@/components/notifications/NotificationAlert";
+import ChatPanel from "@/components/chat/ChatPanel";
 import { ROUTES } from "@/utils/constant";
 import { Skeleton } from "@/components/ui/skeleton";
 
