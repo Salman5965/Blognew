@@ -463,7 +463,6 @@ const App = () => (
       <AuthProvider>
         <TooltipProvider>
           <BrowserRouter>
-<<<<<<< HEAD
             <div className="min-h-screen flex flex-col">
               <Navbar />
               <main className="flex-1">
@@ -628,10 +627,6 @@ const App = () => (
 
             {/* Chat Panel - Available globally for authenticated users */}
             <ChatPanel />
-
-=======
-            <AppLayout />
->>>>>>> origin/main
             <Toaster />
             <Sonner />
           </BrowserRouter>
