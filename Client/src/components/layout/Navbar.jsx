@@ -240,8 +240,12 @@ export const Navbar = () => {
     }
   }, 800); // Increased debounce delay to 800ms
 
-  const handleCreatePost = () => {
+  const handleCreateBlog = () => {
     navigate(ROUTES.CREATE_BLOG);
+  };
+
+  const handleCreateStory = () => {
+    navigate("/stories/create");
   };
 
   return (
