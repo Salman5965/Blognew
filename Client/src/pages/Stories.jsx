@@ -38,8 +38,6 @@ const Stories = () => {
   const { user, isAuthenticated } = useAuthContext();
   const navigate = useNavigate();
   const { toast } = useToast();
-<<<<<<< HEAD
-=======
 
   const [stories, setStories] = useState([]);
   const [featuredStories, setFeaturedStories] = useState([]);
