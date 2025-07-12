@@ -213,6 +213,8 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password, rememberMe } = req.body;
 
+    console.log("Login attempt for:", email);
+
     if (!email || !password) {
       return res.status(400).json({
         status: "error",
