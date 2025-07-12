@@ -23,6 +23,7 @@ import dailyDripRoutes from "./routes/dailyDrip.js";
 import storyRoutes from "./routes/stories.js";
 import exploreRoutes from "./routes/explore.js";
 import communityRoutes from "./routes/communityRoutes.js";
+import authRoutes from "./routes/auth.js";
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
@@ -158,6 +159,7 @@ app.use("/api/daily-drip", dailyDripRoutes);
 app.use("/api/stories", storyRoutes);
 app.use("/api/explore", exploreRoutes);
 app.use("/api/community", communityRoutes);
+app.use("/api/auth", authRoutes);
 
 // Welcome route
 app.get("/", (req, res) => {
