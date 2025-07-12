@@ -337,7 +337,7 @@ const Register = () => {
   const canSubmit = canProceedToStep3 && agreedToTerms && !errors.captcha;
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       {/* Left side - Branding/Benefits */}
       <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-green-600 via-teal-600 to-blue-700 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/20" />
