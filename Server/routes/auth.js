@@ -213,13 +213,9 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password, rememberMe } = req.body;
 
-    console.log("=== LOGIN DEBUG ===");
     console.log("Login attempt for:", email);
-    console.log("Password provided:", !!password);
-    console.log("Password length:", password ? password.length : 0);
 
     if (!email || !password) {
-      console.log("Missing email or password");
       return res.status(400).json({
         status: "error",
         message: "Email and password are required",
@@ -227,24 +223,11 @@ router.post("/login", async (req, res) => {
     }
 
     // Find user by email or username (including password for comparison)
-    console.log("Searching for user with email/username:", email.toLowerCase());
     const user = await User.findOne({
       $or: [{ email: email.toLowerCase() }, { username: email.toLowerCase() }],
     }).select("+password");
 
-    console.log("User found:", !!user);
-    if (user) {
-      console.log("User details:", {
-        id: user._id,
-        email: user.email,
-        username: user.username,
-        hasPassword: !!user.password,
-        passwordLength: user.password ? user.password.length : 0,
-      });
-    }
-
     if (!user) {
-      console.log("No user found with email/username:", email);
       return res.status(401).json({
         status: "error",
         message: "Invalid credentials",
@@ -260,12 +243,8 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    console.log("Comparing passwords...");
     const isValidPassword = await bcrypt.compare(password, user.password);
-    console.log("Password comparison result:", isValidPassword);
-
     if (!isValidPassword) {
-      console.log("Password comparison failed for user:", user.email);
       return res.status(401).json({
         status: "error",
         message: "Invalid credentials",
