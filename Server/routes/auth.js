@@ -337,17 +337,13 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    // Hash password
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-
-    // Create user
+    // Create user (let the pre-save hook handle password hashing)
     const userData = {
       firstName,
       lastName,
       username: username.toLowerCase(),
       email: email.toLowerCase(),
-      password: hashedPassword,
+      password: password, // Don't hash here, let the model do it
       accountType,
       agreedToMarketing,
       profile: {
