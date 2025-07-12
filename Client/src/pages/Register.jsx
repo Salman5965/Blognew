@@ -357,7 +357,7 @@ const Register = () => {
         <div className="relative z-10 flex flex-col justify-center p-12 text-white">
           <div className="mb-8">
             <BookOpen className="h-12 w-12 mb-4" />
-            <h1 className="text-4xl font-bold mb-4">Join WriteNest</h1>
+            <h1 className="text-4xl font-bold mb-4">Join SilentVoice</h1>
             <p className="text-xl text-green-100 mb-8">
               Start your writing journey with thousands of creators worldwide
             </p>
