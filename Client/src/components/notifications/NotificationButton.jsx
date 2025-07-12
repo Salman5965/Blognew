@@ -3,6 +3,7 @@ import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useNotificationStore from "@/features/notifications/notificationStore";
 import { useAuthContext } from "@/contexts/AuthContext";
+import { useRealTimeNotifications } from "@/hooks/useRealTimeNotifications";
 import NotificationPanel from "./NotificationPanel";
 
 const NotificationButton = () => {
