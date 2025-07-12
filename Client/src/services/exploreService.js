@@ -121,6 +121,58 @@ class ExploreService {
     };
   }
 
+  // Get featured content (combines blogs, stories, etc.)
+  async getFeaturedContent(options = {}) {
+    try {
+      const params = new URLSearchParams();
+      params.append("page", String(options.page || 1));
+      params.append("limit", String(options.limit || 12));
+
+      if (options.type) {
+        params.append("type", options.type);
+      }
+
+      const response = await apiService.get(`/explore/featured?${params}`);
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn("Error fetching featured content:", error.message);
+    }
+
+    return {
+      content: [],
+      pagination: {
+        currentPage: options.page || 1,
+        totalPages: 0,
+        totalItems: 0,
+        hasNextPage: false,
+        hasPrevPage: false,
+      },
+    };
+  }
+
+  // Get recommended users
+  async getRecommendedUsers(options = {}) {
+    try {
+      const params = new URLSearchParams();
+      params.append("limit", String(options.limit || 8));
+
+      const response = await apiService.get(
+        `/explore/recommended-users?${params}`,
+      );
+
+      if (response?.status === "success") {
+        return response.data.users || [];
+      }
+    } catch (error) {
+      console.warn("Error fetching recommended users:", error.message);
+    }
+
+    return [];
+  }
+
   // Search content across the platform
   async searchContent(query, options = {}) {
     try {
