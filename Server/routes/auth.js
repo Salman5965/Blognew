@@ -209,4 +209,181 @@ router.post("/reset-password", async (req, res) => {
   }
 });
 
+// Login endpoint
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password, rememberMe } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "Email and password are required",
+      });
+    }
+
+    // Find user by email or username
+    const user = await User.findOne({
+      $or: [{ email: email.toLowerCase() }, { username: email.toLowerCase() }],
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        status: "error",
+        message: "Invalid credentials",
+      });
+    }
+
+    // Check password
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      return res.status(401).json({
+        status: "error",
+        message: "Invalid credentials",
+      });
+    }
+
+    // Generate JWT token
+    const tokenExpiry = rememberMe ? "30d" : "7d";
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: tokenExpiry,
+    });
+
+    // Remove password from user object
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.json({
+      status: "success",
+      message: "Login successful",
+      data: {
+        user: userResponse,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Login failed",
+    });
+  }
+});
+
+// Register endpoint
+router.post("/register", async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      accountType = "personal",
+      company,
+      website,
+      agreedToMarketing = false,
+    } = req.body;
+
+    // Validation
+    if (!firstName || !lastName || !username || !email || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "All required fields must be provided",
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [
+        { email: email.toLowerCase() },
+        { username: username.toLowerCase() },
+      ],
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        status: "error",
+        message: "User with this email or username already exists",
+      });
+    }
+
+    // Hash password
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create user
+    const userData = {
+      firstName,
+      lastName,
+      username: username.toLowerCase(),
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      accountType,
+      agreedToMarketing,
+      profile: {
+        bio: "",
+        location: "",
+        website: website || "",
+        socialLinks: {},
+      },
+    };
+
+    if (accountType === "business" && company) {
+      userData.company = company;
+    }
+
+    const user = new User(userData);
+    await user.save();
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    // Remove password from response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.status(201).json({
+      status: "success",
+      message: "Account created successfully",
+      data: {
+        user: userResponse,
+        token,
+      },
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Registration failed",
+    });
+  }
+});
+
+// Get current user profile
+router.get("/me", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      status: "success",
+      data: { user },
+    });
+  } catch (error) {
+    console.error("Get user error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to get user profile",
+    });
+  }
+});
+
 export default router;
