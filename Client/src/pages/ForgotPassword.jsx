@@ -135,10 +135,10 @@ const ForgotPassword = () => {
         <div className="relative z-10 flex flex-col justify-center p-12 text-white">
           <div className="mb-8">
             <BookOpen className="h-12 w-12 mb-4" />
-            <h1 className="text-4xl font-bold mb-4">SilentVoice</h1>
+            <h1 className="text-4xl font-bold mb-4">BlogHub</h1>
             <p className="text-xl text-indigo-100 mb-8">
               Don't worry, it happens to the best of us. Let's get you back to
-              sharing your voice!
+              writing amazing content!
             </p>
           </div>
 
