@@ -317,9 +317,9 @@ export const Login = () => {
         <div className="relative z-10 flex flex-col justify-center p-12 text-white">
           <div className="mb-8">
             <BookOpen className="h-12 w-12 mb-4" />
-            <h1 className="text-4xl font-bold mb-4">BlogHub</h1>
+            <h1 className="text-4xl font-bold mb-4">SilentVoice</h1>
             <p className="text-xl text-blue-100 mb-8">
-              Where stories come to life and writers find their voice
+              Where your stories find their voice in silence
             </p>
           </div>
 
@@ -374,8 +374,8 @@ export const Login = () => {
               <span className="text-blue-100">4.9/5 from 10k+ writers</span>
             </div>
             <blockquote className="text-blue-100 italic">
-              "BlogHub transformed how I share my stories. The community here is
-              incredible!"
+              "SilentVoice transformed how I share my stories. The quiet space
+              here is incredible!"
             </blockquote>
             <cite className="text-blue-200 text-sm">
               - Sarah J., Bestselling Author
