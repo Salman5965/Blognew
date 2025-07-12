@@ -11,10 +11,20 @@
 
     <!-- DNS prefetch for API calls -->
     <link rel="dns-prefetch" href="//localhost:3001" />
+    <link rel="dns-prefetch" href="//localhost:5000" />
 
-    <!-- Preload critical resources -->
+    <!-- Preload critical resources for faster LCP -->
     <link rel="modulepreload" href="/src/main.jsx" />
     <link rel="modulepreload" href="/src/App.jsx" />
+    <link rel="modulepreload" href="/src/pages/Home.jsx" />
+    <link rel="modulepreload" href="/src/components/layout/Navbar.jsx" />
+
+    <!-- Resource hints for better performance -->
+    <link rel="prefetch" href="/api/blogs?page=1&limit=12" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
 
     <!-- Critical CSS for better LCP -->
     <style>
