@@ -260,7 +260,7 @@ export const Navbar = () => {
                 className="font-bold text-xl"
                 style={{ fontFamily: "Pacifico, cursive" }}
               >
-                BlogHub
+                SilentVoice
               </span>
             </Link>
 
