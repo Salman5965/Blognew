@@ -50,13 +50,13 @@ const Stories = () => {
   const { toast } = useToast();
 
   const [stories, setStories] = useState([]);
-  const [featuredStories, setFeaturedStories] = useState([]);
-  const [searchResults, setSearchResults] = useState([]);
-  const [communityImpact, setCommunityImpact] = useState({
-    storiesShared: 0,
-    livesTouched: 0,
-    countries: 0,
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [filterBy, setFilterBy] = useState("all");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilter, setSearchFilter] = useState("all");
