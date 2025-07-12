@@ -155,7 +155,7 @@ export const Login = () => {
                     placeholder="Enter your password"
                     value={values.password}
                     onChange={(e) => setValue("password", e.target.value)}
-                    disabled={isSubmitting || isLocked}
+                    disabled={isSubmitting}
                     autoComplete="current-password"
                     className="pr-10"
                   />
