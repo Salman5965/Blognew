@@ -539,22 +539,86 @@ export const Navbar = () => {
                 </DropdownMenu>
 
                 {/* Notifications */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative hidden md:flex"
-                  onClick={() => navigate("/notifications")}
-                >
-                  <Bell className={`h-4 w-4 ${iconColors.notification}`} />
-                  {unreadNotifications > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
-                    >
-                      {unreadNotifications > 9 ? "9+" : unreadNotifications}
-                    </Badge>
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="relative hidden md:flex"
+                    onClick={handleNotificationClick}
+                  >
+                    <Bell className={`h-4 w-4 ${iconColors.notification}`} />
+                    {unreadNotifications > 0 && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
+                      >
+                        {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                      </Badge>
+                    )}
+                  </Button>
+
+                  {/* Notification Dropdown */}
+                  {showNotifications && (
+                    <div className="absolute right-0 top-full mt-2 w-80 bg-background border rounded-lg shadow-lg z-50">
+                      <div className="p-4 border-b">
+                        <h3 className="font-semibold">Notifications</h3>
+                      </div>
+                      <div className="max-h-96 overflow-y-auto">
+                        {notifications.length === 0 ? (
+                          <div className="p-4 text-center text-muted-foreground">
+                            No notifications yet
+                          </div>
+                        ) : (
+                          notifications.map((notification) => (
+                            <div
+                              key={notification._id}
+                              className="p-3 border-b last:border-b-0 hover:bg-muted/50 cursor-pointer"
+                              onClick={() => {
+                                if (notification.link) {
+                                  navigate(notification.link);
+                                }
+                                setShowNotifications(false);
+                              }}
+                            >
+                              <div className="flex items-start space-x-3">
+                                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                                  <Bell className="w-4 h-4 text-primary" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium">
+                                    {notification.title}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {notification.message}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {formatDistanceToNow(
+                                      new Date(notification.createdAt),
+                                    )}{" "}
+                                    ago
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                      <div className="p-3 border-t">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            navigate("/notifications");
+                            setShowNotifications(false);
+                          }}
+                          className="w-full"
+                        >
+                          View All Notifications
+                        </Button>
+                      </div>
+                    </div>
                   )}
-                </Button>
+                </div>
 
                 {/* Messages */}
                 <Button
