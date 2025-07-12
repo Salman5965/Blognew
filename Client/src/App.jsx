@@ -18,6 +18,7 @@ import { PrivateRoute } from "@/components/shared/PrivateRoute";
 import NotificationAlert from "@/components/notifications/NotificationAlert";
 import { ROUTES } from "@/utils/constant";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ChatPanel } from "@/components/chat/ChatPanel";
 
 // Lazy import pages for code splitting
 const Home = React.lazy(() =>
@@ -65,16 +66,15 @@ const BlogAnalytics = React.lazy(() => import("./pages/BlogAnalytics"));
 const StoryAnalytics = React.lazy(() => import("./pages/StoryAnalytics"));
 const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
-
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
 const Messages = React.lazy(() => import("./pages/Messages"));
 const Stories = React.lazy(() => import("./pages/Stories"));
 const CreateStory = React.lazy(() => import("./pages/CreateStory"));
+const StoryDetails = React.lazy(() => import("./pages/StoryDetails"));
 const Community = React.lazy(() => import("./pages/Community"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
 const DailyDrip = React.lazy(() => import("./pages/DailyDrip"));
-const StoryDetails = React.lazy(() => import("./pages/StoryDetails"));
 const Explore = React.lazy(() => import("./pages/Explore"));
 const NotificationDebug = React.lazy(
   () => import("./components/notifications/NotificationDebug"),
@@ -90,234 +90,16 @@ const PageLoader = () => (
   </div>
 );
 
-// Create a client
+// Create a client with optimized defaults
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
   },
 });
-
-// AppLayout component that conditionally renders Footer
-const AppLayout = () => {
-  const location = useLocation();
-  const showFooter = location.pathname === ROUTES.HOME;
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      {/* Global notification alerts */}
-      <NotificationAlert />
-      <main className="flex-1">
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path={ROUTES.HOME} element={<Home />} />
-            <Route path="/home" element={<Navigate to="/" replace />} />
-            <Route
-              path={`${ROUTES.BLOG_DETAILS}/:slug`}
-              element={<BlogDetails />}
-            />
-            <Route path={ROUTES.LOGIN} element={<Login />} />
-            <Route path={ROUTES.REGISTER} element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path={ROUTES.HELP} element={<Help />} />
-
-            {/* Public browsing routes */}
-            <Route path="/stories" element={<Stories />} />
-            <Route path="/stories/:id" element={<StoryDetails />} />
-            <Route path="/explore" element={<Explore />} />
-
-            {/* Static Pages */}
-            <Route path={ROUTES.ABOUT} element={<About />} />
-            <Route path={ROUTES.CONTACT} element={<Contact />} />
-            <Route path={ROUTES.PRIVACY} element={<Privacy />} />
-            <Route path={ROUTES.TERMS} element={<Terms />} />
-            <Route path={ROUTES.COOKIES} element={<Cookies />} />
-            <Route path={ROUTES.GDPR} element={<Gdpr />} />
-
-            {/* Protected Routes */}
-            <Route
-              path={ROUTES.FEED}
-              element={
-                <PrivateRoute>
-                  <Feed />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path={ROUTES.CREATE_BLOG}
-              element={
-                <PrivateRoute>
-                  <CreateBlog />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path={`${ROUTES.EDIT_BLOG}/:id`}
-              element={
-                <PrivateRoute>
-                  <EditBlog />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path={ROUTES.DASHBOARD}
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path={ROUTES.MY_BLOGS}
-              element={
-                <PrivateRoute>
-                  <MyBlogs />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path={ROUTES.MY_POSTS}
-              element={
-                <PrivateRoute>
-                  <MyPosts />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path={ROUTES.PROFILE}
-              element={
-                <PrivateRoute>
-                  <Profile />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard/analytics"
-              element={
-                <PrivateRoute>
-                  <Analytics />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard/blog-analytics"
-              element={
-                <PrivateRoute>
-                  <BlogAnalytics />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/dashboard/story-analytics"
-              element={
-                <PrivateRoute>
-                  <StoryAnalytics />
-                </PrivateRoute>
-              }
-            />
-
-            {/* User profile pages */}
-            <Route
-              path="/users/:userId"
-              element={
-                <PrivateRoute>
-                  <UserProfile />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/users/:userId/followers"
-              element={
-                <PrivateRoute>
-                  <FollowersPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/users/:userId/following"
-              element={
-                <PrivateRoute>
-                  <FollowingPage />
-                </PrivateRoute>
-              }
-            />
-
-            {/* Notifications */}
-            <Route
-              path="/notifications"
-              element={
-                <PrivateRoute>
-                  <Notifications />
-                </PrivateRoute>
-              }
-            />
-
-            {/* Notification Debug (Development) */}
-            <Route
-              path="/debug/notifications"
-              element={
-                <PrivateRoute>
-                  <NotificationDebug />
-                </PrivateRoute>
-              }
-            />
-
-            {/* Community Forum */}
-            <Route
-              path="/forum"
-              element={
-                <PrivateRoute>
-                  <CommunityForum />
-                </PrivateRoute>
-              }
-            />
-
-            {/* Community Discussions */}
-            <Route
-              path="/community"
-              element={
-                <PrivateRoute>
-                  <Community />
-                </PrivateRoute>
-              }
-            />
-
-            {/* Daily Drip */}
-            <Route path="/daily-drip" element={<DailyDrip />} />
-
-            {/* Story creation - protected */}
-            <Route
-              path="/stories/create"
-              element={
-                <PrivateRoute>
-                  <CreateStory />
-                </PrivateRoute>
-              }
-            />
-
-            {/* Messages - protected */}
-            <Route
-              path="/messages"
-              element={
-                <PrivateRoute>
-                  <Messages />
-                </PrivateRoute>
-              }
-            />
-
-            {/* Catch-all route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </main>
-      {showFooter && <Footer />}
-    </div>
-  );
-};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -325,9 +107,9 @@ const App = () => (
       <AuthProvider>
         <TooltipProvider>
           <BrowserRouter>
-<<<<<<< HEAD
             <div className="min-h-screen flex flex-col">
               <Navbar />
+              <NotificationAlert />
               <main className="flex-1">
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
@@ -339,6 +121,10 @@ const App = () => (
                     />
                     <Route path={ROUTES.LOGIN} element={<Login />} />
                     <Route path={ROUTES.REGISTER} element={<Register />} />
+                    <Route
+                      path="/forgot-password"
+                      element={<ForgotPassword />}
+                    />
                     <Route path={ROUTES.HELP} element={<Help />} />
 
                     {/* Static Pages */}
@@ -391,6 +177,14 @@ const App = () => (
                       }
                     />
                     <Route
+                      path="/my-posts"
+                      element={
+                        <PrivateRoute>
+                          <MyPosts />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
                       path={ROUTES.PROFILE}
                       element={
                         <PrivateRoute>
@@ -403,6 +197,22 @@ const App = () => (
                       element={
                         <PrivateRoute>
                           <Analytics />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/blog/:id/analytics"
+                      element={
+                        <PrivateRoute>
+                          <BlogAnalytics />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/story/:id/analytics"
+                      element={
+                        <PrivateRoute>
+                          <StoryAnalytics />
                         </PrivateRoute>
                       }
                     />
@@ -470,6 +280,14 @@ const App = () => (
                         </PrivateRoute>
                       }
                     />
+                    <Route
+                      path="/stories/:id"
+                      element={
+                        <PrivateRoute>
+                          <StoryDetails />
+                        </PrivateRoute>
+                      }
+                    />
 
                     {/* Community Pages */}
                     <Route
@@ -489,6 +307,16 @@ const App = () => (
                       }
                     />
 
+                    {/* Daily Drip */}
+                    <Route
+                      path="/daily-drip"
+                      element={
+                        <PrivateRoute>
+                          <DailyDrip />
+                        </PrivateRoute>
+                      }
+                    />
+
                     {/* Explore Page */}
                     <Route
                       path={ROUTES.EXPLORE}
@@ -498,6 +326,18 @@ const App = () => (
                         </PrivateRoute>
                       }
                     />
+
+                    {/* Debug Route - Development Only */}
+                    {process.env.NODE_ENV === "development" && (
+                      <Route
+                        path="/debug/notifications"
+                        element={
+                          <PrivateRoute>
+                            <NotificationDebug />
+                          </PrivateRoute>
+                        }
+                      />
+                    )}
 
                     {/* Catch-all route */}
                     <Route path="*" element={<NotFound />} />
@@ -510,9 +350,6 @@ const App = () => (
             {/* Chat Panel - Available globally for authenticated users */}
             <ChatPanel />
 
-=======
-            <AppLayout />
->>>>>>> origin/main
             <Toaster />
             <Sonner />
           </BrowserRouter>
