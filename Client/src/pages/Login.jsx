@@ -385,8 +385,8 @@ export const Login = () => {
               <span className="text-blue-100">4.9/5 from 10k+ writers</span>
             </div>
             <blockquote className="text-blue-100 italic">
-              "WriteNest transformed how I share my stories. The community here
-              is incredible!"
+              "SilentVoice transformed how I share my stories. The community
+              here is incredible!"
             </blockquote>
             <cite className="text-blue-200 text-sm">
               - Sarah J., Bestselling Author
