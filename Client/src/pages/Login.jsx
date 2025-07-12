@@ -181,44 +181,6 @@ export const Login = () => {
                 )}
               </div>
 
-              {/* Captcha (shown after failed attempts) */}
-              {showCaptcha && (
-                <div className="space-y-2">
-                  <Label htmlFor="captcha">Security Check</Label>
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-1">
-                      <div className="bg-muted p-3 rounded text-center font-mono text-lg border">
-                        What is {captchaQuestion.question}?
-                      </div>
-                    </div>
-                    <Input
-                      id="captcha"
-                      type="number"
-                      placeholder="Answer"
-                      value={captchaAnswer}
-                      onChange={(e) => setCaptchaAnswer(e.target.value)}
-                      disabled={isSubmitting || isLocked}
-                      className="w-20"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={generateCaptcha}
-                      disabled={isSubmitting || isLocked}
-                    >
-                      ↻
-                    </Button>
-                  </div>
-                  {errors.captcha && (
-                    <p className="text-sm text-destructive flex items-center">
-                      <AlertTriangle className="h-3 w-3 mr-1" />
-                      {errors.captcha}
-                    </p>
-                  )}
-                </div>
-              )}
-
               {/* Remember me checkbox */}
               <div className="flex items-center space-x-2">
                 <Checkbox
