@@ -2,7 +2,7 @@ import { apiService } from "./api";
 import { PAGINATION } from "@/utils/constant";
 
 class ExploreService {
-  // Get trending authors with proper error handling
+  // Get trending authors
   async getTrendingAuthors(options = {}) {
     try {
       const params = new URLSearchParams();
@@ -21,7 +21,6 @@ class ExploreService {
       console.warn("Error fetching trending authors:", error.message);
     }
 
-    // Return empty data structure instead of mock data
     return {
       authors: [],
       pagination: {
@@ -30,425 +29,198 @@ class ExploreService {
         totalAuthors: 0,
         hasNextPage: false,
         hasPrevPage: false,
-        limit: options.limit || 12,
       },
     };
   }
 
-  // Get featured content with proper error handling
-  async getFeaturedContent(options = {}) {
+  // Get featured blogs
+  async getFeaturedBlogs(options = {}) {
     try {
       const params = new URLSearchParams();
       params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
       params.append("limit", String(options.limit || 6));
 
-      if (options.type) params.append("type", options.type);
-
       const response = await apiService.get(
-        `/explore/featured-content?${params}`,
+        `/explore/featured-blogs?${params}`,
       );
 
       if (response?.status === "success") {
         return response.data;
       }
     } catch (error) {
-      console.warn("Error fetching featured content:", error.message);
+      console.warn("Error fetching featured blogs:", error.message);
     }
 
-    // Return empty data structure instead of mock data
     return {
-      content: [],
+      blogs: [],
       pagination: {
         currentPage: options.page || 1,
         totalPages: 0,
-        totalContent: 0,
+        totalBlogs: 0,
         hasNextPage: false,
         hasPrevPage: false,
-        limit: options.limit || 6,
       },
     };
   }
 
-  // Get popular tags with proper error handling
-  async getPopularTags(limit = 20) {
+  // Get popular tags
+  async getPopularTags(options = {}) {
     try {
-      const response = await apiService.get(
-        `/explore/popular-tags?limit=${limit}`,
-      );
+      const params = new URLSearchParams();
+      params.append("limit", String(options.limit || 20));
+      params.append("timeframe", options.timeframe || "month");
+
+      const response = await apiService.get(`/explore/popular-tags?${params}`);
 
       if (response?.status === "success") {
-        return response.data;
+        return response.data.tags || [];
       }
     } catch (error) {
       console.warn("Error fetching popular tags:", error.message);
     }
 
-    // Return empty data structure instead of mock data
-    return {
-      tags: [],
-      total: 0,
-    };
+    return [];
   }
 
-  // Get recommended users with proper error handling
-  async getRecommendedUsers(options = {}) {
-    try {
-      const params = new URLSearchParams();
-      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
-      params.append("limit", String(options.limit || 8));
-
-      const response = await apiService.get(
-        `/explore/recommended-users?${params}`,
-      );
-
-      if (response?.status === "success") {
-        return response.data;
-      }
-    } catch (error) {
-      console.warn("Error fetching recommended users:", error.message);
-    }
-
-    // Return empty data structure instead of mock data
-    return {
-      users: [],
-      pagination: {
-        currentPage: options.page || 1,
-        totalPages: 0,
-        totalUsers: 0,
-        hasNextPage: false,
-        hasPrevPage: false,
-        limit: options.limit || 8,
-      },
-    };
-  }
-
-  // Get trending topics with proper error handling
-  async getTrendingTopics(limit = 10) {
-    try {
-      const response = await apiService.get(
-        `/explore/trending-topics?limit=${limit}`,
-      );
-
-      if (response?.status === "success") {
-        return response.data;
-      }
-    } catch (error) {
-      console.warn("Error fetching trending topics:", error.message);
-    }
-
-    // Return empty data structure instead of mock data
-    return {
-      topics: [],
-      total: 0,
-    };
-  }
-
-  // Get explore page statistics with proper error handling
-  async getExploreStats() {
+  // Get explore statistics
+  async getStats() {
     try {
       const response = await apiService.get("/explore/stats");
 
       if (response?.status === "success") {
-        return response.data;
+        return response.data.stats;
       }
     } catch (error) {
       console.warn("Error fetching explore stats:", error.message);
     }
 
-    // Return empty data structure instead of mock data
     return {
-      totalUsers: 0,
       totalBlogs: 0,
-      totalComments: 0,
-      activeUsers: 0,
-      growth: {
-        users: 0,
-        blogs: 0,
-        comments: 0,
-      },
+      totalAuthors: 0,
+      totalViews: 0,
+      totalLikes: 0,
     };
   }
 
-<<<<<<< HEAD
-  // Search across all content types
-  async searchAll(query, options = {}) {
-=======
-  // Get community impact statistics
-  async getCommunityImpact() {
+  // Get community stats for stories
+  async getCommunityStats() {
     try {
-      const response = await apiService.get("/explore/community-impact");
+      const response = await apiService.get("/explore/community-stats");
 
       if (response?.status === "success") {
-        return response.data;
+        return response.data.stats;
       }
     } catch (error) {
-      console.warn("Error fetching community impact:", error.message);
+      console.warn("Error fetching community stats:", error.message);
     }
 
-    // Return fallback data
     return {
-      storiesShared: 1247,
-      livesTouched: 3891,
-      countries: 47,
-      recentActivity: {
-        newStories: 23,
-        newUsers: 47,
-        storiesThisMonth: 156,
-      },
-      growth: {
-        storiesGrowth: 15,
-        usersGrowth: 12,
-        countriesGrowth: 8,
-      },
+      storiesShared: 0,
+      livesTouched: 0,
+      countries: 0,
     };
   }
 
-  // Search for users
-  async searchUsers(query, options = {}) {
->>>>>>> origin/main
+  // Search content across the platform
+  async searchContent(query, options = {}) {
     try {
-      const params = new URLSearchParams();
-      params.append("q", query);
-      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
-      params.append("limit", String(options.limit || 10));
-      params.append("type", "users"); // Specify we want to search for users
+      if (!query || query.trim().length < 2) {
+        return {
+          results: {
+            blogs: [],
+            authors: [],
+            tags: [],
+          },
+          pagination: {
+            currentPage: 1,
+            totalPages: 0,
+            totalResults: 0,
+          },
+        };
+      }
 
-<<<<<<< HEAD
-      if (options.type) params.append("type", options.type);
-      if (options.category) params.append("category", options.category);
-      if (options.sortBy) params.append("sortBy", options.sortBy);
-      if (options.timeframe) params.append("timeframe", options.timeframe);
-=======
-      if (options.sortBy) params.append("sortBy", options.sortBy);
->>>>>>> origin/main
+      const params = new URLSearchParams();
+      params.append("q", query.trim());
+      params.append("page", String(options.page || 1));
+      params.append("limit", String(options.limit || 20));
+
+      if (options.type) {
+        params.append("type", options.type);
+      }
 
       const response = await apiService.get(`/explore/search?${params}`);
 
       if (response?.status === "success") {
-<<<<<<< HEAD
         return response.data;
       }
     } catch (error) {
       console.warn("Error searching content:", error.message);
     }
 
-    // Return empty search results
     return {
-      results: [],
+      results: {
+        blogs: [],
+        authors: [],
+        tags: [],
+      },
       pagination: {
         currentPage: options.page || 1,
         totalPages: 0,
         totalResults: 0,
-        hasNextPage: false,
-        hasPrevPage: false,
-        limit: options.limit || 10,
-      },
-      filters: {
-        types: [],
-        categories: [],
-        tags: [],
       },
     };
   }
 
-  // Get category-specific content
-  async getContentByCategory(category, options = {}) {
+  // Get trending topics
+  async getTrendingTopics(options = {}) {
     try {
       const params = new URLSearchParams();
-      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
       params.append("limit", String(options.limit || 10));
-      params.append("sortBy", options.sortBy || "popularity");
+      params.append("timeframe", options.timeframe || "week");
 
       const response = await apiService.get(
-        `/explore/categories/${encodeURIComponent(category)}?${params}`,
+        `/explore/trending-topics?${params}`,
       );
-=======
-        return response.data.results?.users || [];
+
+      if (response?.status === "success") {
+        return response.data.topics || [];
       }
     } catch (error) {
-      console.warn("Error searching users:", error.message);
+      console.warn("Error fetching trending topics:", error.message);
     }
 
-    // Return empty search results
     return [];
   }
 
-  // Enhanced search with content type support
-  async searchContent(query, type = "all", options = {}) {
+  // Get recommended content for user
+  async getRecommendations(options = {}) {
     try {
       const params = new URLSearchParams();
-      params.append("q", query);
-      params.append("type", type);
-      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
+      params.append("page", String(options.page || 1));
       params.append("limit", String(options.limit || 10));
 
-      if (options.sortBy) params.append("sortBy", options.sortBy);
+      if (options.type) {
+        params.append("type", options.type);
+      }
 
-      const response = await apiService.get(`/explore/search?${params}`);
->>>>>>> origin/main
+      const response = await apiService.get(
+        `/explore/recommendations?${params}`,
+      );
 
       if (response?.status === "success") {
         return response.data;
       }
     } catch (error) {
-<<<<<<< HEAD
-      console.warn(
-        `Error fetching content for category ${category}:`,
-        error.message,
-      );
+      console.warn("Error fetching recommendations:", error.message);
     }
 
-=======
-      console.warn("Error searching content:", error.message);
-    }
-
-    // Return empty search results
     return {
-      results: {
-        users: [],
-        blogs: [],
-        stories: [],
-        dailydrip: [],
-      },
+      recommendations: [],
       pagination: {
         currentPage: options.page || 1,
         totalPages: 0,
-        totalResults: 0,
-        hasNextPage: false,
-        hasPrevPage: false,
-        limit: options.limit || 10,
+        totalRecommendations: 0,
       },
-    };
-  }
-
-  // Search across all content types
-  async searchAll(query, options = {}) {
-    try {
-      const params = new URLSearchParams();
-      params.append("q", query);
-      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
-      params.append("limit", String(options.limit || 10));
-
-      if (options.type) params.append("type", options.type);
-      if (options.category) params.append("category", options.category);
-      if (options.sortBy) params.append("sortBy", options.sortBy);
-      if (options.timeframe) params.append("timeframe", options.timeframe);
-
-      const response = await apiService.get(`/explore/search?${params}`);
-
-      if (response?.status === "success") {
-        return response.data;
-      }
-    } catch (error) {
-      console.warn("Error searching content:", error.message);
-    }
-
-    // Return empty search results
-    return {
-      results: [],
-      pagination: {
-        currentPage: options.page || 1,
-        totalPages: 0,
-        totalResults: 0,
-        hasNextPage: false,
-        hasPrevPage: false,
-        limit: options.limit || 10,
-      },
-      filters: {
-        types: [],
-        categories: [],
-        tags: [],
-      },
-    };
-  }
-
-  // Get category-specific content
-  async getContentByCategory(category, options = {}) {
-    try {
-      const params = new URLSearchParams();
-      params.append("page", String(options.page || PAGINATION.DEFAULT_PAGE));
-      params.append("limit", String(options.limit || 10));
-      params.append("sortBy", options.sortBy || "popularity");
-
-      const response = await apiService.get(
-        `/explore/categories/${encodeURIComponent(category)}?${params}`,
-      );
-
-      if (response?.status === "success") {
-        return response.data;
-      }
-    } catch (error) {
-      console.warn(
-        `Error fetching content for category ${category}:`,
-        error.message,
-      );
-    }
-
->>>>>>> origin/main
-    // Return empty data structure
-    return {
-      content: [],
-      category,
-      pagination: {
-        currentPage: options.page || 1,
-        totalPages: 0,
-        totalContent: 0,
-        hasNextPage: false,
-        hasPrevPage: false,
-        limit: options.limit || 10,
-      },
-    };
-  }
-
-  // Get related content for a specific item
-  async getRelatedContent(contentId, contentType = "blog", limit = 5) {
-    try {
-      const response = await apiService.get(
-        `/explore/related/${contentType}/${contentId}?limit=${limit}`,
-      );
-
-      if (response?.status === "success") {
-        return response.data;
-      }
-    } catch (error) {
-      console.warn(
-        `Error fetching related content for ${contentType} ${contentId}:`,
-        error.message,
-      );
-    }
-
-    // Return empty related content
-    return {
-      relatedContent: [],
-      total: 0,
-    };
-  }
-
-  // Get content analytics/insights
-  async getContentInsights(timeframe = "week") {
-    try {
-      const response = await apiService.get(
-        `/explore/insights?timeframe=${timeframe}`,
-      );
-
-      if (response?.status === "success") {
-        return response.data;
-      }
-    } catch (error) {
-      console.warn("Error fetching content insights:", error.message);
-    }
-
-    // Return empty insights
-    return {
-      topPerformingContent: [],
-      emergingTopics: [],
-      userEngagement: {
-        totalViews: 0,
-        totalLikes: 0,
-        totalComments: 0,
-        averageReadTime: 0,
-      },
-      categoryDistribution: [],
     };
   }
 }
