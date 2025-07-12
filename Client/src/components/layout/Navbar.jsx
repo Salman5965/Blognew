@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { iconColors } from "@/utils/iconColors";
 import { notificationService } from "@/services/notificationService";
+import { formatDistanceToNow } from "date-fns";
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuthContext();
