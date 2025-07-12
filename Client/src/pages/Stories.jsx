@@ -29,10 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuthContext } from "@/contexts/AuthContext";
-<<<<<<< HEAD
-import { useNavigate } from "react-router-dom";
-=======
->>>>>>> origin/main
 import { useToast } from "@/hooks/use-toast";
 import storiesService from "@/services/storiesService";
 import exploreService from "@/services/exploreService";
