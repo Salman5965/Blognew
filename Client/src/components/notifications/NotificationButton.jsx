@@ -23,7 +23,7 @@ const NotificationButton = () => {
       // Set up polling for new notifications
       const interval = setInterval(() => {
         fetchUnreadCount();
-      }, 30000); // Check every 30 seconds
+      }, 5000); // Check every 5 seconds for real-time updates
 
       return () => clearInterval(interval);
     }
