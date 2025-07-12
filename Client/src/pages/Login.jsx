@@ -122,7 +122,7 @@ export const Login = () => {
                     placeholder="Enter your email or username"
                     value={values.email}
                     onChange={(e) => setValue("email", e.target.value)}
-                    disabled={isSubmitting || isLocked}
+                    disabled={isSubmitting}
                     autoComplete="username"
                     autoFocus
                     className="pr-10"
