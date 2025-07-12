@@ -71,7 +71,7 @@ class AuthService {
   }
 
   async updateProfile(userData) {
-    const response = await apiService.put("/auth/profile", userData);
+    const response = await apiService.put("/auth/me", userData);
 
     if (response.status === "success") {
       this.updateStoredUser(response.data.user);
