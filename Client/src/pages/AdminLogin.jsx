@@ -41,7 +41,7 @@ export const AdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   // Redirect target after login
-  const from = location.state?.from?.pathname || "/dashboard/ai-content";
+  const from = location.state?.from?.pathname || "/admin/dashboard";
 
   // Check if user is already authenticated as admin
   useEffect(() => {
