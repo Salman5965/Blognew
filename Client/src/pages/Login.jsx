@@ -231,6 +231,17 @@ export const Login = () => {
                   Create one now
                 </Link>
               </div>
+
+              {/* Admin portal link */}
+              <div className="text-center text-sm border-t pt-4">
+                <Link
+                  to="/admin/login"
+                  className="text-purple-600 hover:text-purple-500 hover:underline font-medium flex items-center justify-center gap-2"
+                >
+                  <Shield className="h-4 w-4" />
+                  Administrator Portal
+                </Link>
+              </div>
             </CardFooter>
           </form>
         </Card>
