@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { userService } from "@/services/userService";
+import { followService } from "@/services/followService";
 import {
   User,
   Users,
