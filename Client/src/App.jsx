@@ -118,6 +118,14 @@ const App = () => (
                     />
                     <Route path={ROUTES.LOGIN} element={<Login />} />
                     <Route path={ROUTES.REGISTER} element={<Register />} />
+                    <Route
+                      path={ROUTES.FORGOT_PASSWORD}
+                      element={<ForgotPassword />}
+                    />
+                    <Route
+                      path={ROUTES.RESET_PASSWORD}
+                      element={<ResetPassword />}
+                    />
                     <Route path={ROUTES.HELP} element={<Help />} />
 
                     {/* Public browsing routes */}
