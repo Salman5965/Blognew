@@ -251,6 +251,32 @@ class ExploreService {
     return [];
   }
 
+  // Get explore statistics
+  async getStats() {
+    try {
+      const response = await apiService.get("/explore/stats");
+
+      if (response?.status === "success") {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn("Error fetching explore stats:", error.message);
+    }
+
+    return {
+      totalAuthors: 0,
+      totalBlogs: 0,
+      activeUsers: 0,
+      totalUsers: 0,
+      totalComments: 0,
+      growth: {
+        users: 0,
+        blogs: 0,
+        comments: 0,
+      },
+    };
+  }
+
   // Get recommended content for user
   async getRecommendations(options = {}) {
     try {
