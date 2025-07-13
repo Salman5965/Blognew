@@ -264,12 +264,30 @@ const App = () => (
                       }
                     />
 
+                    {/* Notification Debug (Development) */}
+                    <Route
+                      path="/debug/notifications"
+                      element={
+                        <PrivateRoute>
+                          <NotificationDebug />
+                        </PrivateRoute>
+                      }
+                    />
+
                     {/* Community Forum */}
+                    <Route
+                      path="/forum"
+                      element={
+                        <PrivateRoute>
+                          <CommunityForum />
+                        </PrivateRoute>
+                      }
+                    />
                     <Route
                       path="/community"
                       element={
                         <PrivateRoute>
-                          <CommunityForum />
+                          <Community />
                         </PrivateRoute>
                       }
                     />
