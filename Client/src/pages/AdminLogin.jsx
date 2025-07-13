@@ -33,7 +33,7 @@ import {
 export const AdminLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, login, user } = useAuthContext();
+  const { isAuthenticated, login, logout, user } = useAuthContext();
   const { toast } = useToast();
 
   // State management
