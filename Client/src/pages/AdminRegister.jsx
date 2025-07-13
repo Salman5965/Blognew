@@ -180,7 +180,8 @@ export const AdminRegister = () => {
     async (formData) => {
       setIsLoading(true);
       try {
-        const response = await fetch("/api/auth/register-admin", {
+        const apiUrl = `${window.location.origin}/api/auth/register-admin`;
+        const response = await fetch(apiUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
