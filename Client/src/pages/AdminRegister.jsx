@@ -67,7 +67,12 @@ export const AdminRegister = () => {
 
   // Check if any admin exists
   useEffect(() => {
-    checkExistingAdmins();
+    // Temporarily disable admin check due to fetch issues
+    // checkExistingAdmins();
+
+    // For now, allow registration but require admin key
+    setAdminKeyRequired(true);
+    setCheckingAdmins(false);
   }, []);
 
   const checkExistingAdmins = async () => {
