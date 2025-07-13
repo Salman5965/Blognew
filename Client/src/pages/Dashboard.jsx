@@ -500,6 +500,16 @@ export const Dashboard = () => {
                       <BarChart3 className="h-4 w-4 mr-2 text-blue-600 dark:text-blue-400" />
                       Detailed Analytics
                     </Button>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => navigate("/dashboard/ai-content")}
+                      >
+                        <Bot className="h-4 w-4 mr-2 text-purple-600 dark:text-purple-400" />
+                        AI Content Manager
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               </div>
