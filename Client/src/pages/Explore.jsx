@@ -36,7 +36,6 @@ import { Link } from "react-router-dom";
 
 const Explore = () => {
   const { user } = useAuthContext();
-  const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [timeframe, setTimeframe] = useState("week");
 
@@ -76,11 +75,6 @@ const Explore = () => {
     tags: isLoadingTags,
     users: isLoadingUsers,
   } = loading;
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    await searchUsers(searchQuery);
-  };
 
   const getAuthorRankIcon = (rank) => {
     if (rank === 1) return <Crown className="h-4 w-4 text-yellow-500" />;
