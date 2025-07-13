@@ -179,8 +179,8 @@ const ProfileSettings = () => {
   const loadFollowStats = async () => {
     try {
       const [followersResponse, followingResponse] = await Promise.all([
-        userService.getFollowers(user._id, { page: 1, limit: 1 }),
-        userService.getFollowing(user._id, { page: 1, limit: 1 }),
+        followService.getFollowers(user._id, { page: 1, limit: 1 }),
+        followService.getFollowing(user._id, { page: 1, limit: 1 }),
       ]);
 
       setFollowStats({
