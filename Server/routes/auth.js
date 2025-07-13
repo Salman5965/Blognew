@@ -592,4 +592,141 @@ router.put("/me", protect, async (req, res) => {
   }
 });
 
+// Check if any admin exists (for initial setup)
+router.get("/check-admin-exists", async (req, res) => {
+  try {
+    const adminCount = await User.countDocuments({ role: "admin" });
+
+    res.json({
+      status: "success",
+      adminExists: adminCount > 0,
+      message:
+        adminCount > 0
+          ? "Administrator accounts exist"
+          : "No administrator accounts found",
+    });
+  } catch (error) {
+    console.error("Check admin exists error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Failed to check admin status",
+    });
+  }
+});
+
+// Register admin (secure endpoint)
+router.post("/register-admin", async (req, res) => {
+  try {
+    const {
+      firstName,
+      lastName,
+      username,
+      email,
+      password,
+      adminKey,
+      justification,
+    } = req.body;
+
+    // Validate required fields
+    if (!firstName || !lastName || !username || !email || !password) {
+      return res.status(400).json({
+        status: "error",
+        message: "All fields are required",
+      });
+    }
+
+    // Check if any admin exists
+    const existingAdminCount = await User.countDocuments({ role: "admin" });
+
+    // If admins exist, require admin key (you can set this in environment)
+    const ADMIN_REGISTRATION_KEY =
+      process.env.ADMIN_REGISTRATION_KEY || "SilentVoice2024AdminKey";
+
+    if (existingAdminCount > 0) {
+      if (!adminKey || adminKey !== ADMIN_REGISTRATION_KEY) {
+        return res.status(403).json({
+          status: "error",
+          message: "Invalid administrator registration key",
+        });
+      }
+    }
+
+    // Validate justification
+    if (!justification || justification.length < 20) {
+      return res.status(400).json({
+        status: "error",
+        message: "Justification must be at least 20 characters",
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({
+      $or: [
+        { email: email.toLowerCase() },
+        { username: username.toLowerCase() },
+      ],
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        status: "error",
+        message: "User with this email or username already exists",
+      });
+    }
+
+    // Create admin user
+    const userData = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      username: username.toLowerCase().trim(),
+      email: email.toLowerCase().trim(),
+      password: password, // Will be hashed by pre-save hook
+      role: "admin",
+      isActive: true,
+      isEmailVerified: true, // Auto-verify admin emails
+      lastLogin: new Date(),
+      // Add admin-specific metadata
+      adminMetadata: {
+        registrationJustification: justification,
+        registeredAt: new Date(),
+        registrationIP: req.ip || req.connection.remoteAddress,
+        isInitialAdmin: existingAdminCount === 0,
+      },
+    };
+
+    const user = new User(userData);
+    await user.save();
+
+    // Log admin creation for security
+    console.log(`🔐 ADMIN ACCOUNT CREATED:`, {
+      email: user.email,
+      username: user.username,
+      name: `${user.firstName} ${user.lastName}`,
+      isInitialAdmin: existingAdminCount === 0,
+      timestamp: new Date().toISOString(),
+      ip: req.ip || req.connection.remoteAddress,
+    });
+
+    // Remove password from response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    delete userResponse.adminMetadata; // Don't send sensitive metadata
+
+    res.status(201).json({
+      status: "success",
+      message: "Administrator account created successfully",
+      data: {
+        user: userResponse,
+        isInitialAdmin: existingAdminCount === 0,
+      },
+    });
+  } catch (error) {
+    console.error("Admin registration error:", error);
+    res.status(500).json({
+      status: "error",
+      message: "Administrator registration failed",
+    });
+  }
+});
+
 export default router;
