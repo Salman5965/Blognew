@@ -23,6 +23,7 @@ import dailyDripRoutes from "./routes/dailyDrip.js";
 import storyRoutes from "./routes/stories.js";
 import exploreRoutes from "./routes/explore.js";
 import communityRoutes from "./routes/communityRoutes.js";
+import aiContentRoutes from "./routes/aiContent.js";
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
