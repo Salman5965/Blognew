@@ -168,8 +168,8 @@ export const AdminRegister = () => {
   };
 
   // Form hook
-  const { values, errors, isSubmitting, handleChange, handleSubmit } = useForm(
-    {
+  const { values, errors, isSubmitting, handleChange, handleSubmit } = useForm({
+    initialValues: {
       firstName: "",
       lastName: "",
       username: "",
@@ -179,8 +179,8 @@ export const AdminRegister = () => {
       adminKey: "",
       justification: "",
     },
-    validateForm,
-    async (formData) => {
+    validate: validateForm,
+    onSubmit: async (formData) => {
       setIsLoading(true);
       try {
         const apiUrl = `${window.location.origin}/api/auth/register-admin`;
