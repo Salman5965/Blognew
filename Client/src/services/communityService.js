@@ -107,14 +107,28 @@ class CommunityService {
     }
   }
 
+  // Get community categories
+  async getCategories() {
+    try {
+      const response = await apiService.get(`${this.baseUrl}/categories`);
+      if (response.status === "success" && response.data.categories) {
+        return {
+          categories: response.data.categories,
+        };
+      }
+      throw new Error(response.message || "Failed to fetch categories");
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      // Return default categories as fallback
+      return {
+        categories: this.getDefaultCategories(),
+      };
+    }
+  }
+
   // Helper method to get default categories
   getDefaultCategories() {
     return [
-      {
-        id: "all",
-        name: "All Categories",
-        description: "View all community posts",
-      },
       {
         id: "general",
         name: "General Discussion",
