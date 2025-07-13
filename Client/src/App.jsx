@@ -131,6 +131,7 @@ const App = () => (
                       path={ROUTES.RESET_PASSWORD}
                       element={<ResetPassword />}
                     />
+                    <Route path="/auth/callback" element={<OAuthCallback />} />
                     <Route
                       path="/admin/dashboard"
                       element={
