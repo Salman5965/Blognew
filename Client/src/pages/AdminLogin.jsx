@@ -184,10 +184,7 @@ export const AdminLogin = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="flex items-center gap-2">
-                <Lock className="h-4 w-4 text-purple-600" />
-                Administrator Password
-              </Label>
+              <Label htmlFor="password">Administrator Password</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -196,7 +193,7 @@ export const AdminLogin = () => {
                   placeholder="Enter your admin password"
                   value={values.password}
                   onChange={handleChange}
-                  className="pr-10 border-purple-200 dark:border-purple-800 focus:border-purple-500"
+                  className="pr-10"
                   disabled={isSubmitting}
                 />
                 <button
