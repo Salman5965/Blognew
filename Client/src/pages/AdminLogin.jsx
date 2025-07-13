@@ -222,7 +222,7 @@ export const AdminLogin = () => {
             <Button
               type="submit"
               disabled={isSubmitting || isLoading}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-2.5"
+              className="w-full"
             >
               {isSubmitting || isLoading ? (
                 <>
