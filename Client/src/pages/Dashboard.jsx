@@ -31,6 +31,7 @@ import {
   Share2,
   Target,
   Activity,
+  Bot,
 } from "lucide-react";
 import {
   Select,
