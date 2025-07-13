@@ -924,6 +924,17 @@ const Register = () => {
                 </Link>
               </div>
 
+              {/* Admin portal link */}
+              <div className="text-center text-sm border-t pt-4">
+                <Link
+                  to="/admin/register"
+                  className="text-purple-600 hover:text-purple-500 hover:underline font-medium flex items-center justify-center gap-2"
+                >
+                  <Shield className="h-4 w-4" />
+                  Administrator Registration
+                </Link>
+              </div>
+
               {/* Security notice */}
               <div className="text-center text-xs text-muted-foreground pt-4">
                 <div className="flex items-center justify-center space-x-1 mb-2">
