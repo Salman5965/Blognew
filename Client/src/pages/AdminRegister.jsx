@@ -459,7 +459,7 @@ export const AdminRegister = () => {
 
             {/* Justification */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-purple-700 dark:text-purple-300 flex items-center gap-2">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
                 <CheckCircle className="h-5 w-5" />
                 Justification
               </h3>
