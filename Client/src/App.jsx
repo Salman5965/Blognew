@@ -68,8 +68,6 @@ const StoryAnalytics = React.lazy(() => import("./pages/StoryAnalytics"));
 const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 const AIContentManager = React.lazy(() => import("./pages/AIContentManager"));
-const AdminLogin = React.lazy(() => import("./pages/AdminLogin"));
-const AdminRegister = React.lazy(() => import("./pages/AdminRegister"));
 const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
 
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
@@ -132,8 +130,6 @@ const App = () => (
                       path={ROUTES.RESET_PASSWORD}
                       element={<ResetPassword />}
                     />
-                    <Route path="/admin/login" element={<AdminLogin />} />
-                    <Route path="/admin/register" element={<AdminRegister />} />
                     <Route
                       path="/admin/dashboard"
                       element={
