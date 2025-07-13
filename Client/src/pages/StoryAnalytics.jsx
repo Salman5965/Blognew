@@ -8,7 +8,6 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { userService } from "@/services/userService";
 import {
-  ArrowLeft,
   BarChart3,
   BookOpen,
   Eye,
@@ -281,26 +280,15 @@ export const StoryAnalytics = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate("/dashboard")}
-              className="mb-2 sm:mb-0"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
-                <BookOpen className="h-8 w-8 mr-3 text-purple-600 dark:text-purple-400" />
-                Story Analytics
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Comprehensive insights into your story performance and reader
-                engagement
-              </p>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
+              <BookOpen className="h-8 w-8 mr-3 text-purple-600 dark:text-purple-400" />
+              Story Analytics
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Comprehensive insights into your story performance and reader
+              engagement
+            </p>
           </div>
           <div className="flex items-center space-x-3 mt-4 sm:mt-0">
             <Select value={selectedPeriod} onValueChange={setSelectedPeriod}>
