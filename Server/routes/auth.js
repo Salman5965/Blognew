@@ -646,7 +646,8 @@ router.post("/register-admin", async (req, res) => {
       if (!adminKey || adminKey !== ADMIN_REGISTRATION_KEY) {
         return res.status(403).json({
           status: "error",
-          message: "Invalid administrator registration key",
+          message:
+            "Invalid administrator registration key. Contact existing administrator for access.",
         });
       }
     }
