@@ -74,6 +74,9 @@ app.use(compression());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+// Passport middleware
+app.use(passport.initialize());
+
 // Add request timeout middleware
 app.use((req, res, next) => {
   // Set timeout for requests (45 seconds)
