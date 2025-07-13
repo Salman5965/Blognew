@@ -36,6 +36,41 @@ class CommunityService {
           totalPages: 0,
           totalPosts: 0,
         },
+        hasMore: false,
+      };
+    }
+  }
+
+  // Search community posts
+  async searchPosts(options = {}) {
+    try {
+      const {
+        query,
+        category,
+        sortBy = "recent",
+        page = 1,
+        limit = 20,
+      } = options;
+
+      const params = new URLSearchParams();
+      if (query) params.append("search", query);
+      if (category && category !== "all") params.append("category", category);
+      if (sortBy) params.append("sortBy", sortBy);
+      if (page) params.append("page", page);
+      if (limit) params.append("limit", limit);
+
+      const response = await apiService.get(`${this.baseUrl}/search?${params}`);
+      return response;
+    } catch (error) {
+      console.error("Failed to search community posts:", error);
+      return {
+        posts: [],
+        pagination: {
+          currentPage: page,
+          totalPages: 0,
+          totalPosts: 0,
+        },
+        hasMore: false,
       };
     }
   }
