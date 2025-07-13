@@ -82,6 +82,22 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    // OAuth fields
+    googleId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+    githubId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google", "github"],
+      default: "local",
+    },
     // Social links
     socialLinks: {
       twitter: { type: String, trim: true },
