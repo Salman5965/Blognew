@@ -120,54 +120,32 @@ const Explore = () => {
           </div>
         </div>
 
-        {/* Search and Filters */}
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex flex-col lg:flex-row gap-4 items-center">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search for authors, topics, or content..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                  className="pl-10"
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Button onClick={handleSearch} size="sm">
-                  <Search className="h-4 w-4 mr-2" />
-                  Search
-                </Button>
-
-                <div className="flex items-center space-x-1">
-                  <Button
-                    variant={timeframe === "day" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setTimeframe("day")}
-                  >
-                    Today
-                  </Button>
-                  <Button
-                    variant={timeframe === "week" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setTimeframe("week")}
-                  >
-                    Week
-                  </Button>
-                  <Button
-                    variant={timeframe === "month" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setTimeframe("month")}
-                  >
-                    Month
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Timeframe Filters */}
+        <div className="flex justify-center">
+          <div className="flex items-center space-x-1">
+            <Button
+              variant={timeframe === "day" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTimeframe("day")}
+            >
+              Today
+            </Button>
+            <Button
+              variant={timeframe === "week" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTimeframe("week")}
+            >
+              This Week
+            </Button>
+            <Button
+              variant={timeframe === "month" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setTimeframe("month")}
+            >
+              This Month
+            </Button>
+          </div>
+        </div>
 
         {/* Trending Topics */}
         <Card>
