@@ -159,6 +159,7 @@ app.use("/api/daily-drip", dailyDripRoutes);
 app.use("/api/stories", storyRoutes);
 app.use("/api/explore", exploreRoutes);
 app.use("/api/community", communityRoutes);
+app.use("/api/ai-content", aiContentRoutes);
 
 // Welcome route
 app.get("/", (req, res) => {
