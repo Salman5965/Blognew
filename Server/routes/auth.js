@@ -1,6 +1,7 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import passport from "../config/passport.js";
 import User from "../models/User.js";
 import { protect } from "../middlewares/auth.js";
 
@@ -9,25 +10,23 @@ const router = express.Router();
 // Get available OAuth providers
 router.get("/providers", (req, res) => {
   try {
-    // For now, return empty array since OAuth is not implemented on backend
-    // When implementing OAuth, check environment variables for each provider
     const providers = [];
 
-    // Example of how to check if providers are configured:
-    // if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
-    //   providers.push("google");
-    // }
-    // if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
-    //   providers.push("github");
-    // }
-    // if (process.env.APPLE_CLIENT_ID && process.env.APPLE_CLIENT_SECRET) {
-    //   providers.push("apple");
-    // }
+    // Check if providers are configured
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+      providers.push("google");
+    }
+    if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
+      providers.push("github");
+    }
 
     res.json({
       status: "success",
       providers,
-      message: "OAuth providers not configured yet",
+      message:
+        providers.length > 0
+          ? "OAuth providers available"
+          : "No OAuth providers configured",
     });
   } catch (error) {
     console.error("Error checking OAuth providers:", error);
