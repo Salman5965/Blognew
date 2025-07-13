@@ -216,6 +216,14 @@ const App = () => (
                         </PrivateRoute>
                       }
                     />
+                    <Route
+                      path="/dashboard/ai-content"
+                      element={
+                        <PrivateRoute>
+                          <AIContentManager />
+                        </PrivateRoute>
+                      }
+                    />
 
                     {/* Public route for story details */}
                     <Route path="/stories/:id" element={<StoryDetails />} />
