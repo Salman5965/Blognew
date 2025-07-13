@@ -131,6 +131,8 @@ const App = () => (
                       path={ROUTES.RESET_PASSWORD}
                       element={<ResetPassword />}
                     />
+                    <Route path="/admin/login" element={<AdminLogin />} />
+                    <Route path="/admin/register" element={<AdminRegister />} />
                     <Route path={ROUTES.HELP} element={<Help />} />
 
                     {/* Public browsing routes */}
