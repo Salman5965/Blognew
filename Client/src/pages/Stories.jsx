@@ -283,11 +283,29 @@ const Stories = () => {
 
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center space-x-4">
-            <button className="flex items-center space-x-1 hover:text-red-500 transition-colors">
-              <Heart className="w-4 h-4" />
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                handleLike(story._id, story.isLiked);
+              }}
+              className={`flex items-center space-x-1 transition-colors ${
+                story.isLiked
+                  ? "text-red-500 hover:text-red-600"
+                  : "hover:text-red-500"
+              }`}
+            >
+              <Heart
+                className={`w-4 h-4 ${story.isLiked ? "fill-current" : ""}`}
+              />
               <span>{story.likesCount || 0}</span>
             </button>
-            <button className="flex items-center space-x-1 hover:text-blue-500 transition-colors">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                handleComment(story._id);
+              }}
+              className="flex items-center space-x-1 hover:text-blue-500 transition-colors"
+            >
               <MessageCircle className="w-4 h-4" />
               <span>{story.commentsCount || 0}</span>
             </button>
