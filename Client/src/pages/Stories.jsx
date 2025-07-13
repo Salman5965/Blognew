@@ -292,8 +292,8 @@ const Stories = () => {
             </div>
           ) : (
             <>
-              {stories.map((story) => (
-                <StoryCard key={story._id} story={story} />
+              {stories.map((story, index) => (
+                <StoryCard key={story._id || `story-${index}`} story={story} />
               ))}
 
               {/* Load More */}
