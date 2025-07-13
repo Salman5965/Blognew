@@ -212,6 +212,15 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    // Admin-specific metadata (only for admin users)
+    adminMetadata: {
+      registrationJustification: String,
+      registeredAt: Date,
+      registrationIP: String,
+      isInitialAdmin: { type: Boolean, default: false },
+      lastAdminAction: Date,
+      adminNotes: String,
+    },
   },
   {
     timestamps: true,
