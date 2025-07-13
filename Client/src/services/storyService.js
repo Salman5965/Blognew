@@ -260,6 +260,87 @@ class StoryService {
       };
     }
   }
+
+  /**
+   * Get comments for a story
+   */
+  async getComments(storyId, page = 1, limit = 20) {
+    try {
+      const response = await apiService.get(
+        `/stories/${storyId}/comments?page=${page}&limit=${limit}`,
+      );
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to fetch comments");
+    } catch (error) {
+      console.error("Failed to fetch comments:", error);
+      return { comments: [], pagination: {} };
+    }
+  }
+
+  /**
+   * Add a comment to a story
+   */
+  async addComment(storyId, content) {
+    try {
+      const response = await apiService.post(`/stories/${storyId}/comments`, {
+        content,
+      });
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to add comment");
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update a comment
+   */
+  async updateComment(storyId, commentId, content) {
+    try {
+      const response = await apiService.put(
+        `/stories/${storyId}/comments/${commentId}`,
+        { content },
+      );
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to update comment");
+    } catch (error) {
+      console.error("Failed to update comment:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a comment
+   */
+  async deleteComment(storyId, commentId) {
+    try {
+      const response = await apiService.delete(
+        `/stories/${storyId}/comments/${commentId}`,
+      );
+
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      throw new Error(response.message || "Failed to delete comment");
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+      throw error;
+    }
+  }
 }
 
 export const storyService = new StoryService();
