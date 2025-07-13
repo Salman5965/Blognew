@@ -137,24 +137,21 @@ export const AdminLogin = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md border shadow-lg">
         <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-            <Shield className="h-8 w-8 text-white" />
+          <div className="mx-auto w-12 h-12 bg-muted rounded-full flex items-center justify-center">
+            <Shield className="h-6 w-6 text-muted-foreground" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              Admin Portal
+            <CardTitle className="text-2xl font-bold">
+              Administrator Portal
             </CardTitle>
             <CardDescription className="text-base">
               Sign in to access the administrator dashboard
             </CardDescription>
           </div>
           <div className="flex items-center justify-center gap-2">
-            <Badge
-              variant="secondary"
-              className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300"
-            >
-              <Crown className="h-3 w-3 mr-1" />
-              Administrator Access
+            <Badge variant="secondary" className="text-sm">
+              <Shield className="h-3 w-3 mr-1" />
+              Admin Access
             </Badge>
           </div>
         </CardHeader>
