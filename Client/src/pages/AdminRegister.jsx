@@ -225,7 +225,7 @@ export const AdminRegister = () => {
         setIsLoading(false);
       }
     },
-  );
+  });
 
   if (checkingAdmins) {
     return (
