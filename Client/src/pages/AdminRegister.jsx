@@ -74,6 +74,11 @@ export const AdminRegister = () => {
     try {
       setCheckingAdmins(true);
       const response = await fetch("/api/auth/check-admin-exists");
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -87,6 +92,9 @@ export const AdminRegister = () => {
           });
           navigate("/admin/login", { replace: true });
         }
+      } else {
+        // If API doesn't return success, assume admins exist for security
+        setAdminKeyRequired(true);
       }
     } catch (error) {
       console.error("Error checking admin status:", error);
