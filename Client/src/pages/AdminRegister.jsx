@@ -52,8 +52,8 @@ export const AdminRegister = () => {
   // Check if user is already authenticated as admin
   useEffect(() => {
     if (isAuthenticated && user) {
-      if (user.role === "admin" || user.isAdmin) {
-        navigate("/dashboard/ai-content", { replace: true });
+      if (user?.role === "admin" || user?.isAdmin) {
+        navigate("/admin/dashboard", { replace: true });
       } else {
         toast({
           title: "Access Denied",
