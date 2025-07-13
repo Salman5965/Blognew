@@ -134,6 +134,14 @@ const App = () => (
                     />
                     <Route path="/admin/login" element={<AdminLogin />} />
                     <Route path="/admin/register" element={<AdminRegister />} />
+                    <Route
+                      path="/admin/dashboard"
+                      element={
+                        <PrivateRoute>
+                          <AdminDashboard />
+                        </PrivateRoute>
+                      }
+                    />
                     <Route path={ROUTES.HELP} element={<Help />} />
 
                     {/* Public browsing routes */}
