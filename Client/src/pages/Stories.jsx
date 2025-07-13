@@ -66,6 +66,7 @@ const Stories = () => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const loadingRef = useRef(false);
 
   // Initial load
   useEffect(() => {
