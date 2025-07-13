@@ -189,6 +189,35 @@ const App = () => (
                         </PrivateRoute>
                       }
                     />
+                    <Route
+                      path="/dashboard/blog-analytics"
+                      element={
+                        <PrivateRoute>
+                          <BlogAnalytics />
+                        </PrivateRoute>
+                      }
+                    />
+                    <Route
+                      path="/dashboard/story-analytics"
+                      element={
+                        <PrivateRoute>
+                          <StoryAnalytics />
+                        </PrivateRoute>
+                      }
+                    />
+
+                    {/* Public route for story details */}
+                    <Route path="/stories/:id" element={<StoryDetails />} />
+
+                    {/* Additional protected routes */}
+                    <Route
+                      path={ROUTES.MY_POSTS}
+                      element={
+                        <PrivateRoute>
+                          <MyPosts />
+                        </PrivateRoute>
+                      }
+                    />
 
                     {/* User profile pages */}
                     <Route
