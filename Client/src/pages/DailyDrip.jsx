@@ -14,6 +14,8 @@ import {
   TrendingUp,
   Clock,
   Bookmark,
+  Bot,
+  Settings,
 } from "lucide-react";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Button } from "@/components/ui/button";
