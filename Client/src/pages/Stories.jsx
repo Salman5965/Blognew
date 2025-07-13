@@ -41,6 +41,19 @@ import { useToast } from "@/hooks/use-toast";
 import { storyService } from "@/services/storyService";
 import { formatDistanceToNow } from "date-fns";
 
+// Utility function to remove duplicate stories
+const deduplicateStories = (stories) => {
+  const seen = new Set();
+  return stories.filter((story) => {
+    if (seen.has(story._id)) {
+      console.warn(`Duplicate story found with ID: ${story._id}`);
+      return false;
+    }
+    seen.add(story._id);
+    return true;
+  });
+};
+
 const Stories = () => {
   const { user, isAuthenticated } = useAuthContext();
   const navigate = useNavigate();
