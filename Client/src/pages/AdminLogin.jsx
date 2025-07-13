@@ -93,7 +93,7 @@ export const AdminLogin = () => {
 
         // Check if the logged-in user is actually an admin
         if (
-          response.user &&
+          response?.user &&
           (response.user.role === "admin" || response.user.isAdmin)
         ) {
           toast({
@@ -110,7 +110,9 @@ export const AdminLogin = () => {
             variant: "destructive",
           });
           // Logout the user since they're not an admin
-          await logout();
+          if (logout) {
+            await logout();
+          }
         }
       } catch (error) {
         console.error("Admin login error:", error);
