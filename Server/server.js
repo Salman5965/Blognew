@@ -250,12 +250,32 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   await connectToDatabase();
 
+  // Initialize AI content scheduler only if OpenAI API key is available
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      contentScheduler.init();
+      console.log("🤖 AI Content Scheduler initialized");
+    } catch (error) {
+      console.warn(
+        "⚠️ AI Content Scheduler failed to initialize:",
+        error.message,
+      );
+    }
+  } else {
+    console.warn(
+      "⚠️ OpenAI API key not found. AI content generation disabled.",
+    );
+  }
+
   httpServer.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📝 API Documentation: http://localhost:${PORT}/`);
     console.log(`🔗 Health Check: http://localhost:${PORT}/health`);
     console.log(`💬 WebSocket Server: ws://localhost:${PORT}`);
     console.log(`🌍 Environment: ${process.env.NODE_ENV || "development"}`);
+    if (process.env.OPENAI_API_KEY) {
+      console.log(`🤖 AI Content Generation: Enabled`);
+    }
   });
 };
 
