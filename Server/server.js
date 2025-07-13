@@ -257,7 +257,7 @@ const startServer = async () => {
       console.log("🤖 AI Content Scheduler initialized");
     } catch (error) {
       console.warn(
-        "⚠️ AI Content Scheduler failed to initialize:",
+        "���️ AI Content Scheduler failed to initialize:",
         error.message,
       );
     }
@@ -282,6 +282,14 @@ const startServer = async () => {
 // Handle graceful shutdown
 process.on("SIGTERM", async () => {
   console.log("SIGTERM received, shutting down gracefully...");
+
+  // Stop content scheduler
+  try {
+    contentScheduler.stop();
+    console.log("Content scheduler stopped");
+  } catch (error) {
+    console.error("Error stopping content scheduler:", error);
+  }
 
   // Close Socket.IO server
   io.close(() => {
