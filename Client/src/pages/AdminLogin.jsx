@@ -159,10 +159,7 @@ export const AdminLogin = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-purple-600" />
-                Administrator Email
-              </Label>
+              <Label htmlFor="email">Administrator Email</Label>
               <div className="relative">
                 <Input
                   id="email"
@@ -171,7 +168,7 @@ export const AdminLogin = () => {
                   placeholder="Enter your admin email or username"
                   value={values.email}
                   onChange={handleChange}
-                  className="pl-10 border-purple-200 dark:border-purple-800 focus:border-purple-500"
+                  className="pl-10"
                   disabled={isSubmitting}
                 />
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
