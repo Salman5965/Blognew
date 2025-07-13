@@ -112,6 +112,7 @@ const App = () => (
                   <Routes>
                     {/* Public Routes */}
                     <Route path={ROUTES.HOME} element={<Home />} />
+                    <Route path="/home" element={<Navigate to="/" replace />} />
                     <Route
                       path={`${ROUTES.BLOG_DETAILS}/:slug`}
                       element={<BlogDetails />}
