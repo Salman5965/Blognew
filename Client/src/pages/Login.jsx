@@ -19,7 +19,14 @@ import { validateEmail } from "@/utils/validators";
 import { ROUTES } from "@/utils/constant";
 import { useToast } from "@/hooks/use-toast";
 import OAuthButtons from "@/components/auth/OAuthButtons";
-import { Loader2, Eye, EyeOff, AlertTriangle, Mail } from "lucide-react";
+import {
+  Loader2,
+  Eye,
+  EyeOff,
+  AlertTriangle,
+  Mail,
+  Shield,
+} from "lucide-react";
 
 export const Login = () => {
   const navigate = useNavigate();
