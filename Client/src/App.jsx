@@ -70,6 +70,7 @@ const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
 const AIContentManager = React.lazy(() => import("./pages/AIContentManager"));
 const AdminLogin = React.lazy(() => import("./pages/AdminLogin"));
 const AdminRegister = React.lazy(() => import("./pages/AdminRegister"));
+const AdminDashboard = React.lazy(() => import("./pages/AdminDashboard"));
 
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
