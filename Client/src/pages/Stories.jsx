@@ -55,8 +55,14 @@ const Stories = () => {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    loadStories();
-  }, [sortBy, page]);
+    loadStories(true); // Always reset when sortBy changes
+  }, [sortBy]);
+
+  useEffect(() => {
+    if (page > 1) {
+      loadStories(false); // Only load more when page > 1
+    }
+  }, [page]);
 
   const loadStories = async (reset = false) => {
     try {
