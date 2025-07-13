@@ -89,7 +89,14 @@ const Stories = () => {
   }, [page]);
 
   const loadStories = async (reset = false) => {
+    // Prevent concurrent requests
+    if (loadingRef.current) {
+      return;
+    }
+
     try {
+      loadingRef.current = true;
+
       if (reset) {
         setLoading(true);
         setPage(1);
