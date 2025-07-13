@@ -175,13 +175,11 @@ const AdminDashboard = () => {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-              <Shield className="h-6 w-6 text-white" />
+            <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+              <Shield className="h-6 w-6 text-muted-foreground" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Administrator Dashboard
-              </h1>
+              <h1 className="text-3xl font-bold">Administrator Dashboard</h1>
               <p className="text-muted-foreground">
                 Welcome back, {user?.firstName || ""} {user?.lastName || ""}
               </p>
