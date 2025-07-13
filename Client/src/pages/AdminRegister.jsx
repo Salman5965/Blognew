@@ -153,9 +153,10 @@ export const AdminRegister = () => {
       errors.confirmPassword = "Passwords do not match";
     }
 
-    if (adminKeyRequired && !values.adminKey) {
-      errors.adminKey = "Administrator registration key is required";
-    }
+    // Temporarily disabled to allow easier admin setup
+    // if (adminKeyRequired && !values.adminKey) {
+    //   errors.adminKey = "Administrator registration key is required";
+    // }
 
     if (!values.justification) {
       errors.justification = "Please provide justification for admin access";
