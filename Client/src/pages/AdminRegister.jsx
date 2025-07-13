@@ -73,7 +73,15 @@ export const AdminRegister = () => {
   const checkExistingAdmins = async () => {
     try {
       setCheckingAdmins(true);
-      const response = await fetch("/api/auth/check-admin-exists");
+
+      // Use full URL to ensure proper routing
+      const apiUrl = `${window.location.origin}/api/auth/check-admin-exists`;
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -81,7 +89,7 @@ export const AdminRegister = () => {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (data.status === "success") {
         setAdminKeyRequired(data.adminExists);
         if (data.adminExists) {
           toast({
