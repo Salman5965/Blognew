@@ -104,15 +104,12 @@ const Stories = () => {
 
       if (response && response.stories) {
         if (reset) {
-          setStories(response.stories);
+          setStories(deduplicateStories(response.stories));
         } else {
           // Filter out any duplicates based on _id to prevent key conflicts
           setStories((prev) => {
-            const existingIds = new Set(prev.map((story) => story._id));
-            const newStories = response.stories.filter(
-              (story) => !existingIds.has(story._id),
-            );
-            return [...prev, ...newStories];
+            const combined = [...prev, ...response.stories];
+            return deduplicateStories(combined);
           });
         }
         setHasMore(response.pagination?.hasNext || false);
