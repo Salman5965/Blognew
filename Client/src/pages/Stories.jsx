@@ -72,9 +72,10 @@ const Stories = () => {
     loadStories(true);
   }, []);
 
-  // Load when sortBy changes
+  // Load when sortBy changes (but not on initial render)
   useEffect(() => {
-    if (sortBy) {
+    if (stories.length > 0) {
+      // Only if we already have stories loaded
       loadStories(true);
     }
   }, [sortBy]);
