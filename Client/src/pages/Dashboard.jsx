@@ -55,6 +55,9 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Check if user is admin
+  const isAdmin = user?.role === "admin" || user?.isAdmin;
+
   // Load dashboard data
   useEffect(() => {
     if (user?._id) {
