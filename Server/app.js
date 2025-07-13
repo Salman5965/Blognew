@@ -6,6 +6,7 @@ import compression from "compression";
 import path from "path";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
+import passport from "./config/passport.js";
 
 // Import routes
 import authRoutes from "./routes/auth.js";
