@@ -592,38 +592,4 @@ router.put("/me", protect, async (req, res) => {
   }
 });
 
-
-
-    // Log admin creation for security
-    console.log(`🔐 ADMIN ACCOUNT CREATED:`, {
-      email: user.email,
-      username: user.username,
-      name: `${user.firstName} ${user.lastName}`,
-      isInitialAdmin: existingAdminCount === 0,
-      timestamp: new Date().toISOString(),
-      ip: req.ip || req.connection.remoteAddress,
-    });
-
-    // Remove password from response
-    const userResponse = user.toObject();
-    delete userResponse.password;
-    delete userResponse.adminMetadata; // Don't send sensitive metadata
-
-    res.status(201).json({
-      status: "success",
-      message: "Administrator account created successfully",
-      data: {
-        user: userResponse,
-        isInitialAdmin: existingAdminCount === 0,
-      },
-    });
-  } catch (error) {
-    console.error("Admin registration error:", error);
-    res.status(500).json({
-      status: "error",
-      message: "Administrator registration failed",
-    });
-  }
-});
-
 export default router;
