@@ -35,6 +35,7 @@ const Login = React.lazy(() =>
 const Register = React.lazy(() => import("./pages/Register"));
 const ForgotPassword = React.lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = React.lazy(() => import("./pages/ResetPassword"));
+const OAuthCallback = React.lazy(() => import("./pages/OAuthCallback"));
 const CreateBlog = React.lazy(() =>
   import("./pages/CreateBlog").then((module) => ({
     default: module.CreateBlog,
