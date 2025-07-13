@@ -138,6 +138,15 @@ const App = () => (
                         </PrivateRoute>
                       }
                     />
+                    {/* Redirect removed admin auth routes */}
+                    <Route
+                      path="/admin/login"
+                      element={<Navigate to="/login" replace />}
+                    />
+                    <Route
+                      path="/admin/register"
+                      element={<Navigate to="/register" replace />}
+                    />
                     <Route path={ROUTES.HELP} element={<Help />} />
 
                     {/* Public browsing routes */}
