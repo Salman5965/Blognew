@@ -78,6 +78,7 @@ const Stories = () => {
       if (reset) {
         setLoading(true);
         setPage(1);
+        setStories([]); // Clear stories when resetting
       }
 
       const response = await storyService.getStories({
