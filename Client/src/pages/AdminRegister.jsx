@@ -359,7 +359,7 @@ export const AdminRegister = () => {
 
             {/* Security Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-purple-700 dark:text-purple-300 flex items-center gap-2">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Lock className="h-5 w-5" />
                 Security Information
               </h3>
