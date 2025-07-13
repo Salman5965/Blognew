@@ -67,6 +67,7 @@ const BlogAnalytics = React.lazy(() => import("./pages/BlogAnalytics"));
 const StoryAnalytics = React.lazy(() => import("./pages/StoryAnalytics"));
 const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
+const AIContentManager = React.lazy(() => import("./pages/AIContentManager"));
 
 const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
