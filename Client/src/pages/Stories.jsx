@@ -77,7 +77,14 @@ const Stories = () => {
         if (reset) {
           setStories(response.stories);
         } else {
-          setStories((prev) => [...prev, ...response.stories]);
+          // Filter out any duplicates based on _id to prevent key conflicts
+          setStories((prev) => {
+            const existingIds = new Set(prev.map((story) => story._id));
+            const newStories = response.stories.filter(
+              (story) => !existingIds.has(story._id),
+            );
+            return [...prev, ...newStories];
+          });
         }
         setHasMore(response.pagination?.hasNext || false);
       }
