@@ -264,7 +264,13 @@ export const AdminLogin = () => {
 
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Need admin access? Contact the system administrator.
+              Need to register as admin?{" "}
+              <Link
+                to="/admin/register"
+                className="font-medium text-purple-600 hover:text-purple-500 hover:underline"
+              >
+                Sign up as admin
+              </Link>
             </p>
           </div>
         </CardFooter>
