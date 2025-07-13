@@ -10,7 +10,6 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { FollowButton } from "@/components/shared/FollowButton";
 import { formatDistanceToNow } from "date-fns";
 import {
-  Search,
   TrendingUp,
   Users,
   BookOpen,
