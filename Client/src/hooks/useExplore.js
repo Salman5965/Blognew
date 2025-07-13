@@ -53,7 +53,7 @@ export const useExplore = (options = {}) => {
         exploreService.getPopularTags({ limit: 20 }),
         exploreService.getRecommendedUsers({ limit: 8 }),
         exploreService.getTrendingTopics({ limit: 10 }),
-        exploreService.getExploreStats(),
+        exploreService.getStats(),
       ]);
 
       // Update data with successful results
