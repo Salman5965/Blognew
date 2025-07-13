@@ -148,6 +148,64 @@ const Stories = () => {
     navigate("/stories/create");
   };
 
+  const handleLike = async (storyId, currentlyLiked) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to like stories",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await storyService.toggleLike(storyId);
+
+      // Update the story in local state
+      setStories((prevStories) =>
+        prevStories.map((story) => {
+          if (story._id === storyId) {
+            return {
+              ...story,
+              isLiked: !currentlyLiked,
+              likesCount: currentlyLiked
+                ? (story.likesCount || 1) - 1
+                : (story.likesCount || 0) + 1,
+            };
+          }
+          return story;
+        }),
+      );
+
+      toast({
+        title: currentlyLiked ? "Story unliked" : "Story liked",
+        description: currentlyLiked
+          ? "Removed from your liked stories"
+          : "Added to your liked stories",
+      });
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update like status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleComment = (storyId) => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to comment on stories",
+        variant: "destructive",
+      });
+      return;
+    }
+    // Navigate to story details page where comments are handled
+    navigate(`/stories/${storyId}#comments`);
+  };
+
   const loadMore = () => {
     if (!loading && hasMore) {
       setPage((prev) => prev + 1);
