@@ -183,7 +183,7 @@ const AdminDashboard = () => {
                 Administrator Dashboard
               </h1>
               <p className="text-muted-foreground">
-                Welcome back, {user?.firstName} {user?.lastName}
+                Welcome back, {user?.firstName || ""} {user?.lastName || ""}
               </p>
             </div>
           </div>
