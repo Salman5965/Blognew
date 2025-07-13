@@ -14,6 +14,8 @@ class StoryService {
       if (filters.tags) queryParams.append("tags", filters.tags);
       if (filters.author) queryParams.append("author", filters.author);
       if (filters.search) queryParams.append("search", filters.search);
+      if (filters.sortBy) queryParams.append("sortBy", filters.sortBy);
+      if (filters.sortOrder) queryParams.append("sortOrder", filters.sortOrder);
 
       const response = await apiService.get(
         `/stories?${queryParams.toString()}`,
