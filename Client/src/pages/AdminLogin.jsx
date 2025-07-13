@@ -80,13 +80,13 @@ export const AdminLogin = () => {
   };
 
   // Form hook
-  const { values, errors, isSubmitting, handleChange, handleSubmit } = useForm(
-    {
+  const { values, errors, isSubmitting, setValue, handleSubmit } = useForm({
+    initialValues: {
       email: "",
       password: "",
     },
-    validateForm,
-    async (formData) => {
+    validate: validateForm,
+    onSubmit: async (formData) => {
       setIsLoading(true);
       try {
         const response = await login(formData.email, formData.password, false);
