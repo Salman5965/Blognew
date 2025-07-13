@@ -5,6 +5,7 @@ import connectDB from "./config/database.js";
 import app from "./app.js";
 import User from "./models/User.js";
 import Conversation from "./models/Conversation.js";
+import contentScheduler from "./services/contentScheduler.js";
 
 // Load environment variables
 dotenv.config();
