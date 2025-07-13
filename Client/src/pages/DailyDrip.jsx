@@ -184,14 +184,25 @@ const DailyDrip = () => {
                   <Crown className="h-5 w-5 text-yellow-600" />
                   <h2 className="text-lg font-semibold">Admin Panel</h2>
                 </div>
-                <Button
-                  onClick={() => setShowCreateForm(!showCreateForm)}
-                  size="sm"
-                  className="bg-yellow-600 hover:bg-yellow-700"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Daily Drip
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={() => navigate("/dashboard/ai-content")}
+                    size="sm"
+                    variant="outline"
+                    className="border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-950"
+                  >
+                    <Bot className="h-4 w-4 mr-2" />
+                    AI Content
+                  </Button>
+                  <Button
+                    onClick={() => setShowCreateForm(!showCreateForm)}
+                    size="sm"
+                    className="bg-yellow-600 hover:bg-yellow-700"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    New Daily Drip
+                  </Button>
+                </div>
               </div>
             </CardHeader>
 
