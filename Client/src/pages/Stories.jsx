@@ -132,6 +132,7 @@ const Stories = () => {
       });
     } finally {
       setLoading(false);
+      loadingRef.current = false;
     }
   };
 
