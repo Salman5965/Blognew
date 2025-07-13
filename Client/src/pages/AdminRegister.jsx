@@ -168,7 +168,7 @@ export const AdminRegister = () => {
   };
 
   // Form hook
-  const { values, errors, isSubmitting, handleChange, handleSubmit } = useForm({
+  const { values, errors, isSubmitting, setValue, handleSubmit } = useForm({
     initialValues: {
       firstName: "",
       lastName: "",
