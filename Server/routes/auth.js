@@ -591,4 +591,61 @@ router.put("/me", protect, async (req, res) => {
   }
 });
 
+// Helper function to generate JWT token
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || "7d",
+  });
+};
+
+// Google OAuth routes
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] }),
+);
+
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false }),
+  (req, res) => {
+    try {
+      const token = generateToken(req.user._id);
+
+      // Redirect to frontend with token
+      const redirectUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/auth/callback?token=${token}&provider=google`;
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error("Google OAuth callback error:", error);
+      res.redirect(
+        `${process.env.CLIENT_URL || "http://localhost:3000"}/login?error=oauth_failed`,
+      );
+    }
+  },
+);
+
+// GitHub OAuth routes
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] }),
+);
+
+router.get(
+  "/github/callback",
+  passport.authenticate("github", { session: false }),
+  (req, res) => {
+    try {
+      const token = generateToken(req.user._id);
+
+      // Redirect to frontend with token
+      const redirectUrl = `${process.env.CLIENT_URL || "http://localhost:3000"}/auth/callback?token=${token}&provider=github`;
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error("GitHub OAuth callback error:", error);
+      res.redirect(
+        `${process.env.CLIENT_URL || "http://localhost:3000"}/login?error=oauth_failed`,
+      );
+    }
+  },
+);
+
 export default router;
