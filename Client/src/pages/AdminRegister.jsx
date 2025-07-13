@@ -431,30 +431,29 @@ export const AdminRegister = () => {
                 </div>
               </div>
 
-              {adminKeyRequired && (
-                <div className="space-y-2">
-                  <Label htmlFor="adminKey" className="flex items-center gap-2">
-                    <Key className="h-4 w-4 text-purple-600" />
-                    Administrator Registration Key
-                  </Label>
-                  <Input
-                    id="adminKey"
-                    name="adminKey"
-                    type="password"
-                    placeholder="Enter administrator registration key"
-                    value={values.adminKey}
-                    onChange={handleChange}
-                    className="border-purple-200 dark:border-purple-800 focus:border-purple-500"
-                    disabled={isSubmitting}
-                  />
-                  {errors.adminKey && (
-                    <p className="text-sm text-red-500">{errors.adminKey}</p>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Contact your system administrator for the registration key.
-                  </p>
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label htmlFor="adminKey" className="flex items-center gap-2">
+                  <Key className="h-4 w-4 text-purple-600" />
+                  Administrator Registration Key (Optional for first admin)
+                </Label>
+                <Input
+                  id="adminKey"
+                  name="adminKey"
+                  type="password"
+                  placeholder="Enter administrator registration key (leave empty for first admin)"
+                  value={values.adminKey}
+                  onChange={handleChange}
+                  className="border-purple-200 dark:border-purple-800 focus:border-purple-500"
+                  disabled={isSubmitting}
+                />
+                {errors.adminKey && (
+                  <p className="text-sm text-red-500">{errors.adminKey}</p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Key: SilentVoice2024AdminKey (required only if other admins
+                  exist)
+                </p>
+              </div>
             </div>
 
             {/* Justification */}
