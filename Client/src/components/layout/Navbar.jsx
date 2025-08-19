@@ -23,7 +23,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useDebouncedCallback } from "use-debounce";
 import { useAuthContext } from "@/contexts/AuthContext";
-import { ROUTES } from "@/utils/constants";
+import { ROUTES } from "@/utils/constant";
 import { getDisplayName, getInitials } from "@/utils/userUtils";
 
 const Navbar = () => {
@@ -64,7 +64,7 @@ const Navbar = () => {
         ]);
 
         setUnreadNotifications(notifications);
-        
+
         // Count unread messages from conversations
         const messageCount = (conversations.conversations || []).reduce(
           (total, conv) => total + (conv.unreadCount || 0),
