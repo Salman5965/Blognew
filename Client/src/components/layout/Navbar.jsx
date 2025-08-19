@@ -33,6 +33,7 @@ import {
   Users,
   BookOpen,
   HelpCircle,
+  ChevronDown,
 } from "lucide-react";
 import { iconColors } from "@/utils/iconColors";
 
