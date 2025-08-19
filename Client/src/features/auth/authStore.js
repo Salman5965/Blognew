@@ -168,27 +168,32 @@ export const useAuthStore = create(
         }
       },
 
-      initializeAuth: () => {
+      initializeAuth: async () => {
         const storedUser = authService.getStoredUser();
-        const isAuthenticated = authService.isAuthenticated();
+        const hasToken = authService.isAuthenticated();
 
-        if (storedUser && isAuthenticated) {
+        if (storedUser && hasToken) {
           set({
             user: storedUser,
             isAuthenticated: true,
-            isLoading: false,
+            isLoading: true, // Set loading during validation
           });
 
-          get()
-            .getCurrentUser()
-            .catch(() => {
-              // If validation fails, auth will be cleared
-            });
+          try {
+            // Validate token by getting current user
+            await get().getCurrentUser();
+          } catch (error) {
+            // If validation fails, auth will be cleared by getCurrentUser
+            console.log("Auth validation failed during initialization");
+          }
         } else {
+          // No stored auth data, clear everything
+          authService.clearAuthData();
           set({
             user: null,
             isAuthenticated: false,
             isLoading: false,
+            error: null,
           });
         }
       },
