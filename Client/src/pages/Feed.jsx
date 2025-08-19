@@ -447,11 +447,29 @@ const Feed = () => {
       <PageWrapper className="py-6">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold">Blog Feed</h1>
-            <p className="text-muted-foreground mt-1">
-              Discover amazing content from our community
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold">Blog Feed</h1>
+              <p className="text-muted-foreground mt-1">
+                Discover amazing content from our community
+              </p>
+            </div>
+            {/* Desktop Refresh Button */}
+            <div className="hidden sm:block mt-4 sm:mt-0">
+              <Button
+                onClick={handleRefresh}
+                variant="outline"
+                size="sm"
+                disabled={refreshing}
+              >
+                {refreshing ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                )}
+                Refresh
+              </Button>
+            </div>
           </div>
 
         {/* Search and Filters */}
