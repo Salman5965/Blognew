@@ -1,30 +1,6 @@
 import apiService from "./api";
 
 class UserService {
-<<<<<<< HEAD
-  // Get user profile by ID
-  async getUserById(userId) {
-    try {
-      const response = await apiService.get(`/users/${userId}`);
-      if (response.status === "success") {
-        return response.data;
-      }
-      throw new Error(response.message || "Failed to fetch user");
-    } catch (error) {
-      // Handle specific error types
-      if (error.response?.status === 404) {
-        throw new Error("User not found");
-      } else if (error.response?.status === 400) {
-        throw new Error("Invalid user ID");
-      } else if (error.response?.status >= 500) {
-        throw new Error("Server error. Please try again later.");
-      } else if (error.message === "Network Error") {
-        throw new Error("Network error. Please check your connection.");
-      }
-
-      // Re-throw the original error if it's already a custom error
-      throw error;
-=======
   // Get user profile by ID or username
   async getUserById(userIdOrUsername) {
     try {
@@ -47,43 +23,108 @@ class UserService {
               "Cast to ObjectId failed",
             )
           ) {
-            // This means it was a username passed to ObjectId endpoint, try username endpoint
-            throw secondError;
+            throw new Error("User not found");
           }
-          // Otherwise throw the original error
-          throw firstError;
+          // Re-throw the first error if it's more specific
+          throw firstError.response?.status >= 400 ? firstError : secondError;
         }
       }
 
       if (response.status === "success") {
         return response.data;
       }
-      // If response is not successful, return null (will be handled by UserProfile)
-      return null;
+      throw new Error(response.message || "Failed to fetch user");
     } catch (error) {
-      console.error("Error fetching user:", error);
-
-      // For debugging - log the specific error
+      // Handle specific HTTP status codes
       if (error.response?.status === 404) {
-        console.warn(
-          "User not found - this might be expected for username lookup",
-        );
+        throw new Error("User not found");
+      } else if (error.response?.status === 400) {
+        throw new Error("Invalid user ID or username");
+      } else if (error.response?.status === 403) {
+        throw new Error("Access denied");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      } else if (error.message === "Network Error") {
+        throw new Error("Network error. Please check your connection.");
       }
 
-      // Return null instead of throwing - let the calling component handle it
-      return null;
->>>>>>> refs/remotes/origin/main
+      // Re-throw the original error if it's already a custom error
+      throw error;
     }
   }
 
-  // Get user profile by username
-  async getUserByUsername(username) {
+  // Get current user profile
+  async getCurrentUser() {
     try {
-      const response = await apiService.get(`/users/username/${username}`);
+      const response = await apiService.get("/users/profile");
       if (response.status === "success") {
         return response.data;
       }
-      throw new Error(response.message || "Failed to fetch user");
+      throw new Error(response.message || "Failed to fetch profile");
+    } catch (error) {
+      if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
+    }
+  }
+
+  // Update user profile
+  async updateProfile(profileData) {
+    try {
+      const response = await apiService.put("/users/profile", profileData);
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to update profile");
+    } catch (error) {
+      if (error.response?.status === 400) {
+        throw new Error(
+          error.response.data?.message || "Invalid profile data",
+        );
+      } else if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
+    }
+  }
+
+  // Follow/unfollow user
+  async toggleFollow(userId) {
+    try {
+      const response = await apiService.post(`/users/${userId}/follow`);
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to follow/unfollow user");
+    } catch (error) {
+      if (error.response?.status === 400) {
+        throw new Error("Cannot follow yourself");
+      } else if (error.response?.status === 404) {
+        throw new Error("User not found");
+      } else if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
+    }
+  }
+
+  // Get followers
+  async getFollowers(userId, page = 1, limit = 20) {
+    try {
+      const response = await apiService.get(
+        `/users/${userId}/followers?page=${page}&limit=${limit}`,
+      );
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to fetch followers");
     } catch (error) {
       if (error.response?.status === 404) {
         throw new Error("User not found");
@@ -94,13 +135,51 @@ class UserService {
     }
   }
 
-  // Get user statistics
-<<<<<<< HEAD
+  // Get following
+  async getFollowing(userId, page = 1, limit = 20) {
+    try {
+      const response = await apiService.get(
+        `/users/${userId}/following?page=${page}&limit=${limit}`,
+      );
+      if (response.status === "success") {
+        return response.data;
+      }
+      throw new Error(response.message || "Failed to fetch following");
+    } catch (error) {
+      if (error.response?.status === 404) {
+        throw new Error("User not found");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
+    }
+  }
+
+  // Search users
+  async searchUsers(query, limit = 10) {
+    try {
+      const response = await apiService.get(
+        `/users/search?q=${encodeURIComponent(query)}&limit=${limit}`,
+      );
+      if (response.status === "success") {
+        return response.data || [];
+      }
+      return [];
+    } catch (error) {
+      console.error("Search users failed:", error);
+      if (error.response?.status === 401) {
+        return []; // Return empty array for unauthenticated users
+      }
+      return [];
+    }
+  }
+
+  // Get user stats
   async getUserStats(userId) {
     try {
       const response = await apiService.get(`/users/${userId}/stats`);
       if (response.status === "success") {
-        return response.data.stats;
+        return response.data;
       }
       throw new Error(response.message || "Failed to fetch user stats");
     } catch (error) {
@@ -110,216 +189,56 @@ class UserService {
         throw new Error("Server error. Please try again later.");
       }
       throw error;
-=======
-  async getUserStats(userIdOrUsername) {
+    }
+  }
+
+  // Upload avatar
+  async uploadAvatar(file) {
     try {
-      let response;
-      try {
-        // Try as ObjectId first
-        response = await apiService.get(`/users/${userIdOrUsername}/stats`);
-      } catch (firstError) {
-        // If that fails due to ObjectId casting, try username endpoint
-        if (
-          firstError.response?.status === 400 ||
-          firstError.response?.data?.message?.includes(
-            "Cast to ObjectId failed",
-          )
-        ) {
-          response = await apiService.get(
-            `/users/username/${userIdOrUsername}/stats`,
-          );
-        } else {
-          throw firstError;
-        }
-      }
-      if (response.status === "success") {
-        return response.data.stats || response.data;
-      }
+      const formData = new FormData();
+      formData.append("avatar", file);
 
-      // Return default stats if response is not successful
-      return {
-        blogsCount: 0,
-        storiesCount: 0,
-        totalViews: 0,
-        totalLikes: 0,
-        followerCount: 0,
-        followingCount: 0,
-      };
-    } catch (error) {
-      console.error("Error fetching user stats:", error);
+      const response = await apiService.post("/users/avatar", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
-      // Always return default stats instead of throwing
-      return {
-        blogsCount: 0,
-        storiesCount: 0,
-        totalViews: 0,
-        totalLikes: 0,
-        followerCount: 0,
-        followingCount: 0,
-      };
->>>>>>> refs/remotes/origin/main
-    }
-  }
-
-  // Get activity on current user's blogs (likes, comments from other users)
-  async getUserActivity(userId, limit = 10) {
-    try {
-      const response = await apiService.get(
-        `/users/${userId}/activity?limit=${limit}`,
-      );
-      if (response.status === "success") {
-        return response.data.activities || response.data;
-      }
-      throw new Error(response.message || "Failed to fetch user activity");
-    } catch (error) {
-      console.error("Error fetching user activity:", error);
-
-      // Return empty array for missing endpoints
-      if (error.response?.status === 404 || error.status === 404) {
-        return [];
-      }
-
-      return [];
-    }
-  }
-
-  // Search users
-  async searchUsers(query, limit = 10) {
-    const response = await apiService.get(
-      `/users/search?q=${encodeURIComponent(query)}&limit=${limit}`,
-    );
-    if (response.status === "success") {
-      return response.data.users;
-    }
-    throw new Error(response.message || "Failed to search users");
-  }
-
-  // Get top authors
-  async getTopAuthors(limit = 10) {
-    const response = await apiService.get(`/users/top-authors?limit=${limit}`);
-    if (response.status === "success") {
-      return response.data.authors;
-    }
-    throw new Error(response.message || "Failed to fetch top authors");
-  }
-
-  // Update user role (admin only)
-  async updateUserRole(userId, role) {
-    const response = await apiService.put(`/users/${userId}/role`, { role });
-    if (response.status === "success") {
-      return response.data.user;
-    }
-    throw new Error(response.message || "Failed to update user role");
-  }
-
-  // Toggle user status (admin only)
-  async toggleUserStatus(userId) {
-    const response = await apiService.put(`/users/${userId}/status`);
-    if (response.status === "success") {
-      return response.data.user;
-    }
-    throw new Error(response.message || "Failed to toggle user status");
-  }
-
-  // Delete user (admin only)
-  async deleteUser(userId) {
-    const response = await apiService.delete(`/users/${userId}`);
-    if (response.status === "success") {
-      return true;
-    }
-    throw new Error(response.message || "Failed to delete user");
-  }
-
-  // Get user followers
-  async getFollowers(userId, options = {}) {
-    try {
-      const params = new URLSearchParams();
-      if (options.page) params.append("page", options.page);
-      if (options.limit) params.append("limit", options.limit);
-
-      const response = await apiService.get(
-        `/users/${userId}/followers?${params}`,
-      );
       if (response.status === "success") {
         return response.data;
       }
-      throw new Error(response.message || "Failed to fetch followers");
+      throw new Error(response.message || "Failed to upload avatar");
     } catch (error) {
-      console.error("Error fetching followers:", error);
-      return {
-        followers: [],
-        pagination: {
-          currentPage: 1,
-          totalPages: 0,
-          totalFollowers: 0,
-          hasNextPage: false,
-          hasPrevPage: false,
-          limit: options.limit || 20,
-        },
-      };
+      if (error.response?.status === 400) {
+        throw new Error(
+          error.response.data?.message || "Invalid file format",
+        );
+      } else if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
     }
   }
 
-  // Get user following
-  async getFollowing(userId, options = {}) {
+  // Delete account
+  async deleteAccount() {
     try {
-      const params = new URLSearchParams();
-      if (options.page) params.append("page", options.page);
-      if (options.limit) params.append("limit", options.limit);
-
-      const response = await apiService.get(
-        `/users/${userId}/following?${params}`,
-      );
+      const response = await apiService.delete("/users/profile");
       if (response.status === "success") {
         return response.data;
       }
-      throw new Error(response.message || "Failed to fetch following");
+      throw new Error(response.message || "Failed to delete account");
     } catch (error) {
-      console.error("Error fetching following:", error);
-      return {
-        following: [],
-        pagination: {
-          currentPage: 1,
-          totalPages: 0,
-          totalFollowing: 0,
-          hasNextPage: false,
-          hasPrevPage: false,
-          limit: options.limit || 20,
-        },
-      };
+      if (error.response?.status === 401) {
+        throw new Error("Authentication required");
+      } else if (error.response?.status >= 500) {
+        throw new Error("Server error. Please try again later.");
+      }
+      throw error;
     }
-  }
-
-  // Get current user profile (using auth endpoint)
-  async getCurrentUserProfile() {
-    const response = await apiService.get("/auth/profile");
-    if (response.status === "success") {
-      return response.data.user;
-    }
-    throw new Error(response.message || "Failed to fetch current user profile");
-  }
-
-  // Update current user profile (using auth endpoint)
-  async updateProfile(userData) {
-    const response = await apiService.put("/auth/profile", userData);
-    if (response.status === "success") {
-      return response.data.user;
-    }
-    throw new Error(response.message || "Failed to update profile");
-  }
-
-  // Change password (using auth endpoint)
-  async changePassword(currentPassword, newPassword) {
-    const response = await apiService.put("/auth/change-password", {
-      currentPassword,
-      newPassword,
-    });
-    if (response.status === "success") {
-      return true;
-    }
-    throw new Error(response.message || "Failed to change password");
   }
 }
 
-export const userService = new UserService();
-export default userService;
+export default new UserService();
