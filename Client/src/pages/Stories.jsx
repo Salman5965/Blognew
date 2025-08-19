@@ -326,9 +326,12 @@ const Stories = () => {
             >
               Life Stories
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="text-xl text-muted-foreground mb-4">
               Share your journey, inspire others, and discover amazing life
               stories
+            </p>
+            <p className="text-sm text-muted-foreground mb-8">
+              Pull down to refresh • Create stories from the navbar
             </p>
 
             {/* Enhanced Search Section */}
