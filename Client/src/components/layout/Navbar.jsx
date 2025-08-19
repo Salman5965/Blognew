@@ -470,16 +470,30 @@ export const Navbar = () => {
           <div className="flex items-center space-x-3">
             {isAuthenticated ? (
               <>
-                {/* Create Button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCreatePost}
-                  className="hidden md:flex items-center space-x-2"
-                >
-                  <Plus className={`h-4 w-4 ${iconColors.success}`} />
-                  <span>Create</span>
-                </Button>
+                {/* Create Button with Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hidden md:flex items-center space-x-2"
+                    >
+                      <Plus className={`h-4 w-4 ${iconColors.success}`} />
+                      <span>Create</span>
+                      <ChevronDown className="h-3 w-3 ml-1" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={handleCreateBlog}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      Write a Blog
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleCreateStory}>
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Share a Story
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
                 {/* Notifications */}
                 <Button
