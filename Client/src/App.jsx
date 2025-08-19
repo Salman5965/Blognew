@@ -325,7 +325,6 @@ const App = () => (
       <AuthProvider>
         <TooltipProvider>
           <BrowserRouter>
-<<<<<<< HEAD
             <div className="min-h-screen flex flex-col">
               <Navbar />
               <main className="flex-1">
@@ -488,10 +487,6 @@ const App = () => (
               </main>
               <Footer />
             </div>
-
-=======
-            <AppLayout />
->>>>>>> refs/remotes/origin/main
             <Toaster />
             <Sonner />
           </BrowserRouter>
