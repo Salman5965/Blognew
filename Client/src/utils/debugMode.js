@@ -127,10 +127,12 @@ if (isDebugMode()) {
     showDebugPanel();
   }
 
-  // Run API config debug
-  setTimeout(() => {
-    debugApiConfig();
-  }, 1000);
+  // Run API config debug only if explicitly enabled
+  if (window.location.search.includes("debug=api")) {
+    setTimeout(() => {
+      debugApiConfig();
+    }, 1000);
+  }
 }
 
 // Make debug functions available globally in development
