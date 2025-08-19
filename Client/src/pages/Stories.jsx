@@ -188,33 +188,6 @@ const Stories = () => {
     }
   };
 
-<<<<<<< HEAD
-  const handleShareStory = async (story) => {
-    const shareUrl =
-      window.location.origin + `/stories/${story.id || story._id}`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: story.title,
-          text: story.excerpt,
-          url: shareUrl,
-        });
-      } catch (error) {
-        console.error("Share failed:", error);
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        toast({
-          title: "Link Copied",
-          description: "Story link copied to clipboard!",
-        });
-      } catch (error) {
-        console.error("Copy failed:", error);
-      }
-    }
-=======
   const handleShareStory = (story) => {
     const shareUrl =
       window.location.origin + `/stories/${story.id || story._id}`;
@@ -226,7 +199,6 @@ const Stories = () => {
       description: `Copy this link: ${shareUrl}`,
       duration: 15000, // Long duration so user can copy
     });
->>>>>>> refs/remotes/origin/main
   };
 
   const toggleAudio = (storyId) => {
