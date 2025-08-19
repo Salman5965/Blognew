@@ -278,14 +278,72 @@ class BlogService {
       query.tags.forEach((tag) => params.append("tags", tag));
     }
 
-    const endpoint = userId ? `/blogs/user/${userId}` : "/blogs/my";
-    const response = await apiService.get(`${endpoint}?${params}`);
+    try {
+      let response;
+      if (userId) {
+        try {
+          // Try with user endpoint that might accept username
+          response = await apiService.get(`/blogs/user/${userId}?${params}`);
+        } catch (firstError) {
+          // If that fails, try alternative endpoint patterns
+          try {
+            response = await apiService.get(`/users/${userId}/blogs?${params}`);
+          } catch (secondError) {
+            // Final fallback - return empty results instead of throwing
+            console.warn(
+              "Failed to fetch user blogs, returning empty results:",
+              secondError,
+            );
+            return {
+              blogs: [],
+              data: [],
+              pagination: {
+                currentPage: 1,
+                totalPages: 0,
+                totalCount: 0,
+                hasNext: false,
+                hasPrev: false,
+              },
+            };
+          }
+        }
+      } else {
+        // For current user's blogs
+        response = await apiService.get(`/blogs/my?${params}`);
+      }
 
-    if (response.status === "success") {
-      return response.data;
+      if (response.status === "success") {
+        return response.data;
+      }
+
+      // Return empty results instead of throwing
+      return {
+        blogs: [],
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalCount: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+      };
+    } catch (error) {
+      console.error("Error fetching user blogs:", error);
+
+      // Return empty results instead of throwing
+      return {
+        blogs: [],
+        data: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalCount: 0,
+          hasNext: false,
+          hasPrev: false,
+        },
+      };
     }
-
-    throw new Error(response.message || "Failed to fetch user blogs");
   }
 
   async getTags() {

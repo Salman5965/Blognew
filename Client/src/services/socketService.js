@@ -8,7 +8,7 @@ class SocketService {
     this.listeners = new Map();
   }
 
-  connect(serverUrl = window.location.origin) {
+  connect(serverUrl) {
     if (this.socket?.connected) {
       return this.socket;
     }
@@ -16,20 +16,82 @@ class SocketService {
     const token = localStorage.getItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
 
     if (!token) {
-      console.warn("No auth token found, cannot connect to socket");
+      console.warn("No auth token found, will work without real-time features");
+      this.connectionStatus = "no-auth";
+      this.emit("connectionStatusChanged", "no-auth");
       return null;
     }
 
+    // Default to backend server URL if not provided
+    if (!serverUrl) {
+      // Check if we're in local development (localhost)
+      const isLocalDev =
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1";
+
+      if (isLocalDev) {
+        // In local development, connect to backend server on port 3001
+        serverUrl = "http://localhost:3001";
+      } else {
+        // In deployed environment, disable Socket.IO to avoid parser errors
+        // The app will use polling fallback instead
+        console.warn(
+          "⚠️ Socket.IO disabled in deployed environment, using polling fallback",
+        );
+        this.connectionStatus = "disabled";
+        this.emit("connectionStatusChanged", "disabled");
+        return null;
+      }
+    }
+
+    return this.attemptConnection(serverUrl, token);
+  }
+
+  async attemptConnection(serverUrl, token) {
     try {
+      console.log(`🔌 Attempting Socket.IO connection:`);
+      console.log(`  - Server URL: ${serverUrl}`);
+      console.log(`  - Current hostname: ${window.location.hostname}`);
+      console.log(`  - Current origin: ${window.location.origin}`);
+      console.log(
+        `  - Is local dev: ${window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"}`,
+      );
+      console.log(`  - Has token: ${!!token}`);
+
+      // Test if Socket.IO endpoint is reachable (non-blocking)
+      const testUrl = `${serverUrl}/socket.io/?transport=polling`;
+      console.log(`🧪 Testing Socket.IO endpoint: ${testUrl}`);
+
+      fetch(testUrl, {
+        method: "GET",
+        mode: "cors",
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+      })
+        .then((response) => {
+          console.log(
+            `✅ Socket.IO endpoint test - Status: ${response.status}`,
+          );
+        })
+        .catch((testError) => {
+          console.error(
+            `❌ Socket.IO endpoint test failed:`,
+            testError.message,
+          );
+        });
+
       this.socket = io(serverUrl, {
         auth: {
           token: token,
         },
-        transports: ["websocket", "polling"],
+        transports: ["polling", "websocket"], // Try polling first, then upgrade to websocket
         upgrade: true,
-        rememberUpgrade: true,
-        timeout: 20000,
+        rememberUpgrade: false, // Don't remember upgrade in case of issues
+        timeout: 15000, // Increase timeout slightly
         forceNew: false,
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+        autoConnect: true,
       });
 
       this.setupEventHandlers();
@@ -56,12 +118,42 @@ class SocketService {
     });
 
     this.socket.on("connect_error", (error) => {
-      // Only log if it's not a typical deployment websocket error
-      if (!error.message.includes("websocket error")) {
-        console.error("Socket connection error:", error);
+      console.error("🔴 Socket connection error:");
+      console.error("Error object:", error);
+      console.error("Error message:", error?.message || "No message");
+      console.error("Error type:", error?.type || "No type");
+      console.error(
+        "Error description:",
+        error?.description || "No description",
+      );
+      console.error("Server URL:", this.socket?.io?.uri || "Unknown URL");
+      console.error("Error stack:", error?.stack || "No stack");
+
+      // Try to stringify the entire error object
+      try {
+        console.error(
+          "Full error JSON:",
+          JSON.stringify(error, Object.getOwnPropertyNames(error)),
+        );
+      } catch (e) {
+        console.error("Could not stringify error object");
       }
-      this.connectionStatus = "error";
-      this.emit("connectionStatusChanged", "error");
+
+      // If it's an authentication error, we should still allow the app to function
+      // without real-time features
+      if (
+        error?.message?.includes("token") ||
+        error?.message?.includes("Authentication")
+      ) {
+        console.warn(
+          "⚠️ Socket.IO authentication failed - running without real-time features",
+        );
+        this.connectionStatus = "no-auth";
+      } else {
+        this.connectionStatus = "error";
+      }
+
+      this.emit("connectionStatusChanged", this.connectionStatus);
     });
 
     this.socket.on("reconnect", (attemptNumber) => {

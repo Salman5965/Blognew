@@ -11,7 +11,7 @@ class ApiService {
   constructor() {
     this.instance = axios.create({
       baseURL: API_BASE_URL,
-      timeout: 30000, // Increased to 30 seconds
+      timeout: 60000, // Increased to 60 seconds for slow responses
       headers: {
         "Content-Type": "application/json",
       },
@@ -53,9 +53,11 @@ class ApiService {
           let errorMessage = "Network connection failed";
           if (
             error.code === "ECONNABORTED" ||
-            error.message.includes("timeout")
+            error.message.includes("timeout") ||
+            error.message.includes("Request timed out")
           ) {
-            errorMessage = "Request timed out. Please try again.";
+            errorMessage =
+              "Request is taking longer than expected. Please wait...";
           } else if (error.message.includes("Network Error")) {
             errorMessage =
               "Unable to connect to server. Please check your internet connection.";
@@ -211,6 +213,20 @@ class ApiService {
 
       // Handle network errors gracefully
       if (error.isNetworkError || !error.response) {
+        // Check if it's a timeout error specifically
+        if (
+          error.code === "ECONNABORTED" ||
+          error.message.includes("timeout")
+        ) {
+          const timeoutError = new Error(
+            "Request is taking longer than expected. The server might be slow.",
+          );
+          timeoutError.isNetworkError = true;
+          timeoutError.isTimeout = true;
+          timeoutError.originalError = error;
+          throw timeoutError;
+        }
+
         const networkError = new Error("Failed to fetch data");
         networkError.isNetworkError = true;
         networkError.originalError = error;

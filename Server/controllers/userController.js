@@ -2,6 +2,10 @@ import User from "../models/User.js";
 import Blog from "../models/Blog.js";
 import Comment from "../models/Comment.js";
 import Follow from "../models/Follow.js";
+<<<<<<< HEAD
+=======
+import Story from "../models/Story.js";
+>>>>>>> refs/remotes/origin/main
 import { validationResult } from "express-validator";
 
 // @desc    Get all users (admin only)
@@ -294,14 +298,67 @@ export const getUserStats = async (req, res, next) => {
       },
     ]);
 
-    // Get comment statistics
+    // Get comments on user's blogs
     const commentStats = await Comment.aggregate([
-      { $match: { author: user._id, status: "active" } },
+      {
+        $lookup: {
+          from: "blogs",
+          localField: "contentId",
+          foreignField: "_id",
+          as: "blog",
+        },
+      },
+      {
+        $match: {
+          "blog.author": user._id,
+          "blog.status": "published",
+          status: "active",
+        },
+      },
       {
         $group: {
           _id: null,
           totalComments: { $sum: 1 },
           totalCommentLikes: { $sum: { $size: "$likes" } },
+        },
+      },
+    ]);
+
+    // Get story statistics
+    const storyStats = await Story.aggregate([
+      { $match: { author: user._id, isPublished: true } },
+      {
+        $group: {
+          _id: null,
+          totalStories: { $sum: 1 },
+          totalViews: { $sum: "$views" },
+          totalLikes: { $sum: { $size: "$likes" } },
+          avgReadTime: { $avg: "$readTime" },
+        },
+      },
+    ]);
+
+    // Get comments on user's stories
+    const storyCommentStats = await Comment.aggregate([
+      {
+        $lookup: {
+          from: "stories",
+          localField: "contentId",
+          foreignField: "_id",
+          as: "story",
+        },
+      },
+      {
+        $match: {
+          "story.author": user._id,
+          "story.isPublished": true,
+          status: "active",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalStoryComments: { $sum: 1 },
         },
       },
     ]);
@@ -338,9 +395,18 @@ export const getUserStats = async (req, res, next) => {
         totalLikes: 0,
         avgReadTime: 0,
       },
-      comments: commentStats[0] || {
-        totalComments: 0,
-        totalCommentLikes: 0,
+      stories: storyStats[0] || {
+        totalStories: 0,
+        totalViews: 0,
+        totalLikes: 0,
+        avgReadTime: 0,
+      },
+      comments: {
+        ...(commentStats[0] || {
+          totalComments: 0,
+          totalCommentLikes: 0,
+        }),
+        totalStoryComments: storyCommentStats[0]?.totalStoryComments || 0,
       },
       monthlyStats,
       joinedDate: user.createdAt,
@@ -498,6 +564,7 @@ export const getTopAuthors = async (req, res, next) => {
           totalViews: 1,
           totalLikes: 1,
           authorScore: 1,
+          createdAt: 1,
         },
       },
     ]);

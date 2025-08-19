@@ -188,6 +188,7 @@ const Stories = () => {
     }
   };
 
+<<<<<<< HEAD
   const handleShareStory = async (story) => {
     const shareUrl =
       window.location.origin + `/stories/${story.id || story._id}`;
@@ -213,6 +214,19 @@ const Stories = () => {
         console.error("Copy failed:", error);
       }
     }
+=======
+  const handleShareStory = (story) => {
+    const shareUrl =
+      window.location.origin + `/stories/${story.id || story._id}`;
+
+    // Skip APIs entirely to avoid permission issues
+    // Show URL directly for manual copying
+    toast({
+      title: "Share Story",
+      description: `Copy this link: ${shareUrl}`,
+      duration: 15000, // Long duration so user can copy
+    });
+>>>>>>> refs/remotes/origin/main
   };
 
   const toggleAudio = (storyId) => {

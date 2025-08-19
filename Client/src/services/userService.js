@@ -1,6 +1,7 @@
 import apiService from "./api";
 
 class UserService {
+<<<<<<< HEAD
   // Get user profile by ID
   async getUserById(userId) {
     try {
@@ -23,6 +24,55 @@ class UserService {
 
       // Re-throw the original error if it's already a custom error
       throw error;
+=======
+  // Get user profile by ID or username
+  async getUserById(userIdOrUsername) {
+    try {
+      let response;
+
+      try {
+        // First try as ObjectId
+        response = await apiService.get(`/users/${userIdOrUsername}`);
+      } catch (firstError) {
+        // If that fails, try as username
+        try {
+          response = await apiService.get(
+            `/users/username/${userIdOrUsername}`,
+          );
+        } catch (secondError) {
+          // If both fail, check if it's a 400/500 error on ObjectId or username issue
+          if (
+            firstError.response?.status === 400 ||
+            firstError.response?.data?.message?.includes(
+              "Cast to ObjectId failed",
+            )
+          ) {
+            // This means it was a username passed to ObjectId endpoint, try username endpoint
+            throw secondError;
+          }
+          // Otherwise throw the original error
+          throw firstError;
+        }
+      }
+
+      if (response.status === "success") {
+        return response.data;
+      }
+      // If response is not successful, return null (will be handled by UserProfile)
+      return null;
+    } catch (error) {
+      console.error("Error fetching user:", error);
+
+      // For debugging - log the specific error
+      if (error.response?.status === 404) {
+        console.warn(
+          "User not found - this might be expected for username lookup",
+        );
+      }
+
+      // Return null instead of throwing - let the calling component handle it
+      return null;
+>>>>>>> refs/remotes/origin/main
     }
   }
 
@@ -45,6 +95,7 @@ class UserService {
   }
 
   // Get user statistics
+<<<<<<< HEAD
   async getUserStats(userId) {
     try {
       const response = await apiService.get(`/users/${userId}/stats`);
@@ -59,6 +110,54 @@ class UserService {
         throw new Error("Server error. Please try again later.");
       }
       throw error;
+=======
+  async getUserStats(userIdOrUsername) {
+    try {
+      let response;
+      try {
+        // Try as ObjectId first
+        response = await apiService.get(`/users/${userIdOrUsername}/stats`);
+      } catch (firstError) {
+        // If that fails due to ObjectId casting, try username endpoint
+        if (
+          firstError.response?.status === 400 ||
+          firstError.response?.data?.message?.includes(
+            "Cast to ObjectId failed",
+          )
+        ) {
+          response = await apiService.get(
+            `/users/username/${userIdOrUsername}/stats`,
+          );
+        } else {
+          throw firstError;
+        }
+      }
+      if (response.status === "success") {
+        return response.data.stats || response.data;
+      }
+
+      // Return default stats if response is not successful
+      return {
+        blogsCount: 0,
+        storiesCount: 0,
+        totalViews: 0,
+        totalLikes: 0,
+        followerCount: 0,
+        followingCount: 0,
+      };
+    } catch (error) {
+      console.error("Error fetching user stats:", error);
+
+      // Always return default stats instead of throwing
+      return {
+        blogsCount: 0,
+        storiesCount: 0,
+        totalViews: 0,
+        totalLikes: 0,
+        followerCount: 0,
+        followingCount: 0,
+      };
+>>>>>>> refs/remotes/origin/main
     }
   }
 

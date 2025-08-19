@@ -13,6 +13,7 @@ import {
   Share2,
   Bookmark,
   MoreHorizontal,
+  Heart,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -91,17 +92,31 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
   };
 
   const handleShare = async () => {
+    const shareData = {
+      title: blog.title,
+      text: blog.excerpt || `Check out this blog: ${blog.title}`,
+      url: window.location.href,
+    };
+
     // Try native sharing first
-    if (navigator.share) {
+    if (
+      navigator.share &&
+      navigator.canShare &&
+      navigator.canShare(shareData)
+    ) {
       try {
-        await navigator.share({
-          title: blog.title,
-          text: blog.excerpt,
-          url: window.location.href,
+        await navigator.share(shareData);
+        toast({
+          title: "Shared successfully!",
+          description: "Thanks for sharing this blog",
+          duration: 2000,
         });
         return;
       } catch (error) {
-        // User cancelled or share failed, fall back to clipboard
+        if (error.name !== "AbortError") {
+          console.error("Share failed:", error);
+        }
+        // Fall through to clipboard fallback
       }
     }
 
@@ -110,34 +125,67 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
       await navigator.clipboard.writeText(window.location.href);
       toast({
         title: "Link copied!",
-        description: "Blog link copied to clipboard",
-        duration: 2000,
-      });
-    } catch (error) {
-      toast({
-        title: "Share failed",
-        description: "Unable to share the blog",
-        variant: "destructive",
+        description:
+          "Blog link copied to clipboard. Share it with your friends!",
         duration: 3000,
       });
+    } catch (error) {
+      // Final fallback - create a temporary input to copy
+      const tempInput = document.createElement("input");
+      tempInput.value = window.location.href;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+
+      try {
+        document.execCommand("copy");
+        toast({
+          title: "Link copied!",
+          description: "Blog link copied to clipboard",
+          duration: 2000,
+        });
+      } catch (copyError) {
+        toast({
+          title: "Share failed",
+          description:
+            "Unable to share the blog. Please copy the URL manually.",
+          variant: "destructive",
+          duration: 3000,
+        });
+      } finally {
+        document.body.removeChild(tempInput);
+      }
     }
   };
 
   const handleBookmark = async () => {
+    if (!currentUser) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to bookmark blogs",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const result = await bookmarkService.toggleBookmark(blog._id || blog.id);
 
       toast({
         title: result.bookmarked ? "Bookmarked!" : "Bookmark removed",
         description: result.bookmarked
-          ? "Blog saved to your bookmarks"
-          : "Blog removed from bookmarks",
+          ? "Blog saved to your bookmarks collection"
+          : "Blog removed from your bookmarks",
         duration: 2000,
       });
+
+      // Update UI to reflect bookmark state if needed
+      // This would ideally update the blog state in the store
     } catch (error) {
+      console.error("Bookmark error:", error);
       toast({
         title: "Error",
-        description: "Failed to bookmark blog",
+        description:
+          error.message || "Failed to bookmark blog. Please try again.",
         variant: "destructive",
         duration: 3000,
       });
@@ -183,23 +231,6 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
             </div>
           )}
         </div>
-
-        {showActions && (
-          <div className="flex items-center space-x-2">
-            <LikeButton
-              blogId={blog.id || blog._id}
-              likeCount={blog.likeCount || 0}
-              isLiked={blog.isLiked}
-              blogLikes={blog.likes || []}
-            />
-            <Button variant="ghost" size="sm" onClick={handleShare}>
-              <Share2 className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleBookmark}>
-              <Bookmark className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
       </div>
     );
   }
@@ -286,6 +317,10 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
           <MessageCircle className="h-4 w-4" />
           <span>{blog.commentCount || 0} comments</span>
         </div>
+        <div className="flex items-center space-x-1">
+          <Heart className="h-4 w-4" />
+          <span>{blog.likeCount || 0} likes</span>
+        </div>
       </div>
 
       {/* Tags */}
@@ -296,26 +331,6 @@ export const BlogMeta = ({ blog, variant = "full", showActions = true }) => {
               {tag}
             </Badge>
           ))}
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      {showActions && (
-        <div className="flex items-center space-x-4 pt-4 border-t">
-          <LikeButton
-            blogId={blog.id || blog._id}
-            likeCount={blog.likeCount || 0}
-            isLiked={blog.isLiked}
-            blogLikes={blog.likes || []}
-          />
-          <Button variant="outline" size="sm" onClick={handleShare}>
-            <Share2 className="h-4 w-4 mr-2" />
-            Share
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleBookmark}>
-            <Bookmark className="h-4 w-4 mr-2" />
-            Bookmark
-          </Button>
         </div>
       )}
 

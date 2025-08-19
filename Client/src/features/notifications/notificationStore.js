@@ -17,6 +17,8 @@ const useNotificationStore = create((set, get) => ({
   },
   preferences: null,
   isPreferencesLoading: false,
+  realtimeAlerts: [], // For showing toast notifications
+  lastNotificationCheck: null,
 
   // Actions
 
@@ -62,12 +64,43 @@ const useNotificationStore = create((set, get) => ({
     }
   },
 
-  // Fetch unread count
+  // Fetch unread count and create alerts for new notifications
   fetchUnreadCount: async () => {
     try {
       const result = await notificationService.getUnreadCount();
       if (result.success) {
-        set({ unreadCount: result.count });
+        const currentState = get();
+        const newCount = result.count;
+
+        // If count increased, check for new notifications to create alerts
+        if (
+          currentState.unreadCount > 0 &&
+          newCount > currentState.unreadCount
+        ) {
+          try {
+            // Fetch latest notifications to see what's new
+            const notificationsResult =
+              await notificationService.getNotifications(1, 5);
+            if (notificationsResult.success) {
+              const newNotifications =
+                notificationsResult.data.notifications.filter((notif) => {
+                  return !currentState.notifications.some(
+                    (existing) =>
+                      (existing._id || existing.id) === (notif._id || notif.id),
+                  );
+                });
+
+              // Create real-time alerts for new notifications
+              newNotifications.forEach((notification) => {
+                get().createAlert(notification);
+              });
+            }
+          } catch (alertError) {
+            console.error("Error creating notification alerts:", alertError);
+          }
+        }
+
+        set({ unreadCount: newCount, lastNotificationCheck: new Date() });
       } else {
         set({ unreadCount: 0 });
       }
@@ -78,6 +111,41 @@ const useNotificationStore = create((set, get) => ({
       }
       set({ unreadCount: 0 });
     }
+  },
+
+  // Create real-time alert
+  createAlert: (notification) => {
+    const alert = {
+      id: Date.now() + Math.random(),
+      notification,
+      timestamp: new Date(),
+      shown: false,
+    };
+
+    set((state) => ({
+      realtimeAlerts: [...state.realtimeAlerts, alert],
+    }));
+
+    // Auto-remove alert after 5 seconds
+    setTimeout(() => {
+      set((state) => ({
+        realtimeAlerts: state.realtimeAlerts.filter((a) => a.id !== alert.id),
+      }));
+    }, 5000);
+  },
+
+  // Mark alert as shown
+  markAlertShown: (alertId) => {
+    set((state) => ({
+      realtimeAlerts: state.realtimeAlerts.map((alert) =>
+        alert.id === alertId ? { ...alert, shown: true } : alert,
+      ),
+    }));
+  },
+
+  // Clear all alerts
+  clearAlerts: () => {
+    set({ realtimeAlerts: [] });
   },
 
   // Mark notification as read
@@ -197,6 +265,7 @@ const useNotificationStore = create((set, get) => ({
 
   // Real-time notification handling
   addNotification: (notification) => {
+    console.log("📬 Adding new notification to store:", notification);
     set((state) => ({
       notifications: [notification, ...(state.notifications || [])],
       unreadCount: state.unreadCount + 1,

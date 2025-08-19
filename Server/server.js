@@ -28,19 +28,44 @@ const io = new Server(httpServer, {
 // Socket.IO middleware for authentication
 io.use(async (socket, next) => {
   try {
+    console.log("🔐 Socket.IO authentication attempt");
+
     const token = socket.handshake.auth.token;
+    console.log("Token present:", !!token);
+
     if (!token) {
-      return next(new Error("Authentication error: No token provided"));
+      console.error("❌ No token provided");
+      return next(new Error("No token provided"));
     }
 
-    // Verify JWT token (you'll need to import your JWT verification logic)
+    // Check if JWT_SECRET is available
+    if (!process.env.JWT_SECRET) {
+      console.error("❌ JWT_SECRET not configured");
+      return next(new Error("Server configuration error"));
+    }
+
+    // Verify JWT token
     const jwt = await import("jsonwebtoken");
-    const decoded = jwt.default.verify(token, process.env.JWT_SECRET);
+
+    let decoded;
+    try {
+      decoded = jwt.default.verify(token, process.env.JWT_SECRET);
+      console.log("✅ Token verified for user ID:", decoded.id);
+    } catch (jwtError) {
+      console.error("❌ JWT verification failed:", jwtError.message);
+      return next(new Error("Invalid token"));
+    }
 
     // Get user from database
     const user = await User.findById(decoded.id).select("-password");
     if (!user) {
-      return next(new Error("Authentication error: User not found"));
+      console.error("❌ User not found:", decoded.id);
+      return next(new Error("User not found"));
+    }
+
+    if (!user.isActive) {
+      console.error("❌ User account is inactive:", decoded.id);
+      return next(new Error("Account is inactive"));
     }
 
     socket.userId = user._id.toString();
@@ -52,9 +77,11 @@ io.use(async (socket, next) => {
       lastSeen: new Date(),
     });
 
+    console.log("✅ Socket.IO authentication successful for:", user.username);
     next();
   } catch (error) {
-    next(new Error("Authentication error: Invalid token"));
+    console.error("❌ Socket.IO authentication error:", error.message);
+    return next(new Error("Authentication failed"));
   }
 });
 
@@ -64,6 +91,13 @@ io.on("connection", (socket) => {
 
   // Join user to their personal room
   socket.join(`user:${socket.userId}`);
+
+  // Broadcast online status to all connected users
+  io.emit("user_status_changed", {
+    userId: socket.userId,
+    status: "online",
+    lastSeen: new Date(),
+  });
 
   // Join user to their conversation rooms
   socket.on("join_conversations", async () => {
@@ -135,14 +169,29 @@ io.on("connection", (socket) => {
         lastSeen: new Date(),
       });
 
-      // Broadcast status to user's connections
-      socket.broadcast.emit("user_status_changed", {
+      // Broadcast status to all connected users
+      io.emit("user_status_changed", {
         userId: socket.userId,
         status,
         lastSeen: new Date(),
       });
     } catch (error) {
       console.error("Error updating user status:", error);
+    }
+  });
+
+  // Handle online status query
+  socket.on("get_online_status", async (userIds) => {
+    try {
+      const onlineUsers = await User.find({
+        _id: { $in: userIds },
+        isOnline: true,
+      }).select("_id");
+
+      const onlineUserIds = onlineUsers.map((user) => user._id.toString());
+      socket.emit("online_status_response", onlineUserIds);
+    } catch (error) {
+      console.error("Error getting online status:", error);
     }
   });
 
@@ -157,8 +206,8 @@ io.on("connection", (socket) => {
         lastSeen: new Date(),
       });
 
-      // Broadcast offline status
-      socket.broadcast.emit("user_status_changed", {
+      // Broadcast offline status to all connected users
+      io.emit("user_status_changed", {
         userId: socket.userId,
         status: "offline",
         lastSeen: new Date(),

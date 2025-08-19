@@ -28,6 +28,10 @@ import { cn } from "@/lib/utils";
 import { getDisplayName, getInitials } from "@/utils/userUtils";
 import { useToast } from "@/hooks/use-toast";
 import messagingService from "@/services/messagingService";
+<<<<<<< HEAD
+=======
+import socketService from "@/services/socketService";
+>>>>>>> refs/remotes/origin/main
 import NewMessageModal from "@/components/messages/NewMessageModal";
 import EmojiPicker from "@/components/messages/EmojiPicker";
 import FileUpload from "@/components/messages/FileUpload";
@@ -59,6 +63,7 @@ const Messages = () => {
   const [onlineUsers, setOnlineUsers] = useState(new Set());
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
+<<<<<<< HEAD
   const pollingIntervalRef = useRef(null);
   const lastMessageCountRef = useRef(0);
 
@@ -98,10 +103,209 @@ const Messages = () => {
   }, [userIdToMessage, conversations]);
 
   useEffect(() => {
+=======
+  const lastMessageCountRef = useRef(0);
+  const typingTimeoutRef = useRef(null);
+
+  // Check if we need to open conversation with specific user
+  const userIdToMessage = searchParams.get("user");
+
+  // Socket.IO connection and real-time event handling
+  useEffect(() => {
+    loadConversations();
+
+    // Connect to Socket.IO when user is authenticated
+    if (user) {
+      const socket = socketService.connect();
+
+      // Set up status change handler
+      const handleConnectionStatus = (status) => {
+        if (
+          status === "no-auth" ||
+          status === "error" ||
+          status === "disabled"
+        ) {
+          console.warn(
+            "⚠️ Real-time messaging unavailable, using polling fallback",
+          );
+          // Set up polling fallback for when Socket.IO fails
+          startPollingFallback();
+        }
+      };
+
+      socketService.on("connectionStatusChanged", handleConnectionStatus);
+
+      if (socket) {
+        // Join user's conversation rooms
+        socket.emit("join_conversations");
+
+        // Listen for new messages
+        socket.on("newMessage", (data) => {
+          const { message, conversationId } = data;
+
+          // Update messages if this is the current conversation
+          if (
+            selectedChat &&
+            (selectedChat.id === conversationId ||
+              selectedChat._id === conversationId)
+          ) {
+            setMessages((prev) => {
+              // Avoid duplicates
+              const exists = prev.some(
+                (m) => (m.id || m._id) === (message.id || message._id),
+              );
+              if (!exists) {
+                return [...prev, message];
+              }
+              return prev;
+            });
+
+            // Mark as read if conversation is open
+            messagingService.markAsRead(conversationId);
+          }
+
+          // Update conversation list with new last message
+          setConversations((prev) =>
+            prev.map((conv) => {
+              if ((conv.id || conv._id) === conversationId) {
+                const isCurrentChat =
+                  selectedChat &&
+                  (selectedChat.id || selectedChat._id) === conversationId;
+                return {
+                  ...conv,
+                  lastMessage: {
+                    content: message.content,
+                    createdAt: message.createdAt,
+                    sender: message.sender._id,
+                  },
+                  unreadCount: isCurrentChat ? 0 : (conv.unreadCount || 0) + 1,
+                };
+              }
+              return conv;
+            }),
+          );
+        });
+
+        // Listen for message status updates
+        socket.on("messageRead", (data) => {
+          setMessages((prev) =>
+            prev.map((msg) => {
+              if ((msg.id || msg._id) === data.messageId) {
+                return {
+                  ...msg,
+                  readBy: [
+                    ...(msg.readBy || []),
+                    { user: data.readBy, readAt: data.readAt },
+                  ],
+                };
+              }
+              return msg;
+            }),
+          );
+        });
+
+        // Listen for typing indicators
+        socket.on("user_typing", (data) => {
+          if (
+            selectedChat &&
+            data.conversationId === (selectedChat.id || selectedChat._id)
+          ) {
+            // Show typing indicator (implement this UI state)
+            console.log(`${data.username} is typing...`);
+          }
+        });
+
+        socket.on("user_stopped_typing", (data) => {
+          if (
+            selectedChat &&
+            data.conversationId === (selectedChat.id || selectedChat._id)
+          ) {
+            // Hide typing indicator
+            console.log(`User stopped typing`);
+          }
+        });
+
+        // Listen for online status changes
+        socket.on("user_status_changed", (data) => {
+          setOnlineUsers((prev) => {
+            const newSet = new Set(prev);
+            if (data.status === "online") {
+              newSet.add(data.userId);
+            } else {
+              newSet.delete(data.userId);
+            }
+            return newSet;
+          });
+
+          // Update conversation list with online status
+          setConversations((prev) =>
+            prev.map((conv) => {
+              if (conv.participantId === data.userId) {
+                return { ...conv, isOnline: data.status === "online" };
+              }
+              return conv;
+            }),
+          );
+        });
+
+        // Request current online status for conversation participants
+        const participantIds = conversations
+          .map((conv) => conv.participantId)
+          .filter(Boolean);
+        if (participantIds.length > 0) {
+          socket.emit("get_online_status", participantIds);
+        }
+
+        // Listen for online status response
+        socket.on("online_status_response", (onlineUserIds) => {
+          setOnlineUsers(new Set(onlineUserIds));
+        });
+
+        return () => {
+          socket.off("newMessage");
+          socket.off("messageRead");
+          socket.off("user_typing");
+          socket.off("user_stopped_typing");
+          socket.off("user_status_changed");
+          socket.off("online_status_response");
+          socketService.off("connectionStatusChanged", handleConnectionStatus);
+        };
+      }
+    }
+  }, [user, selectedChat]);
+
+  // Polling fallback when Socket.IO is not available
+  const startPollingFallback = () => {
+    console.log("📡 Starting polling fallback for real-time features");
+
+    const pollingInterval = setInterval(() => {
+      if (selectedChat) {
+        const conversationId = selectedChat.id || selectedChat._id;
+        if (conversationId && !isSending) {
+          // Silently refresh messages
+          loadMessages(conversationId, true);
+        }
+      }
+      // Refresh conversations list for new message indicators
+      loadConversations(true);
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(pollingInterval);
+  };
+
+  useEffect(() => {
+    if (userIdToMessage && conversations.length > 0) {
+      handleDirectMessage(userIdToMessage);
+    }
+  }, [userIdToMessage, conversations]);
+
+  useEffect(() => {
+>>>>>>> refs/remotes/origin/main
     if (selectedChat) {
       const conversationId = selectedChat.id || selectedChat._id;
       if (conversationId) {
         loadMessages(conversationId);
+<<<<<<< HEAD
       }
     }
   }, [selectedChat]);
@@ -192,6 +396,53 @@ const Messages = () => {
 
     return () => clearInterval(messagePollingInterval);
   }, [selectedChat, isSending]);
+=======
+
+        // Join the conversation room for real-time updates
+        const socket = socketService.socket;
+        if (socket && socket.connected) {
+          socket.emit("join_conversation", conversationId);
+        }
+      }
+    }
+  }, [selectedChat]);
+
+  useEffect(() => {
+    // Only scroll if new messages were added and user is near bottom
+    if (
+      messages.length > lastMessageCountRef.current &&
+      lastMessageCountRef.current > 0
+    ) {
+      const container = messagesContainerRef.current;
+      if (container) {
+        const isNearBottom =
+          container.scrollHeight -
+            container.scrollTop -
+            container.clientHeight <
+          150; // Increased threshold to be less aggressive
+        if (isNearBottom) {
+          // Use requestAnimationFrame for smoother scrolling
+          requestAnimationFrame(() => {
+            scrollToBottom();
+          });
+        }
+      }
+    }
+    lastMessageCountRef.current = messages.length;
+  }, [messages]);
+
+  // Get real online status from Socket.IO
+  useEffect(() => {
+    if (socketService.connected) {
+      // Request initial online status
+      conversations.forEach((conv) => {
+        if (conv.isOnline) {
+          setOnlineUsers((prev) => new Set([...prev, conv.participantId]));
+        }
+      });
+    }
+  }, [conversations, socketService.connected]);
+>>>>>>> refs/remotes/origin/main
 
   useEffect(() => {
     if (searchQuery.trim()) {
@@ -351,13 +602,20 @@ const Messages = () => {
     if (!newMessage.trim() || !selectedChat || isSending) return;
 
     const content = newMessage.trim();
+<<<<<<< HEAD
     setNewMessage(""); // Clear input immediately
+=======
+>>>>>>> refs/remotes/origin/main
 
     if (editingMessage) {
       // Handle message editing
       await handleEditMessageContent(content);
     } else {
       // Handle new message
+<<<<<<< HEAD
+=======
+      setNewMessage("");
+>>>>>>> refs/remotes/origin/main
       await handleSendMessageContent(content);
     }
   };
@@ -405,12 +663,21 @@ const Messages = () => {
   };
 
   const scrollToBottom = () => {
+<<<<<<< HEAD
     if (messagesEndRef.current && messagesContainerRef.current) {
       // Scroll within the messages container only, not the whole page
       messagesEndRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "end",
         inline: "nearest",
+=======
+    if (messagesContainerRef.current) {
+      // Scroll within the messages container only, not the entire page
+      const container = messagesContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+>>>>>>> refs/remotes/origin/main
       });
     }
   };
@@ -419,6 +686,31 @@ const Messages = () => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
+<<<<<<< HEAD
+=======
+    }
+  };
+
+  const handleInputChange = (e) => {
+    setNewMessage(e.target.value);
+
+    // Send typing indicator
+    if (selectedChat && socketService.connected) {
+      const conversationId = selectedChat.id || selectedChat._id;
+
+      // Clear previous timeout
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      // Send typing start
+      socketService.socket.emit("typing_start", conversationId);
+
+      // Stop typing after 1 second of no input
+      typingTimeoutRef.current = setTimeout(() => {
+        socketService.socket.emit("typing_stop", conversationId);
+      }, 1000);
+>>>>>>> refs/remotes/origin/main
     }
   };
 
@@ -575,6 +867,7 @@ const Messages = () => {
       return;
     }
 
+<<<<<<< HEAD
     const messageContent = content.trim();
     let optimisticMessage;
 
@@ -591,16 +884,31 @@ const Messages = () => {
           firstName: user.firstName,
           lastName: user.lastName
         },
+=======
+    try {
+      setIsSending(true);
+
+      // Optimistically add message to UI
+      const optimisticMessage = {
+        id: `temp-${Date.now()}`,
+        content: content.trim(),
+        sender: { _id: user._id, username: user.username },
+>>>>>>> refs/remotes/origin/main
         createdAt: new Date().toISOString(),
         status: "sending",
         replyTo: replyToMessage,
       };
 
+<<<<<<< HEAD
       // Add message immediately to UI
       setMessages((prev) => [...prev, optimisticMessage]);
 
       // Scroll to bottom immediately
       setTimeout(() => scrollToBottom(), 50);
+=======
+      setMessages((prev) => [...prev, optimisticMessage]);
+      const messageContent = content.trim();
+>>>>>>> refs/remotes/origin/main
 
       // Send message to backend
       const data = await messagingService.sendMessage(
@@ -609,6 +917,7 @@ const Messages = () => {
       );
 
       // Replace optimistic message with real one
+<<<<<<< HEAD
       if (data && data.message) {
         setMessages((prev) =>
           prev.map((msg) =>
@@ -643,6 +952,31 @@ const Messages = () => {
           ),
         );
       }
+=======
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === optimisticMessage.id
+            ? { ...data.message, status: "sent" }
+            : msg,
+        ),
+      );
+
+      // Update conversation last message
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === conversationId || conv._id === conversationId
+            ? {
+                ...conv,
+                lastMessage: {
+                  content: messageContent,
+                  createdAt: new Date().toISOString(),
+                  sender: user._id,
+                },
+              }
+            : conv,
+        ),
+      );
+>>>>>>> refs/remotes/origin/main
 
       // Clear reply state
       setReplyToMessage(null);
@@ -650,11 +984,17 @@ const Messages = () => {
       console.error("Failed to send message:", error);
 
       // Remove optimistic message on error
+<<<<<<< HEAD
       if (optimisticMessage) {
         setMessages((prev) =>
           prev.filter((msg) => msg.id !== optimisticMessage.id),
         );
       }
+=======
+      setMessages((prev) =>
+        prev.filter((msg) => msg.id !== optimisticMessage.id),
+      );
+>>>>>>> refs/remotes/origin/main
 
       toast({
         title: "Error",
@@ -953,8 +1293,12 @@ const Messages = () => {
                             "U"}
                         </AvatarFallback>
                       </Avatar>
+<<<<<<< HEAD
                       {(conversation.isOnline ||
                         onlineUsers.has(conversation.participantId)) && (
+=======
+                      {onlineUsers.has(conversation.participantId) && (
+>>>>>>> refs/remotes/origin/main
                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
                       )}
                     </div>
@@ -1054,9 +1398,13 @@ const Messages = () => {
                           "U"}
                       </AvatarFallback>
                     </Avatar>
+<<<<<<< HEAD
                     {(selectedChat.isOnline ||
                       onlineUsers.has(selectedChat.participantId) ||
                       selectedChat.participantStatus === "online") && (
+=======
+                    {onlineUsers.has(selectedChat.participantId) && (
+>>>>>>> refs/remotes/origin/main
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
                     )}
                   </div>
@@ -1066,9 +1414,13 @@ const Messages = () => {
                       {selectedChat.participantName || "Unknown User"}
                     </h2>
                     <p className="text-sm text-muted-foreground">
+<<<<<<< HEAD
                       {selectedChat.isOnline ||
                       onlineUsers.has(selectedChat.participantId) ||
                       selectedChat.participantStatus === "online"
+=======
+                      {onlineUsers.has(selectedChat.participantId)
+>>>>>>> refs/remotes/origin/main
                         ? "Active now"
                         : "Offline"}
                     </p>
@@ -1103,6 +1455,7 @@ const Messages = () => {
                 >
                   <Video className="h-5 w-5" />
                 </Button>
+<<<<<<< HEAD
                 <Button
                   variant="ghost"
                   size="icon"
@@ -1110,6 +1463,9 @@ const Messages = () => {
                   onClick={() => navigate(`/users/${selectedChat.participantId}`)}
                   title="View profile"
                 >
+=======
+                <Button variant="ghost" size="icon" className="rounded-full">
+>>>>>>> refs/remotes/origin/main
                   <Info className="h-5 w-5" />
                 </Button>
               </div>
@@ -1118,7 +1474,11 @@ const Messages = () => {
             {/* Messages */}
             <div
               ref={messagesContainerRef}
+<<<<<<< HEAD
               className="flex-1 overflow-y-auto p-4 space-y-4"
+=======
+              className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[calc(100vh-12rem)]"
+>>>>>>> refs/remotes/origin/main
             >
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center h-full">
@@ -1249,6 +1609,7 @@ const Messages = () => {
                   >
                     ×
                   </Button>
+<<<<<<< HEAD
                 </div>
               )}
 
@@ -1295,8 +1656,73 @@ const Messages = () => {
                       />
                     )}
                   </div>
+=======
+>>>>>>> refs/remotes/origin/main
+                </div>
+              )}
+
+<<<<<<< HEAD
+=======
+              {editingMessage && (
+                <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg flex items-center justify-between">
+                  <div className="flex-1">
+                    <p className="text-xs text-blue-600 dark:text-blue-400">
+                      Editing message
+                    </p>
+                    <p className="text-sm truncate">{editingMessage.content}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => {
+                      setEditingMessage(null);
+                      setNewMessage("");
+                    }}
+                  >
+                    ×
+                  </Button>
+                </div>
+              )}
+
+              <div className="flex items-end gap-3">
+                <FileUpload
+                  onFileSelect={handleFileSelect}
+                  disabled={uploadingFile || isSending}
+                >
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    className="rounded-full cursor-pointer hover:bg-muted flex items-center justify-center h-8 w-8"
+                    title="Attach file"
+                  >
+                    <Paperclip className="h-5 w-5" />
+                  </div>
+                </FileUpload>
+
+                <div className="flex-1 bg-muted rounded-full flex items-center px-4 py-2">
+                  <Input
+                    placeholder={
+                      editingMessage ? "Edit message..." : "Message..."
+                    }
+                    value={newMessage}
+                    onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
+                    disabled={isSending || uploadingFile}
+                    className="border-0 bg-transparent p-0 text-sm focus-visible:ring-0"
+                  />
+                  <div className="flex items-center gap-2 ml-2">
+                    <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+                    {!newMessage.trim() && !uploadingFile && (
+                      <ImageUpload
+                        onImageSelect={handleImageSelect}
+                        disabled={uploadingFile || isSending}
+                      />
+                    )}
+                  </div>
                 </div>
 
+>>>>>>> refs/remotes/origin/main
                 {newMessage.trim() ? (
                   <Button
                     onClick={handleSendMessage}

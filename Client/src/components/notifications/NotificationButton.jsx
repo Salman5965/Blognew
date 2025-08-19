@@ -3,6 +3,7 @@ import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useNotificationStore from "@/features/notifications/notificationStore";
 import { useAuthContext } from "@/contexts/AuthContext";
+import { useRealTimeNotifications } from "@/hooks/useRealTimeNotifications";
 import NotificationPanel from "./NotificationPanel";
 
 const NotificationButton = () => {
@@ -12,22 +13,18 @@ const NotificationButton = () => {
   const panelRef = useRef(null);
 
   const { user, isAuthenticated } = useAuthContext();
-  const { unreadCount, fetchNotifications, fetchUnreadCount, initialize } =
+  const { unreadCount, fetchNotifications, initialize } =
     useNotificationStore();
+
+  // Use the real-time notifications hook
+  const { socketConnected, socketStatus } = useRealTimeNotifications();
 
   // Initialize notifications when authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
       initialize();
-
-      // Set up polling for new notifications
-      const interval = setInterval(() => {
-        fetchUnreadCount();
-      }, 30000); // Check every 30 seconds
-
-      return () => clearInterval(interval);
     }
-  }, [isAuthenticated, user, initialize, fetchUnreadCount]);
+  }, [isAuthenticated, user, initialize]);
 
   // Handle click outside to close panel
   useEffect(() => {

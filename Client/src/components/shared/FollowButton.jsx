@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuthContext } from "@/contexts/AuthContext";
 import { followService } from "@/services/followService";
+import notificationService from "@/services/notificationService";
 import { UserPlus, UserMinus, Loader2, UserCheck } from "lucide-react";
 import { isValidObjectId } from "@/utils/validation";
 
@@ -106,6 +107,30 @@ export const FollowButton = ({
           description: "You are now following this user",
           duration: 2000,
         });
+
+        // Create notification for the followed user
+        try {
+          const notificationResult =
+            await notificationService.createNotification({
+              recipientId: userId,
+              type: "follow",
+              title: "New follower",
+              message: `${user.username} started following you`,
+              data: {
+                followerId: user._id,
+                followerUsername: user.username,
+              },
+            });
+
+          if (!notificationResult.success) {
+            console.error(
+              "Failed to create follow notification:",
+              notificationResult.error,
+            );
+          }
+        } catch (notifError) {
+          console.error("Failed to create follow notification:", notifError);
+        }
       }
 
       // Notify parent component of follow status change

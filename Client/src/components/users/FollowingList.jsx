@@ -231,11 +231,12 @@ export const FollowingList = ({ userId, variant = "default" }) => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                 {following.map((user) => (
                   <UserCard
                     key={user._id}
                     user={user}
+                    variant="compact"
                     onFollowChange={handleFollowChange}
                   />
                 ))}
