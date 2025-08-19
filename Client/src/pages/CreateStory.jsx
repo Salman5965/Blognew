@@ -47,8 +47,12 @@ const CreateStory = () => {
   const [isPreview, setIsPreview] = useState(false);
   const [coverImagePreview, setCoverImagePreview] = useState(null);
   const [audioPreview, setAudioPreview] = useState(null);
+  const [videoPreview, setVideoPreview] = useState(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [isRecordingVideo, setIsRecordingVideo] = useState(false);
   const [audioRecorder, setAudioRecorder] = useState(null);
+  const [videoRecorder, setVideoRecorder] = useState(null);
+  const [recordingType, setRecordingType] = useState('audio'); // 'audio' or 'video'
   const [errors, setErrors] = useState({});
 
   const { user } = useAuthContext();
