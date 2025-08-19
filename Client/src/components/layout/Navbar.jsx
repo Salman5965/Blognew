@@ -497,23 +497,10 @@ export const Navbar = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Notifications */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative hidden md:flex"
-                  onClick={() => navigate("/notifications")}
-                >
-                  <Bell className={`h-4 w-4 ${iconColors.notification}`} />
-                  {unreadNotifications > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center text-xs"
-                    >
-                      {unreadNotifications > 9 ? "9+" : unreadNotifications}
-                    </Badge>
-                  )}
-                </Button>
+                {/* Real-time Notifications */}
+                <div className="hidden md:block">
+                  <NotificationButton />
+                </div>
 
                 {/* Messages */}
                 <Button
