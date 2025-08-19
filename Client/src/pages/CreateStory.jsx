@@ -37,6 +37,7 @@ const CreateStory = () => {
     location: "",
     coverImage: null,
     audioFile: null,
+    videoFile: null,
     isPublic: true,
     allowComments: true,
   });
