@@ -350,18 +350,14 @@ const Register = () => {
   const canSubmit = canProceedToStep3 && agreedToTerms && !errors.captcha;
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-background">
-      <div className="w-full max-w-md px-6 py-12">
-        <div className="text-center mb-8">
-          <BookOpen className="h-12 w-12 text-primary mx-auto mb-4" />
-        </div>
-
-          <Card className="border-0 shadow-xl">
-            <CardHeader className="space-y-1 pb-6">
-              <CardTitle className="text-2xl font-bold text-center">
+    <div className="min-h-screen flex justify-center items-center bg-background px-4 py-8">
+      <div className="w-full max-w-2xl">
+          <Card className="border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.02] bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/90 hover:bg-card/98">
+            <CardHeader className="space-y-4 pb-8 pt-8">
+              <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 Create your account
               </CardTitle>
-              <CardDescription className="text-center text-muted-foreground">
+              <CardDescription className="text-center text-muted-foreground text-base">
                 Join our community of passionate writers and readers
               </CardDescription>
 
@@ -381,7 +377,7 @@ const Register = () => {
             </CardHeader>
 
             <form onSubmit={handleSubmit}>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-6 px-8">
                 {/* Step 1: Personal Information */}
                 {currentStep === 1 && (
                   <>
@@ -889,7 +885,7 @@ const Register = () => {
                 )}
               </CardContent>
 
-              <CardFooter className="flex flex-col space-y-4 pt-6">
+              <CardFooter className="flex flex-col space-y-6 pt-8 px-8 pb-8">
                 {/* Navigation buttons */}
                 <div className="flex space-x-3 w-full">
                   {currentStep > 1 && (
