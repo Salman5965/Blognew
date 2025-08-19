@@ -20,6 +20,7 @@ import { ROUTES } from "@/utils/constant";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Lazy import pages for code splitting
+// Named exports - need to be destructured
 const Home = React.lazy(() =>
   import("./pages/Home").then((module) => ({ default: module.Home })),
 );
@@ -31,8 +32,6 @@ const BlogDetails = React.lazy(() =>
 const Login = React.lazy(() =>
   import("./pages/Login").then((module) => ({ default: module.Login })),
 );
-const Register = React.lazy(() => import("./pages/Register"));
-const ForgotPassword = React.lazy(() => import("./pages/ForgotPassword"));
 const CreateBlog = React.lazy(() =>
   import("./pages/CreateBlog").then((module) => ({
     default: module.CreateBlog,
@@ -47,10 +46,32 @@ const MyBlogs = React.lazy(() =>
 const MyPosts = React.lazy(() =>
   import("./pages/MyPosts").then((module) => ({ default: module.MyPosts })),
 );
-const Profile = React.lazy(() => import("./pages/ProfileSettings"));
 const EditBlog = React.lazy(() =>
   import("./pages/EditBlog").then((module) => ({ default: module.EditBlog })),
 );
+const Analytics = React.lazy(() =>
+  import("./pages/Analytics").then((module) => ({ default: module.Analytics })),
+);
+const BlogAnalytics = React.lazy(() =>
+  import("./pages/BlogAnalytics").then((module) => ({ default: module.BlogAnalytics })),
+);
+const StoryAnalytics = React.lazy(() =>
+  import("./pages/StoryAnalytics").then((module) => ({ default: module.StoryAnalytics })),
+);
+const FollowersPage = React.lazy(() =>
+  import("./pages/FollowersPage").then((module) => ({ default: module.FollowersPage })),
+);
+const FollowingPage = React.lazy(() =>
+  import("./pages/FollowingPage").then((module) => ({ default: module.FollowingPage })),
+);
+const UserProfile = React.lazy(() =>
+  import("./pages/UserProfile").then((module) => ({ default: module.UserProfile })),
+);
+
+// Default exports - can be imported directly
+const Register = React.lazy(() => import("./pages/Register"));
+const ForgotPassword = React.lazy(() => import("./pages/ForgotPassword"));
+const Profile = React.lazy(() => import("./pages/ProfileSettings"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const About = React.lazy(() => import("./pages/About"));
 const Contact = React.lazy(() => import("./pages/Contact"));
@@ -60,13 +81,6 @@ const Cookies = React.lazy(() => import("./pages/Cookies"));
 const Gdpr = React.lazy(() => import("./pages/Gdpr"));
 const Help = React.lazy(() => import("./pages/Help"));
 const Feed = React.lazy(() => import("./pages/Feed"));
-const Analytics = React.lazy(() => import("./pages/Analytics"));
-const BlogAnalytics = React.lazy(() => import("./pages/BlogAnalytics"));
-const StoryAnalytics = React.lazy(() => import("./pages/StoryAnalytics"));
-const FollowersPage = React.lazy(() => import("./pages/FollowersPage"));
-const FollowingPage = React.lazy(() => import("./pages/FollowingPage"));
-
-const UserProfile = React.lazy(() => import("./pages/UserProfile"));
 const Notifications = React.lazy(() => import("./pages/Notifications"));
 const CommunityForum = React.lazy(() => import("./pages/CommunityForum"));
 const Community = React.lazy(() => import("./pages/Community"));
