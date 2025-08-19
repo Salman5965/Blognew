@@ -128,83 +128,14 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-700 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 flex flex-col justify-center p-12 text-white">
-          <div className="mb-8">
-            <BookOpen className="h-12 w-12 mb-4" />
-            <h1 className="text-4xl font-bold mb-4">Password Reset</h1>
-            <p className="text-xl text-indigo-100 mb-8">
-              Don't worry, it happens to the best of us. Let's get you back to
-              writing!
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 rounded-full p-3">
-                <Shield className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Secure Process</h3>
-                <p className="text-indigo-100">
-                  Your security is our top priority
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 rounded-full p-3">
-                <Clock className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Quick Recovery</h3>
-                <p className="text-indigo-100">
-                  Back to writing in just a few clicks
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-12 pt-8 border-t border-white/20">
-            <p className="text-indigo-100 text-sm">
-              💡 <strong>Tip:</strong> Use a password manager to generate and
-              store secure passwords for all your accounts.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Right side - Reset form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 bg-background">
-        <div className="mx-auto w-full max-w-md">
-          {/* Theme toggle */}
-          <div className="flex justify-between items-center mb-8">
-            <div className="lg:hidden">
-              <BookOpen className="h-8 w-8 text-primary" />
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="ml-auto"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-
-          <Card className="border-0 shadow-xl">
-            <CardHeader className="space-y-1 pb-6">
-              <CardTitle className="text-2xl font-bold text-center">
+    <div className="min-h-screen flex justify-center items-center bg-background px-4 py-8">
+      <div className="w-full max-w-lg">
+          <Card className="border-0 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:scale-[1.03] bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/90 hover:bg-card/98">
+            <CardHeader className="space-y-4 pb-8 pt-8">
+              <CardTitle className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 {emailSent ? "Check your email" : "Reset your password"}
               </CardTitle>
-              <CardDescription className="text-center text-muted-foreground">
+              <CardDescription className="text-center text-muted-foreground text-base">
                 {emailSent
                   ? `We've sent password reset instructions to ${sentEmail}`
                   : "Enter your email address and we'll send you a link to reset your password"}
@@ -213,7 +144,7 @@ const ForgotPassword = () => {
 
             {!emailSent ? (
               <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6 px-8">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
                     <div className="relative">
@@ -247,7 +178,7 @@ const ForgotPassword = () => {
                   </Alert>
                 </CardContent>
 
-                <CardFooter className="flex flex-col space-y-4 pt-6">
+                <CardFooter className="flex flex-col space-y-6 pt-8 px-8 pb-8">
                   <Button
                     type="submit"
                     className="w-full h-11 text-base font-medium"
@@ -271,7 +202,7 @@ const ForgotPassword = () => {
                 </CardFooter>
               </form>
             ) : (
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 px-8 pb-8">
                 <div className="text-center">
                   <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-4">
                     <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
@@ -376,7 +307,6 @@ const ForgotPassword = () => {
               </Link>
             </p>
           </div>
-        </div>
       </div>
     </div>
   );
