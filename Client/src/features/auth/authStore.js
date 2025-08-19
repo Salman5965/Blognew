@@ -105,15 +105,29 @@ export const useAuthStore = create(
             isAuthenticated: true,
             isLoading: false,
           });
+          return user;
         } catch (error) {
-          set({
-            error:
-              error instanceof Error ? error.message : "Failed to get user",
-            isLoading: false,
-            isAuthenticated: false,
-            user: null,
-          });
-          authService.logout(); // Clear invalid auth data
+          console.warn("getCurrentUser failed:", error.message);
+
+          // Handle token expiration gracefully
+          if (error.response?.status === 401 || error.message?.includes("expired")) {
+            console.log("Token expired, clearing auth data");
+            authService.clearAuthData();
+            set({
+              user: null,
+              isAuthenticated: false,
+              isLoading: false,
+              error: null, // Don't show error for expired tokens
+            });
+          } else {
+            set({
+              error: error instanceof Error ? error.message : "Failed to get user",
+              isLoading: false,
+              isAuthenticated: false,
+              user: null,
+            });
+          }
+          throw error;
         }
       },
 
