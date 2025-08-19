@@ -50,11 +50,19 @@ class AuthService {
       const response = await apiService.get("/auth/profile");
 
       if (response.status === "success") {
+        this.updateStoredUser(response.data.user);
         return response.data.user;
       }
 
       throw new Error(response.message || "Failed to get current user");
     } catch (error) {
+      // Handle token expiration
+      if (error.response?.status === 401) {
+        console.log("Token expired in getCurrentUser");
+        this.clearAuthData();
+        throw error;
+      }
+
       // Retry network errors up to 2 times with exponential backoff
       if (error.isNetworkError && retryCount < 2) {
         const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s
