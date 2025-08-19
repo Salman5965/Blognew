@@ -157,10 +157,7 @@ app.use("/api/forum", forumRoutes);
 app.use("/api/daily-drip", dailyDripRoutes);
 app.use("/api/stories", storyRoutes);
 app.use("/api/explore", exploreRoutes);
-<<<<<<< HEAD
-=======
 app.use("/api/community", communityRoutes);
->>>>>>> refs/remotes/origin/main
 
 // Welcome route
 app.get("/", (req, res) => {
