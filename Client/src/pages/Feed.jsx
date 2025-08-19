@@ -566,6 +566,7 @@ const Feed = () => {
         )}
       </div>
     </PageWrapper>
+    </div>
   );
 };
 
