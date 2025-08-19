@@ -75,45 +75,12 @@ export const Navbar = () => {
   const [debouncedSearch] = useDebouncedCallback(async (value) => {
     setFilters((prev) => ({ ...prev, search: value }));
 
-<<<<<<< HEAD
-    if (value.trim()) {
-=======
     if (value.trim() && value.length >= 2) {
       // Minimum 2 characters
->>>>>>> refs/remotes/origin/main
       setIsSearching(true);
       setShowSearchResults(true);
 
       try {
-<<<<<<< HEAD
-        // Import exploreService dynamically to avoid circular dependencies
-        const { default: exploreService } = await import(
-          "@/services/exploreService"
-        );
-
-        // Search across all content types
-        const results = await exploreService.searchContent(value, "all", {
-          limit: 8,
-        });
-
-        // Combine and format results
-        const combinedResults = [
-          ...(results.results?.users || [])
-            .slice(0, 3)
-            .map((user) => ({ ...user, type: "user" })),
-          ...(results.results?.blogs || [])
-            .slice(0, 3)
-            .map((blog) => ({ ...blog, type: "blog" })),
-          ...(results.results?.stories || [])
-            .slice(0, 2)
-            .map((story) => ({ ...story, type: "story" })),
-        ];
-
-        setSearchResults(combinedResults);
-      } catch (error) {
-        console.error("Search failed:", error);
-        setSearchResults([]);
-=======
         // Import services dynamically to avoid circular dependencies
         const [
           { default: exploreService },
