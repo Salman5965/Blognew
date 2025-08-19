@@ -60,7 +60,6 @@ const Messages = () => {
   const [onlineUsers, setOnlineUsers] = useState(new Set());
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
-<<<<<<< HEAD
   const pollingIntervalRef = useRef(null);
   const lastMessageCountRef = useRef(0);
 
