@@ -204,6 +204,52 @@ const Stories = () => {
     });
   };
 
+  // Pull-to-refresh handlers
+  const handleTouchStart = (e) => {
+    if (window.scrollY === 0) {
+      setTouchStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (window.scrollY === 0 && touchStartY > 0) {
+      const currentY = e.touches[0].clientY;
+      const distance = currentY - touchStartY;
+
+      if (distance > 0) {
+        e.preventDefault(); // Prevent scrolling
+        setIsPulling(true);
+        setPullDistance(Math.min(distance * 0.5, 100)); // Max 100px
+      }
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (isPulling && pullDistance > 50) {
+      await loadData();
+    }
+
+    setIsPulling(false);
+    setPullDistance(0);
+    setTouchStartY(0);
+  };
+
+  // Add touch event listeners
+  useEffect(() => {
+    const element = document.getElementById('stories-container');
+    if (element) {
+      element.addEventListener('touchstart', handleTouchStart, { passive: false });
+      element.addEventListener('touchmove', handleTouchMove, { passive: false });
+      element.addEventListener('touchend', handleTouchEnd);
+
+      return () => {
+        element.removeEventListener('touchstart', handleTouchStart);
+        element.removeEventListener('touchmove', handleTouchMove);
+        element.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isPulling, pullDistance, touchStartY]);
+
   const toggleAudio = (storyId) => {
     setPlayingAudio(playingAudio === storyId ? null : storyId);
   };
