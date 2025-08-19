@@ -293,7 +293,29 @@ const Stories = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div id="stories-container" className="min-h-screen bg-background relative">
+      {/* Pull-to-refresh indicator */}
+      {isPulling && (
+        <div
+          className="fixed top-0 left-0 right-0 bg-primary/10 backdrop-blur-sm z-40 flex items-center justify-center transition-all duration-200"
+          style={{ height: `${pullDistance}px` }}
+        >
+          <div className="flex items-center space-x-2 text-primary">
+            {pullDistance > 50 ? (
+              <>
+                <BookOpen className="h-5 w-5 animate-spin" />
+                <span className="text-sm font-medium">Release to refresh</span>
+              </>
+            ) : (
+              <>
+                <BookOpen className="h-5 w-5" />
+                <span className="text-sm font-medium">Pull to refresh</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-primary/10 via-background to-background border-b">
         <div className="container mx-auto px-4 py-12">
