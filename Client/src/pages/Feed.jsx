@@ -56,6 +56,9 @@ const Feed = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const [touchStartY, setTouchStartY] = useState(0);
 
   const filters = [
     { value: "latest", label: "Latest Posts", icon: Clock },
