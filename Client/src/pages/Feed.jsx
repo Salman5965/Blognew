@@ -152,8 +152,55 @@ const Feed = () => {
   const handleRefresh = async () => {
     setRefreshing(true);
     setCurrentPage(1);
+    setPosts([]); // Clear existing posts
     await loadPosts(1, selectedFilter, searchQuery, false);
   };
+
+  // Pull-to-refresh handlers
+  const handleTouchStart = (e) => {
+    if (window.scrollY === 0) {
+      setTouchStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (window.scrollY === 0 && touchStartY > 0) {
+      const currentY = e.touches[0].clientY;
+      const distance = currentY - touchStartY;
+
+      if (distance > 0) {
+        e.preventDefault(); // Prevent scrolling
+        setIsPulling(true);
+        setPullDistance(Math.min(distance * 0.5, 100)); // Max 100px
+      }
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (isPulling && pullDistance > 50) {
+      await handleRefresh();
+    }
+
+    setIsPulling(false);
+    setPullDistance(0);
+    setTouchStartY(0);
+  };
+
+  // Add touch event listeners
+  useEffect(() => {
+    const element = document.getElementById('feed-container');
+    if (element) {
+      element.addEventListener('touchstart', handleTouchStart, { passive: false });
+      element.addEventListener('touchmove', handleTouchMove, { passive: false });
+      element.addEventListener('touchend', handleTouchEnd);
+
+      return () => {
+        element.removeEventListener('touchstart', handleTouchStart);
+        element.removeEventListener('touchmove', handleTouchMove);
+        element.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isPulling, pullDistance, touchStartY]);
 
   const handleFilterChange = async (filter) => {
     setSelectedFilter(filter);
