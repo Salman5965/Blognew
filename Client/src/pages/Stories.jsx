@@ -47,6 +47,9 @@ const Stories = () => {
     livesTouched: 0,
     countries: 0,
   });
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+  const [touchStartY, setTouchStartY] = useState(0);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilter, setSearchFilter] = useState("all");
