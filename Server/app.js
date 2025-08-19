@@ -22,10 +22,7 @@ import forumRoutes from "./routes/forum.js";
 import dailyDripRoutes from "./routes/dailyDrip.js";
 import storyRoutes from "./routes/stories.js";
 import exploreRoutes from "./routes/explore.js";
-<<<<<<< HEAD
-=======
 import communityRoutes from "./routes/communityRoutes.js";
->>>>>>> refs/remotes/origin/main
 
 // Import middleware
 import errorHandler from "./middlewares/errorHandler.js";
