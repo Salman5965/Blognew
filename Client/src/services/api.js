@@ -107,14 +107,20 @@ class ApiService {
         }
 
         if (error.response?.status === 401) {
-          // Only clear auth data and redirect if this is not a login/register attempt
+          // Only clear auth data and redirect if this is not an auth-related endpoint
           const isAuthEndpoint =
             error.config?.url?.includes("/auth/login") ||
-            error.config?.url?.includes("/auth/register");
+            error.config?.url?.includes("/auth/register") ||
+            error.config?.url?.includes("/auth/profile"); // Don't redirect on profile validation
+
           if (!isAuthEndpoint) {
             localStorage.removeItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
             localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_DATA);
             window.location.href = "/login";
+          } else {
+            // For auth endpoints, just clear stored data but don't redirect
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.AUTH_TOKEN);
+            localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_DATA);
           }
         }
 
