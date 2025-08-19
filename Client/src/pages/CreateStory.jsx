@@ -250,23 +250,57 @@ const CreateStory = () => {
     try {
       setIsSaving(true);
 
-      const storyData = {
-        title: formData.title.trim(),
-        content: formData.content.trim(),
-        isPublished: publishNow,
-        readTime: Math.ceil(formData.content.split(" ").length / 200), // ~200 WPM
-        visibility: formData.isPublic ? "public" : "private",
-        allowComments: formData.allowComments,
-      };
+      // Check if we have file uploads
+      const hasFiles = formData.coverImage || formData.audioFile || formData.videoFile;
 
-      // Only include optional fields if they have values
-      if (formData.coverImage && typeof formData.coverImage === "string") {
-        storyData.coverImage = formData.coverImage.trim();
-      }
+      let storyData;
 
-      // Handle excerpt if provided
-      if (formData.excerpt && formData.excerpt.trim()) {
-        storyData.excerpt = formData.excerpt.trim();
+      if (hasFiles) {
+        // Use FormData for file uploads
+        storyData = new FormData();
+        storyData.append('title', formData.title.trim());
+        storyData.append('content', formData.content.trim());
+        storyData.append('isPublished', publishNow);
+        storyData.append('readTime', Math.ceil(formData.content.split(" ").length / 200));
+        storyData.append('visibility', formData.isPublic ? "public" : "private");
+        storyData.append('allowComments', formData.allowComments);
+
+        // Add optional fields
+        if (formData.excerpt && formData.excerpt.trim()) {
+          storyData.append('excerpt', formData.excerpt.trim());
+        }
+        if (formData.location && formData.location.trim()) {
+          storyData.append('location', formData.location.trim());
+        }
+
+        // Add file uploads
+        if (formData.coverImage && formData.coverImage instanceof File) {
+          storyData.append('coverImage', formData.coverImage);
+        }
+        if (formData.audioFile && formData.audioFile instanceof File) {
+          storyData.append('audioFile', formData.audioFile);
+        }
+        if (formData.videoFile && formData.videoFile instanceof File) {
+          storyData.append('videoFile', formData.videoFile);
+        }
+      } else {
+        // Use JSON for text-only stories
+        storyData = {
+          title: formData.title.trim(),
+          content: formData.content.trim(),
+          isPublished: publishNow,
+          readTime: Math.ceil(formData.content.split(" ").length / 200), // ~200 WPM
+          visibility: formData.isPublic ? "public" : "private",
+          allowComments: formData.allowComments,
+        };
+
+        // Add optional fields
+        if (formData.excerpt && formData.excerpt.trim()) {
+          storyData.excerpt = formData.excerpt.trim();
+        }
+        if (formData.location && formData.location.trim()) {
+          storyData.location = formData.location.trim();
+        }
       }
 
       console.log("CreateStory: Sending story data:", storyData);
