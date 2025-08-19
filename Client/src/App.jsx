@@ -12,7 +12,7 @@ import {
 } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { Navbar } from "@/components/layout/Navbar";
+import Navbar from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PrivateRoute } from "@/components/shared/PrivateRoute";
 import NotificationAlert from "@/components/notifications/NotificationAlert";
