@@ -320,101 +320,11 @@ export const Login = () => {
   const canSubmit = !isSubmitting && !isRateLimited && !isLocked;
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Branding/Features */}
-      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 flex flex-col justify-center p-12 text-white">
-          <div className="mb-8">
-            <BookOpen className="h-12 w-12 mb-4" />
-            <h1 className="text-4xl font-bold mb-4">WriteNest</h1>
-            <p className="text-xl text-blue-100 mb-8">
-              Where stories come to life and writers find their voice
-            </p>
-          </div>
-
-          {/* Feature highlights */}
-          <div className="space-y-6">
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 rounded-full p-3">
-                <Zap className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Lightning Fast</h3>
-                <p className="text-blue-100">
-                  Instant publishing and real-time collaboration
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 rounded-full p-3">
-                <Users className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Vibrant Community</h3>
-                <p className="text-blue-100">
-                  Connect with writers and readers worldwide
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <div className="bg-white/20 rounded-full p-3">
-                <Shield className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Secure & Private</h3>
-                <p className="text-blue-100">
-                  Your data is protected with enterprise-grade security
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Social proof */}
-          <div className="mt-12 pt-8 border-t border-white/20">
-            <div className="flex items-center space-x-2 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="h-5 w-5 fill-yellow-400 text-yellow-400"
-                />
-              ))}
-              <span className="text-blue-100">4.9/5 from 10k+ writers</span>
-            </div>
-            <blockquote className="text-blue-100 italic">
-              "WriteNest transformed how I share my stories. The community here
-              is incredible!"
-            </blockquote>
-            <cite className="text-blue-200 text-sm">
-              - Sarah J., Bestselling Author
-            </cite>
-          </div>
+    <div className="min-h-screen flex justify-center items-center bg-background">
+      <div className="w-full max-w-md px-6 py-12">
+        <div className="text-center mb-8">
+          <BookOpen className="h-12 w-12 text-primary mx-auto mb-4" />
         </div>
-      </div>
-
-      {/* Right side - Login form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-8 bg-background">
-        <div className="mx-auto w-full max-w-md">
-          {/* Theme toggle */}
-          <div className="flex justify-between items-center mb-8">
-            <div className="lg:hidden">
-              <BookOpen className="h-8 w-8 text-primary" />
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="ml-auto"
-            >
-              {theme === "dark" ? (
-                <Sun className="h-4 w-4" />
-              ) : (
-                <Moon className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
 
           <Card className="border-0 shadow-xl">
             <CardHeader className="space-y-1 pb-6">
@@ -680,7 +590,6 @@ export const Login = () => {
               </CardFooter>
             </form>
           </Card>
-        </div>
       </div>
     </div>
   );
