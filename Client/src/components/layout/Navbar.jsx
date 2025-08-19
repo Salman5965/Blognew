@@ -81,7 +81,7 @@ const Navbar = () => {
     return () => clearInterval(interval);
   }, [user]);
 
-  const [debouncedSearch] = useDebouncedCallback(async (value) => {
+  const debouncedSearch = useDebouncedCallback(async (value) => {
     setFilters((prev) => ({ ...prev, search: value }));
 
     if (value.trim() && value.length >= 2) {
