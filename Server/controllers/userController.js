@@ -2,10 +2,7 @@ import User from "../models/User.js";
 import Blog from "../models/Blog.js";
 import Comment from "../models/Comment.js";
 import Follow from "../models/Follow.js";
-<<<<<<< HEAD
-=======
 import Story from "../models/Story.js";
->>>>>>> refs/remotes/origin/main
 import { validationResult } from "express-validator";
 
 // @desc    Get all users (admin only)
