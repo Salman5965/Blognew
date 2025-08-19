@@ -668,17 +668,33 @@ export const Navbar = () => {
               >
                 Daily Drip
               </Link>
-              <Button
-                variant="ghost"
-                className="justify-start"
-                onClick={() => {
-                  handleCreatePost();
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                <Plus className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
-                Create Post
-              </Button>
+              <div className="space-y-1">
+                <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Create
+                </p>
+                <Button
+                  variant="ghost"
+                  className="justify-start w-full"
+                  onClick={() => {
+                    handleCreateBlog();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <FileText className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  Write a Blog
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="justify-start w-full"
+                  onClick={() => {
+                    handleCreateStory();
+                    setIsMobileMenuOpen(false);
+                  }}
+                >
+                  <BookOpen className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
+                  Share a Story
+                </Button>
+              </div>
               <Button
                 variant="ghost"
                 className="justify-start"
