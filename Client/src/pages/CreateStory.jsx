@@ -110,6 +110,27 @@ const CreateStory = () => {
     }
   };
 
+  const handleVideoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 50 * 1024 * 1024) {
+        // 50MB limit for video
+        toast({
+          title: "File too large",
+          description: "Please select a video file smaller than 50MB",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setFormData((prev) => ({ ...prev, videoFile: file }));
+
+      // Create preview
+      const url = URL.createObjectURL(file);
+      setVideoPreview(url);
+    }
+  };
+
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
