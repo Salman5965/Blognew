@@ -206,7 +206,6 @@ export const Navbar = () => {
             },
           ]);
         }
->>>>>>> refs/remotes/origin/main
       } finally {
         setIsSearching(false);
       }
@@ -214,11 +213,7 @@ export const Navbar = () => {
       setSearchResults([]);
       setShowSearchResults(false);
     }
-<<<<<<< HEAD
-  }, DEBOUNCE_DELAY);
-=======
   }, 800); // Increased debounce delay to 800ms
->>>>>>> refs/remotes/origin/main
 
   const handleCreatePost = () => {
     navigate(ROUTES.CREATE_BLOG);
