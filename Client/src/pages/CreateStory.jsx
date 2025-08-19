@@ -149,6 +149,48 @@ const CreateStory = () => {
     }
   };
 
+  const startVideoRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "video/webm" });
+        const file = new File([blob], "recorded-video.webm", {
+          type: "video/webm",
+        });
+        setFormData((prev) => ({ ...prev, videoFile: file }));
+
+        const url = URL.createObjectURL(blob);
+        setVideoPreview(url);
+      };
+
+      recorder.start();
+      setVideoRecorder(recorder);
+      setIsRecordingVideo(true);
+    } catch (error) {
+      toast({
+        title: "Video recording failed",
+        description: "Could not access camera and microphone. Please check permissions.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopVideoRecording = () => {
+    if (videoRecorder) {
+      videoRecorder.stop();
+      videoRecorder.stream.getTracks().forEach((track) => track.stop());
+      setVideoRecorder(null);
+      setIsRecordingVideo(false);
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
