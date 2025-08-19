@@ -421,36 +421,41 @@ const Feed = () => {
   }
 
   return (
-    <PageWrapper className="py-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
-          <div>
+    <div id="feed-container" className="relative">
+      {/* Pull-to-refresh indicator */}
+      {isPulling && (
+        <div
+          className="fixed top-0 left-0 right-0 bg-primary/10 backdrop-blur-sm z-40 flex items-center justify-center transition-all duration-200"
+          style={{ height: `${pullDistance}px` }}
+        >
+          <div className="flex items-center space-x-2 text-primary">
+            {pullDistance > 50 ? (
+              <>
+                <RefreshCw className="h-5 w-5 animate-spin" />
+                <span className="text-sm font-medium">Release to refresh</span>
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-5 w-5" />
+                <span className="text-sm font-medium">Pull to refresh</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      <PageWrapper className="py-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
             <h1 className="text-3xl font-bold">Blog Feed</h1>
             <p className="text-muted-foreground mt-1">
               Discover amazing content from our community
             </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Pull down to refresh • Create posts from the navbar
+            </p>
           </div>
-          <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-            <Button
-              onClick={handleRefresh}
-              variant="outline"
-              size="sm"
-              disabled={refreshing}
-            >
-              {refreshing ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <RefreshCw className="h-4 w-4 mr-2" />
-              )}
-              Refresh
-            </Button>
-            <Button onClick={() => navigate("/create")} size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Create Post
-            </Button>
-          </div>
-        </div>
 
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
