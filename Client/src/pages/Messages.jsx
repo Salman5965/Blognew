@@ -28,10 +28,7 @@ import { cn } from "@/lib/utils";
 import { getDisplayName, getInitials } from "@/utils/userUtils";
 import { useToast } from "@/hooks/use-toast";
 import messagingService from "@/services/messagingService";
-<<<<<<< HEAD
-=======
 import socketService from "@/services/socketService";
->>>>>>> refs/remotes/origin/main
 import NewMessageModal from "@/components/messages/NewMessageModal";
 import EmojiPicker from "@/components/messages/EmojiPicker";
 import FileUpload from "@/components/messages/FileUpload";
