@@ -144,7 +144,16 @@ class StoriesService {
     try {
       console.log("StoriesService: Creating story with data:", storyData);
 
-      const response = await apiService.post("/stories", storyData);
+      // Determine if this is a file upload or regular JSON
+      const isFormData = storyData instanceof FormData;
+
+      const config = isFormData ? {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      } : {};
+
+      const response = await apiService.post("/stories", storyData, config);
 
       console.log("StoriesService: Response from server:", response);
 
