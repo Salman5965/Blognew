@@ -546,6 +546,74 @@ const CreateStory = () => {
                       </div>
                     )}
                   </div>
+
+                  {/* Video Narration */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Video Narration
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        accept="video/*"
+                        onChange={handleVideoUpload}
+                        className="hidden"
+                        id="video-file"
+                      />
+                      <label htmlFor="video-file">
+                        <Button variant="outline" size="sm" asChild>
+                          <span className="flex items-center gap-2 cursor-pointer">
+                            <Upload className="h-4 w-4" />
+                            Upload Video
+                          </span>
+                        </Button>
+                      </label>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={isRecordingVideo ? stopVideoRecording : startVideoRecording}
+                        className={`flex items-center gap-2 ${isRecordingVideo ? "text-red-500" : ""}`}
+                      >
+                        {isRecordingVideo ? (
+                          <>
+                            <VideoOff className="h-4 w-4" />
+                            Stop Recording
+                          </>
+                        ) : (
+                          <>
+                            <Video className="h-4 w-4" />
+                            Record Video
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    {videoPreview && (
+                      <div className="mt-2">
+                        <video controls className="w-full max-w-md h-48 bg-black rounded">
+                          <source src={videoPreview} type="video/webm" />
+                          <source src={videoPreview} type="video/mp4" />
+                          Your browser does not support video playback.
+                        </video>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="mt-2"
+                          onClick={() => {
+                            setVideoPreview(null);
+                            setFormData((prev) => ({
+                              ...prev,
+                              videoFile: null,
+                            }));
+                          }}
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Remove Video
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             </div>
