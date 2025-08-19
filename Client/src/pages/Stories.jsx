@@ -588,10 +588,9 @@ const Stories = () => {
                     <p className="text-muted-foreground mb-4">
                       Be the first to share your story with the community.
                     </p>
-                    <Button onClick={() => navigate("/stories/create")}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Story
-                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Use the create option in the navbar to share your story.
+                    </p>
                   </CardContent>
                 </Card>
               ) : (
