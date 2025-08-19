@@ -132,20 +132,41 @@ const Messages = () => {
     lastMessageCountRef.current = messages.length;
   }, [messages, selectedChat]);
 
-  // Update online status based on conversation data
+  // Update online status based on conversation data and poll for status updates
   useEffect(() => {
-    const updateOnlineStatus = () => {
-      const onlineUserSet = new Set();
-      conversations.forEach((conv) => {
-        // Use actual isOnline status from conversation data
-        if (conv.isOnline || conv.participantStatus === "online") {
-          onlineUserSet.add(conv.participantId);
+    const updateOnlineStatus = async () => {
+      try {
+        // Get fresh user status data
+        const onlineUserSet = new Set();
+
+        // For each conversation, check if participant is online
+        for (const conv of conversations) {
+          if (conv.participantId) {
+            try {
+              const userData = await messagingService.getUserById(conv.participantId);
+              if (userData && (userData.isOnline || userData.status === 'online')) {
+                onlineUserSet.add(conv.participantId);
+              }
+            } catch (error) {
+              // If user fetch fails, fallback to conversation data
+              if (conv.isOnline || conv.participantStatus === 'online') {
+                onlineUserSet.add(conv.participantId);
+              }
+            }
+          }
         }
-      });
-      setOnlineUsers(onlineUserSet);
+        setOnlineUsers(onlineUserSet);
+      } catch (error) {
+        console.error("Failed to update online status:", error);
+      }
     };
 
     updateOnlineStatus();
+
+    // Poll for online status updates every 10 seconds
+    const statusInterval = setInterval(updateOnlineStatus, 10000);
+
+    return () => clearInterval(statusInterval);
   }, [conversations]);
 
   // Real-time message polling with better efficiency
