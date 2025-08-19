@@ -148,19 +148,13 @@ const NotificationItem = ({ notification }) => {
                   {notification.relatedUser?.lastName}
                   {!notification.relatedUser && "Someone"}
                 </span>
-<<<<<<< HEAD
                 <span className="text-muted-foreground ml-1">
-                  {notification.type === "like" && "liked your post"}
-                  {notification.type === "comment" && "commented on your post"}
-=======
-                <span className="text-slate-300 ml-1">
                   {notification.type === "like" && "liked your blog"}
                   {notification.type === "blog_like" && "liked your blog"}
                   {notification.type === "comment" && "commented on your blog"}
                   {notification.type === "comment_reply" &&
                     "replied to your comment"}
                   {notification.type === "comment_like" && "liked your comment"}
->>>>>>> refs/remotes/origin/main
                   {notification.type === "follow" && "started following you"}
                   {notification.type === "mention" &&
                     "mentioned you in a comment"}
