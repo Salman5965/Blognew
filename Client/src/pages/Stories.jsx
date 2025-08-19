@@ -801,7 +801,7 @@ const Stories = () => {
               </CardContent>
             </Card>
 
-            {/* Create Story CTA */}
+            {/* Community Tips */}
             <Card className="bg-primary/5 border-primary/20">
               <CardContent className="p-6 text-center">
                 <Heart className="h-12 w-12 text-primary mx-auto mb-4" />
@@ -809,13 +809,9 @@ const Stories = () => {
                 <p className="text-sm text-muted-foreground mb-4">
                   Inspire others with your unique journey and experiences.
                 </p>
-                <Button
-                  onClick={() => navigate("/stories/create")}
-                  className="w-full"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Write Story
-                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Use the create button in the navbar to share your story with the community.
+                </p>
               </CardContent>
             </Card>
           </div>
