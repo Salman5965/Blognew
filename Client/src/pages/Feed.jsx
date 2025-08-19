@@ -452,9 +452,6 @@ const Feed = () => {
             <p className="text-muted-foreground mt-1">
               Discover amazing content from our community
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Pull down to refresh • Create posts from the navbar
-            </p>
           </div>
 
         {/* Search and Filters */}
