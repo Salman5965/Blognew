@@ -154,31 +154,23 @@ const Messages = () => {
 
     const pollMessages = async () => {
       const conversationId = selectedChat.id || selectedChat._id;
-      if (conversationId && !isSending && !isLoadingMessages) {
+      if (conversationId && !isSending) {
         try {
           const data = await messagingService.getMessages(conversationId);
           const newMessages = data.messages || [];
 
-          // Only update if messages have changed
-          if (
-            newMessages.length !== messages.length ||
-            (newMessages.length > 0 &&
-              messages.length > 0 &&
-              newMessages[newMessages.length - 1]?.id !==
-                messages[messages.length - 1]?.id)
-          ) {
-            setMessages(newMessages);
-          }
+          // Always update messages to ensure real-time sync
+          setMessages(newMessages);
         } catch (error) {
           console.error("Failed to poll messages:", error);
         }
       }
     };
 
-    const messagePollingInterval = setInterval(pollMessages, 2000); // Poll every 2 seconds
+    const messagePollingInterval = setInterval(pollMessages, 1000); // Poll every 1 second for real-time feel
 
     return () => clearInterval(messagePollingInterval);
-  }, [selectedChat, messages.length, isSending, isLoadingMessages]);
+  }, [selectedChat, isSending]);
 
   useEffect(() => {
     if (searchQuery.trim()) {
@@ -568,7 +560,7 @@ const Messages = () => {
     try {
       setIsSending(true);
 
-      // Optimistically add message to UI
+      // Optimistically add message to UI immediately for instant feedback
       optimisticMessage = {
         id: `temp-${Date.now()}-${Math.random()}`,
         content: messageContent,
@@ -576,14 +568,18 @@ const Messages = () => {
           _id: user._id,
           username: user.username,
           firstName: user.firstName,
-          lastName: user.lastName,
+          lastName: user.lastName
         },
         createdAt: new Date().toISOString(),
         status: "sending",
         replyTo: replyToMessage,
       };
 
+      // Add message immediately to UI
       setMessages((prev) => [...prev, optimisticMessage]);
+
+      // Scroll to bottom immediately
+      setTimeout(() => scrollToBottom(), 50);
 
       // Send message to backend
       const data = await messagingService.sendMessage(
@@ -614,6 +610,15 @@ const Messages = () => {
                   },
                 }
               : conv,
+          ),
+        );
+      } else {
+        // If no response, just mark as sent
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === optimisticMessage.id
+              ? { ...msg, status: "sent" }
+              : msg,
           ),
         );
       }
@@ -801,7 +806,7 @@ const Messages = () => {
   });
 
   return (
-    <div className="h-screen bg-background flex">
+    <div className="h-[calc(100vh-4rem)] bg-background flex">
       {/* Conversations Sidebar */}
       <div
         className={cn(
@@ -1077,7 +1082,13 @@ const Messages = () => {
                 >
                   <Video className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() => navigate(`/users/${selectedChat.participantId}`)}
+                  title="View profile"
+                >
                   <Info className="h-5 w-5" />
                 </Button>
               </div>
@@ -1243,20 +1254,6 @@ const Messages = () => {
               )}
 
               <div className="flex items-end gap-3">
-                <FileUpload
-                  onFileSelect={handleFileSelect}
-                  disabled={uploadingFile || isSending}
-                >
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    className="rounded-full cursor-pointer hover:bg-muted flex items-center justify-center h-8 w-8"
-                    title="Attach file"
-                  >
-                    <Paperclip className="h-5 w-5" />
-                  </div>
-                </FileUpload>
-
                 <div className="flex-1 bg-muted rounded-full flex items-center px-4 py-2">
                   <Input
                     placeholder={
