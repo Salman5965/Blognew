@@ -53,8 +53,20 @@ export const debugApiConfig = () => {
 
   // Test API connectivity with proper error handling
   try {
-    fetch(getApiUrl("/health"))
+    // Use a timeout to prevent hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+    fetch(getApiUrl("/health"), {
+      signal: controller.signal,
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
       .then((response) => {
+        clearTimeout(timeoutId);
         console.log("API Health Check:", response.status, response.statusText);
 
         // Handle rate limiting gracefully
@@ -83,7 +95,12 @@ export const debugApiConfig = () => {
         console.log("API Health Data:", data);
       })
       .catch((error) => {
-        console.warn("API Health Check Failed:", error.message || error);
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          console.warn("API Health Check: Request timeout");
+        } else {
+          console.warn("API Health Check Failed:", error.message || error);
+        }
       });
   } catch (error) {
     console.warn(
