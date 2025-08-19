@@ -15,6 +15,7 @@ import { useAuthContext } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { ROUTES, DEBOUNCE_DELAY } from "@/utils/constant";
+import NotificationButton from "@/components/notifications/NotificationButton";
 import {
   Search,
   Bell,
