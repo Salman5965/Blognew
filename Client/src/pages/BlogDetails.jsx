@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { BlogMeta } from "@/components/blog/BlogMeta";
-import { CommentSection } from "@/components/blog/CommentSection";
+import { InstagramComments } from "@/components/shared/InstagramComments";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useBlogStore } from "@/features/blogs/blogStore";
