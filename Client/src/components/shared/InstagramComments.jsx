@@ -525,6 +525,11 @@ export const InstagramComments = ({
 
     } catch (err) {
       console.error("Failed to post comment:", err);
+      console.error("Error details:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
 
       // Remove optimistic comment on error
       if (replyingTo) {
@@ -542,7 +547,22 @@ export const InstagramComments = ({
         setComments(prev => prev.filter(comment => comment._id !== optimisticComment._id));
       }
 
-      setError("Failed to post comment");
+      // Show more specific error message
+      let errorMessage = "Failed to post comment";
+      if (err.response?.status === 400) {
+        errorMessage = "Invalid comment data. Please check your input.";
+      } else if (err.response?.status === 401) {
+        errorMessage = "You need to be logged in to comment.";
+      } else if (err.response?.status === 403) {
+        errorMessage = "You don't have permission to comment.";
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      }
+
+      setError(errorMessage);
+
+      // Clear error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     } finally {
       setIsSubmitting(false);
     }
