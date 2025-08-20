@@ -414,6 +414,13 @@ export const InstagramComments = ({
   const handleSubmit = async () => {
     if (!newComment.trim() || !isAuthenticated) return;
 
+    // Check if backend supports this content type
+    if (contentType === 'story') {
+      setError("Story comments are not supported yet. Coming soon!");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
+
     const optimisticComment = {
       _id: `temp-${Date.now()}`,
       content: newComment.trim(),
