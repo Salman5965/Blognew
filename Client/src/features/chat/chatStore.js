@@ -183,8 +183,8 @@ export const useChatStore = create()(
                     lastMessage: content,
                     lastMessageTime: response.data.timestamp,
                   }
-                : conv,
-            );
+                : conv;
+            });
             set({ conversations: updatedConversations });
           } else {
             throw new Error(response.message || "Failed to send message");
