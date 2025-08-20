@@ -1,6 +1,6 @@
 /**
  * Instagram-Style Comment System
- * 
+ *
  * A unified comment component that works across Blog, Stories, and Community Posts
  * Features:
  * - Instagram-like UI with avatars, inline usernames, timestamps
@@ -42,18 +42,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import "./instagram-comments.css";
 
 // Individual Comment Component
-const CommentItem = ({ 
-  comment, 
-  onReply, 
-  onEdit, 
-  onDelete, 
+const CommentItem = ({
+  comment,
+  onReply,
+  onEdit,
+  onDelete,
   onLike,
-  isReply = false, 
+  isReply = false,
   canModerate = false,
   contentType = 'blog',
-  contentId 
+  contentId
 }) => {
   const { user, isAuthenticated } = useAuthContext();
   const [isEditing, setIsEditing] = useState(false);
@@ -71,7 +72,7 @@ const CommentItem = ({
 
   const handleEdit = async () => {
     if (!editContent.trim()) return;
-    
+
     try {
       setIsSubmitting(true);
       await onEdit(commentId, editContent);
@@ -99,7 +100,7 @@ const CommentItem = ({
     // Optimistic update
     const newIsLiked = !isLiked;
     const newLikesCount = newIsLiked ? likesCount + 1 : likesCount - 1;
-    
+
     setIsLiked(newIsLiked);
     setLikesCount(newLikesCount);
 
@@ -122,12 +123,13 @@ const CommentItem = ({
 
   return (
     <div className={cn(
-      "flex space-x-3",
-      isReply && "ml-12 mt-3 border-l-2 border-gray-100 pl-4"
+      "flex space-x-3 instagram-comment-item py-2 px-1 rounded-lg",
+      isReply && "ml-12 mt-3 reply-line pl-4",
+      comment.isOptimistic && "optimistic-comment"
     )}>
       {/* Avatar */}
       <Link to={`${ROUTES.USER_PROFILE}/${comment.author.username}`}>
-        <Avatar className="h-8 w-8 flex-shrink-0">
+        <Avatar className="h-8 w-8 flex-shrink-0 comment-avatar">
           <AvatarImage src={comment.author.avatar} />
           <AvatarFallback>
             {comment.author.username?.charAt(0).toUpperCase()}
@@ -194,30 +196,30 @@ const CommentItem = ({
               <button
                 onClick={handleLike}
                 className={cn(
-                  "opacity-0 group-hover:opacity-100 transition-opacity p-1",
+                  "opacity-0 group-hover:opacity-100 transition-all duration-200 p-1 hover:scale-110",
                   isLiked && "opacity-100"
                 )}
                 disabled={!isAuthenticated}
               >
-                <Heart 
+                <Heart
                   className={cn(
-                    "h-3 w-3 transition-colors",
-                    isLiked ? "fill-red-500 text-red-500" : "text-gray-400 hover:text-gray-600"
-                  )} 
+                    "h-3 w-3 transition-all duration-200",
+                    isLiked ? "fill-red-500 text-red-500 heart-like-animation" : "text-gray-400 hover:text-gray-600"
+                  )}
                 />
               </button>
             </div>
 
             {/* Actions Row */}
             <div className="flex items-center space-x-4 mt-1">
-              <span className="text-xs text-gray-500">{timeAgo}</span>
-              
+              <span className="text-xs text-gray-500 time-ago cursor-default">{timeAgo}</span>
+
               {likesCount > 0 && (
                 <span className="text-xs text-gray-500 font-medium">
                   {likesCount} {likesCount === 1 ? 'like' : 'likes'}
                 </span>
               )}
-              
+
               {isAuthenticated && !isReply && (
                 <button
                   onClick={handleReply}
@@ -284,10 +286,10 @@ const CommentItem = ({
         {/* Nested Replies */}
         {!isReply && hasReplies && (
           <div className={cn(
-            "overflow-hidden transition-all duration-300 ease-in-out",
-            showReplies ? "max-h-none opacity-100" : "max-h-0 opacity-0"
+            "overflow-hidden transition-all duration-500 ease-in-out",
+            showReplies ? "max-h-none opacity-100 replies-expand" : "max-h-0 opacity-0"
           )}>
-            <div className="space-y-0">
+            <div className="space-y-0 mt-2">
               {comment.replies.map((reply) => (
                 <CommentItem
                   key={reply._id || reply.id}
@@ -311,9 +313,9 @@ const CommentItem = ({
 };
 
 // Main Instagram Comments Component
-export const InstagramComments = ({ 
+export const InstagramComments = ({
   contentType = 'blog', // 'blog', 'story', 'community'
-  contentId, 
+  contentId,
   allowComments = true,
   onCommentCountChange
 }) => {
@@ -347,21 +349,21 @@ export const InstagramComments = ({
       setIsLoading(true);
       setError(null);
 
-      const endpoint = contentType === 'blog' 
-        ? `/comments/blog/${contentId}` 
+      const endpoint = contentType === 'blog'
+        ? `/comments/blog/${contentId}`
         : contentType === 'story'
         ? `/comments/story/${contentId}`
         : `/comments/community/${contentId}`;
 
       const response = await apiService.get(`${endpoint}?page=${pageNum}&limit=20&includeReplies=true`);
-      
+
       if (response.status === "success") {
         const newComments = response.data.comments || [];
-        
+
         setComments(prev => reset ? newComments : [...prev, ...newComments]);
         setHasMore(newComments.length === 20);
         setPage(pageNum);
-        
+
         if (onCommentCountChange) {
           onCommentCountChange(response.data.total || newComments.length);
         }
@@ -407,7 +409,7 @@ export const InstagramComments = ({
       if (replyingTo) {
         // Handle reply
         optimisticComment.parentId = replyingTo._id || replyingTo.id;
-        
+
         // Add optimistic reply
         setComments(prev => prev.map(comment => {
           if ((comment._id || comment.id) === optimisticComment.parentId) {
@@ -433,9 +435,9 @@ export const InstagramComments = ({
             if ((comment._id || comment.id) === optimisticComment.parentId) {
               return {
                 ...comment,
-                replies: comment.replies.map(reply => 
-                  reply._id === optimisticComment._id 
-                    ? response.data.comment 
+                replies: comment.replies.map(reply =>
+                  reply._id === optimisticComment._id
+                    ? response.data.comment
                     : reply
                 )
               };
@@ -470,9 +472,9 @@ export const InstagramComments = ({
 
         if (response.status === "success") {
           // Replace optimistic with real data
-          setComments(prev => prev.map(comment => 
-            comment._id === optimisticComment._id 
-              ? response.data.comment 
+          setComments(prev => prev.map(comment =>
+            comment._id === optimisticComment._id
+              ? response.data.comment
               : comment
           ));
 
@@ -484,10 +486,10 @@ export const InstagramComments = ({
 
       setNewComment("");
       setReplyingTo(null);
-      
+
     } catch (err) {
       console.error("Failed to post comment:", err);
-      
+
       // Remove optimistic comment on error
       if (replyingTo) {
         setComments(prev => prev.map(comment => {
@@ -503,7 +505,7 @@ export const InstagramComments = ({
       } else {
         setComments(prev => prev.filter(comment => comment._id !== optimisticComment._id));
       }
-      
+
       setError("Failed to post comment");
     } finally {
       setIsSubmitting(false);
@@ -552,7 +554,7 @@ export const InstagramComments = ({
       setComments(prev => {
         // Check if it's a top-level comment
         const isTopLevel = prev.some(comment => (comment._id || comment.id) === commentId);
-        
+
         if (isTopLevel) {
           return prev.filter(comment => (comment._id || comment.id) !== commentId);
         } else {
@@ -619,9 +621,9 @@ export const InstagramComments = ({
       </div>
 
       {/* Comments List */}
-      <div 
+      <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-6"
+        className="flex-1 overflow-y-auto p-4 space-y-6 comments-container"
         style={{ maxHeight: 'calc(100vh - 200px)' }}
       >
         {error && (
@@ -699,7 +701,7 @@ export const InstagramComments = ({
               </Button>
             </div>
           )}
-          
+
           <div className="flex items-end space-x-3">
             <Avatar className="h-8 w-8 flex-shrink-0">
               <AvatarImage src={user?.avatar} />
@@ -707,7 +709,7 @@ export const InstagramComments = ({
                 {user?.username?.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            
+
             <div className="flex-1 flex items-end space-x-2">
               <div className="flex-1 relative">
                 <Textarea
@@ -719,7 +721,7 @@ export const InstagramComments = ({
                   className="min-h-[40px] max-h-[120px] resize-none border-gray-200 rounded-full px-4 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                   style={{ height: '40px' }}
                 />
-                
+
                 {/* Emoji Button */}
                 <Button
                   variant="ghost"
@@ -733,12 +735,17 @@ export const InstagramComments = ({
                   <Smile className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !newComment.trim()}
                 size="sm"
-                className="h-10 w-10 rounded-full p-0 bg-blue-500 hover:bg-blue-600"
+                className={cn(
+                  "h-10 w-10 rounded-full p-0 transition-all duration-200",
+                  newComment.trim()
+                    ? "bg-blue-500 hover:bg-blue-600 send-button-active transform hover:scale-105"
+                    : "bg-gray-300 cursor-not-allowed"
+                )}
               >
                 {isSubmitting ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
