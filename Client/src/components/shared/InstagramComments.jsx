@@ -355,16 +355,27 @@ export const InstagramComments = ({
 
       // Use the same endpoint as the old comment system for compatibility
       let endpoint;
+      let queryParams = `page=${pageNum}&limit=20&includeReplies=true`;
+
       if (contentType === 'blog') {
-        endpoint = `/comments/blog/${contentId}`;
+        endpoint = `/comments/blog/${contentId}?${queryParams}`;
+      } else if (contentType === 'story') {
+        // Stories don't have backend support yet, return empty comments
+        console.log('Story comments not yet supported by backend');
+        setComments([]);
+        setHasMore(false);
+        setPage(pageNum);
+        if (onCommentCountChange) {
+          onCommentCountChange(0);
+        }
+        return;
       } else {
-        // For story and community, use generic endpoint with query params
-        // This allows the backend to be extended later
-        endpoint = `/comments?${contentType}=${contentId}&includeReplies=true`;
+        // For community and other types, use generic endpoint
+        endpoint = `/comments?${contentType}=${contentId}&${queryParams}`;
       }
 
       console.log('Fetching comments from:', endpoint);
-      const response = await apiService.get(`${endpoint}?page=${pageNum}&limit=20&includeReplies=true`);
+      const response = await apiService.get(endpoint);
 
       if (response.status === "success") {
         const newComments = response.data.comments || response.data || [];
