@@ -473,21 +473,9 @@ export const InstagramComments = ({
             return comment;
           }));
 
-          // Create notification for parent comment author
-          if (replyingTo.author._id !== user._id) {
-            await notificationService.createNotification({
-              recipientId: replyingTo.author._id,
-              type: "comment_reply",
-              title: "New reply to your comment",
-              message: `${user.username} replied to your comment`,
-              data: {
-                commentId: replyingTo._id,
-                contentId,
-                contentType,
-                replierUsername: user.username
-              }
-            });
-          }
+          // Note: Notification creation requires admin privileges
+          // This should be handled by the backend when creating comments
+          // For now, we'll skip the notification to avoid 400 errors
         }
       } else {
         // Handle new comment
