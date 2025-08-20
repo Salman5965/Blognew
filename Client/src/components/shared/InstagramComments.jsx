@@ -382,7 +382,13 @@ export const InstagramComments = ({
       }
     } catch (err) {
       console.error("Failed to fetch comments:", err);
-      setError(err.message || "Failed to load comments");
+
+      // Handle specific error cases
+      if (err.response?.status === 404 && contentType !== 'blog') {
+        setError(`Comments for ${contentType} are not supported yet. Coming soon!`);
+      } else {
+        setError(err.message || "Failed to load comments");
+      }
     } finally {
       setIsLoading(false);
     }
