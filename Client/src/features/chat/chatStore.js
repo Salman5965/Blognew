@@ -88,14 +88,18 @@ export const useChatStore = create()(
         try {
           set({ isLoading: true, error: null });
 
+          // Get conversation ID once at the start
+          const conversationId = conversation._id || conversation.id;
+          if (!conversationId) {
+            throw new Error("Invalid conversation ID");
+          }
+
           // Mark as read
           if (conversation.unreadCount > 0) {
-            const conversationId = conversation._id || conversation.id;
             await chatService.markAsRead(conversationId);
 
             // Update local state
             const { conversations } = get();
-            const conversationId = conversation._id || conversation.id;
             const updatedConversations = conversations.map((conv) => {
               const convId = conv._id || conv.id;
               return convId === conversationId ? { ...conv, unreadCount: 0 } : conv;
@@ -111,11 +115,7 @@ export const useChatStore = create()(
             });
           }
 
-          // Fetch messages - handle both _id and id properties
-          const conversationId = conversation._id || conversation.id;
-          if (!conversationId) {
-            throw new Error("Invalid conversation ID");
-          }
+          // Fetch messages
           const response = await chatService.getMessages(conversationId);
 
           if (response.status === "success") {
