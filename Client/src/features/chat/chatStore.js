@@ -155,8 +155,9 @@ export const useChatStore = create()(
           set({ messages: [...messages, tempMessage] });
 
           // Send to server
+          const currentConversationId = currentConversation._id || currentConversation.id;
           const response = await chatService.sendMessage(
-            currentConversation.id,
+            currentConversationId,
             content,
             type,
           );
