@@ -90,13 +90,16 @@ export const useChatStore = create()(
 
           // Mark as read
           if (conversation.unreadCount > 0) {
-            await chatService.markAsRead(conversation.id);
+            const conversationId = conversation._id || conversation.id;
+            await chatService.markAsRead(conversationId);
 
             // Update local state
             const { conversations } = get();
-            const updatedConversations = conversations.map((conv) =>
-              conv.id === conversation.id ? { ...conv, unreadCount: 0 } : conv,
-            );
+            const conversationId = conversation._id || conversation.id;
+            const updatedConversations = conversations.map((conv) => {
+              const convId = conv._id || conv.id;
+              return convId === conversationId ? { ...conv, unreadCount: 0 } : conv;
+            });
             const newUnreadCount = updatedConversations.reduce(
               (sum, conv) => sum + (conv.unreadCount || 0),
               0,
@@ -170,8 +173,10 @@ export const useChatStore = create()(
 
             // Update conversation last message
             const { conversations } = get();
-            const updatedConversations = conversations.map((conv) =>
-              conv.id === currentConversation.id
+            const currentConversationId = currentConversation._id || currentConversation.id;
+            const updatedConversations = conversations.map((conv) => {
+              const convId = conv._id || conv.id;
+              return convId === currentConversationId
                 ? {
                     ...conv,
                     lastMessage: content,
