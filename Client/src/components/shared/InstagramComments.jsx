@@ -422,12 +422,22 @@ export const InstagramComments = ({
           return comment;
         }));
 
-        // API call for reply
-        const response = await apiService.post("/comments", {
+        // API call for reply - format payload based on content type
+        const payload = {
           content: newComment.trim(),
-          [contentType]: contentId,
           parentId: optimisticComment.parentId
-        });
+        };
+
+        // Add the appropriate content ID field based on content type
+        if (contentType === 'blog') {
+          payload.blog = contentId;
+        } else if (contentType === 'story') {
+          payload.story = contentId;
+        } else if (contentType === 'community') {
+          payload.community = contentId;
+        }
+
+        const response = await apiService.post("/comments", payload);
 
         if (response.status === "success") {
           // Replace optimistic with real data
@@ -465,10 +475,21 @@ export const InstagramComments = ({
         // Handle new comment
         setComments(prev => [optimisticComment, ...prev]);
 
-        const response = await apiService.post("/comments", {
-          content: newComment.trim(),
-          [contentType]: contentId
-        });
+        // Format payload based on content type
+        const payload = {
+          content: newComment.trim()
+        };
+
+        // Add the appropriate content ID field based on content type
+        if (contentType === 'blog') {
+          payload.blog = contentId;
+        } else if (contentType === 'story') {
+          payload.story = contentId;
+        } else if (contentType === 'community') {
+          payload.community = contentId;
+        }
+
+        const response = await apiService.post("/comments", payload);
 
         if (response.status === "success") {
           // Replace optimistic with real data
