@@ -358,13 +358,10 @@ export const InstagramComments = ({
       let endpoint;
       if (contentType === 'blog') {
         endpoint = `/comments/blog/${contentId}`;
-      } else if (contentType === 'story') {
-        endpoint = `/comments/story/${contentId}`;
-      } else if (contentType === 'community') {
-        endpoint = `/comments/community/${contentId}`;
       } else {
-        // Fallback to generic comments endpoint
-        endpoint = `/comments?${contentType}=${contentId}`;
+        // For story and community, use generic endpoint with query params
+        // This allows the backend to be extended later
+        endpoint = `/comments?${contentType}=${contentId}&includeReplies=true`;
       }
 
       console.log('Fetching comments from:', endpoint);
