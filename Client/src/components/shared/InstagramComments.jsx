@@ -460,7 +460,7 @@ export const InstagramComments = ({
         // API call for reply - format payload based on content type
         const payload = {
           content: newComment.trim(),
-          parentId: optimisticComment.parentId
+          parentComment: optimisticComment.parentId  // Backend uses 'parentComment', not 'parentId'
         };
 
         // Add the appropriate content ID field based on content type
