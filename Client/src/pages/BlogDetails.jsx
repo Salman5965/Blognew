@@ -263,13 +263,17 @@ export const BlogDetails = () => {
           {/* Footer Actions - Removed redundant author details */}
         </article>
 
-        {/* Comments Section */}
+        {/* Comments Section - Instagram Style */}
         <section id="comments" className="mt-12">
-          <div className="border-t pt-8">
-            <CommentSection
-              blogId={currentBlog._id || currentBlog.id}
-              allowComments={currentBlog.allowComments}
-              blogAuthorId={currentBlog.author._id || currentBlog.author.id}
+          <div className="border-t bg-white rounded-lg shadow-sm">
+            <InstagramComments
+              contentType="blog"
+              contentId={currentBlog._id || currentBlog.id}
+              allowComments={currentBlog.allowComments !== false}
+              onCommentCountChange={(count) => {
+                // Update blog comment count if needed
+                console.log('Comment count updated:', count);
+              }}
             />
           </div>
         </section>
