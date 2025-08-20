@@ -108,8 +108,12 @@ export const useChatStore = create()(
             });
           }
 
-          // Fetch messages
-          const response = await chatService.getMessages(conversation.id);
+          // Fetch messages - handle both _id and id properties
+          const conversationId = conversation._id || conversation.id;
+          if (!conversationId) {
+            throw new Error("Invalid conversation ID");
+          }
+          const response = await chatService.getMessages(conversationId);
 
           if (response.status === "success") {
             set({
