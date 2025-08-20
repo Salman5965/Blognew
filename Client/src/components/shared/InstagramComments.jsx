@@ -21,7 +21,6 @@ import { ROUTES } from "@/utils/constant";
 import { getTimeAgo } from "@/utils/formatDate";
 import { parseMentions } from "@/utils/mentionParser";
 import apiService from "@/services/api";
-import notificationService from "@/services/notificationService";
 import {
   Heart,
   Send,
