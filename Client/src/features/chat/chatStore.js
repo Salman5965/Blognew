@@ -174,7 +174,6 @@ export const useChatStore = create()(
 
             // Update conversation last message
             const { conversations } = get();
-            const currentConversationId = currentConversation._id || currentConversation.id;
             const updatedConversations = conversations.map((conv) => {
               const convId = conv._id || conv.id;
               return convId === currentConversationId
