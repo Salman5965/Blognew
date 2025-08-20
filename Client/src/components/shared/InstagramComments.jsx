@@ -349,16 +349,29 @@ export const InstagramComments = ({
       setIsLoading(true);
       setError(null);
 
-      const endpoint = contentType === 'blog'
-        ? `/comments/blog/${contentId}`
-        : contentType === 'story'
-        ? `/comments/story/${contentId}`
-        : `/comments/community/${contentId}`;
+      // Check if contentId is valid
+      if (!contentId) {
+        throw new Error("Content ID is required");
+      }
 
+      // Use the same endpoint as the old comment system for compatibility
+      let endpoint;
+      if (contentType === 'blog') {
+        endpoint = `/comments/blog/${contentId}`;
+      } else if (contentType === 'story') {
+        endpoint = `/comments/story/${contentId}`;
+      } else if (contentType === 'community') {
+        endpoint = `/comments/community/${contentId}`;
+      } else {
+        // Fallback to generic comments endpoint
+        endpoint = `/comments?${contentType}=${contentId}`;
+      }
+
+      console.log('Fetching comments from:', endpoint);
       const response = await apiService.get(`${endpoint}?page=${pageNum}&limit=20&includeReplies=true`);
 
       if (response.status === "success") {
-        const newComments = response.data.comments || [];
+        const newComments = response.data.comments || response.data || [];
 
         setComments(prev => reset ? newComments : [...prev, ...newComments]);
         setHasMore(newComments.length === 20);
@@ -367,10 +380,12 @@ export const InstagramComments = ({
         if (onCommentCountChange) {
           onCommentCountChange(response.data.total || newComments.length);
         }
+      } else {
+        throw new Error(response.message || "Failed to fetch comments");
       }
     } catch (err) {
       console.error("Failed to fetch comments:", err);
-      setError("Failed to load comments");
+      setError(err.message || "Failed to load comments");
     } finally {
       setIsLoading(false);
     }
