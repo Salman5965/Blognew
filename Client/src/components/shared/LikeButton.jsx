@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/utils/constant";
 import { useToast } from "@/hooks/use-toast";
-import notificationService from "@/services/notificationService";
+
 
 export const LikeButton = ({
   blogId,
