@@ -108,29 +108,8 @@ export const FollowButton = ({
           duration: 2000,
         });
 
-        // Create notification for the followed user
-        try {
-          const notificationResult =
-            await notificationService.createNotification({
-              recipientId: userId,
-              type: "follow",
-              title: "New follower",
-              message: `${user.username} started following you`,
-              data: {
-                followerId: user._id,
-                followerUsername: user.username,
-              },
-            });
-
-          if (!notificationResult.success) {
-            console.error(
-              "Failed to create follow notification:",
-              notificationResult.error,
-            );
-          }
-        } catch (notifError) {
-          console.error("Failed to create follow notification:", notifError);
-        }
+        // Note: Follow notifications should be handled by the backend
+        // when the follow API is called, to avoid admin privilege requirements
       }
 
       // Notify parent component of follow status change
