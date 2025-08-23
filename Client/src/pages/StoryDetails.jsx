@@ -39,7 +39,7 @@ const StoryDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuthContext();
-  
+
   const [story, setStory] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -55,7 +55,7 @@ const StoryDetails = () => {
       try {
         setIsLoading(true);
         const response = await apiService.get(`/stories/${id}`);
-        
+
         if (response.status === "success") {
           setStory(response.data.story);
           setIsLiked(response.data.story.isLiked || false);
@@ -82,7 +82,7 @@ const StoryDetails = () => {
 
     const newIsLiked = !isLiked;
     const newLikesCount = newIsLiked ? likesCount + 1 : likesCount - 1;
-    
+
     setIsLiked(newIsLiked);
     setLikesCount(newLikesCount);
 
@@ -100,16 +100,20 @@ const StoryDetails = () => {
   const handleBookmark = async () => {
     if (!isAuthenticated) return;
 
-    const newIsBookmarked = !isBookmarked;
-    setIsBookmarked(newIsBookmarked);
+    // Story bookmarks not yet supported by backend
+    alert("Story bookmarks coming soon! This feature is under development.");
+    return;
 
-    try {
-      const endpoint = newIsBookmarked ? `/stories/${id}/bookmark` : `/stories/${id}/unbookmark`;
-      await apiService.post(endpoint);
-    } catch (err) {
-      setIsBookmarked(!newIsBookmarked);
-      console.error("Failed to bookmark story:", err);
-    }
+    // TODO: Implement when backend supports story bookmarks
+    // const newIsBookmarked = !isBookmarked;
+    // setIsBookmarked(newIsBookmarked);
+    // try {
+    //   const endpoint = newIsBookmarked ? `/stories/${id}/bookmark` : `/stories/${id}/unbookmark`;
+    //   await apiService.post(endpoint);
+    // } catch (err) {
+    //   setIsBookmarked(!newIsBookmarked);
+    //   console.error("Failed to bookmark story:", err);
+    // }
   };
 
   const handleShare = async () => {
@@ -207,7 +211,7 @@ const StoryDetails = () => {
                   </Avatar>
                 </Link>
                 <div>
-                  <Link 
+                  <Link
                     to={`${ROUTES.USER_PROFILE}/${story.author.username}`}
                     className="font-semibold hover:underline"
                   >
@@ -247,7 +251,7 @@ const StoryDetails = () => {
                     >
                       <source src={story.media.url} type="video/mp4" />
                     </video>
-                    
+
                     {!isPlaying && (
                       <div className="absolute inset-0 flex items-center justify-center">
                         <Button
