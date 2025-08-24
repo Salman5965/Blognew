@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/utils/constant";
 import { useToast } from "@/hooks/use-toast";
+import notificationService from "@/services/notificationService";
 
 
 export const LikeButton = ({
@@ -95,8 +96,40 @@ export const LikeButton = ({
       setLiked(result.isLiked);
       setCount(result.likeCount);
 
+<<<<<<< HEAD
       // Note: Like notifications should be handled by the backend
       // when the like API is called, to avoid admin privilege requirements
+=======
+      // Create notification for blog author (only when liking, not unliking)
+      if (
+        result.isLiked &&
+        blogAuthorId &&
+        blogAuthorId !== (user._id || user.id)
+      ) {
+        try {
+          const notificationResult =
+            await notificationService.createNotification({
+              recipientId: blogAuthorId,
+              type: "blog_like",
+              title: "Someone liked your blog",
+              message: `${user.username} liked your blog`,
+              data: {
+                blogId,
+                blogTitle: blogTitle || "your blog post",
+                likerUsername: user.username,
+              },
+            });
+          if (!notificationResult.success) {
+            console.error(
+              "Failed to create like notification:",
+              notificationResult.error,
+            );
+          }
+        } catch (notifError) {
+          console.error("Failed to create like notification:", notifError);
+        }
+      }
+>>>>>>> refs/remotes/origin/main
     } catch (error) {
       console.error("Failed to toggle like:", error);
 

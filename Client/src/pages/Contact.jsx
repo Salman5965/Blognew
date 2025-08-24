@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +17,10 @@ import {
   Lightbulb,
   Send,
   CheckCircle,
+  Wrench,
+  Briefcase,
+  Twitter,
+  Github,
 } from "lucide-react";
 
 const Contact = () => {
@@ -36,25 +39,25 @@ const Contact = () => {
     {
       icon: Mail,
       title: "Email Us",
-      content: "support@bloghub.com",
+      content: "silentvoice.app@gmail.com",
       description: "Send us an email anytime",
     },
     {
       icon: Phone,
       title: "Call Us",
-      content: "+1 (555) 123-4567",
+      content: "not available",
       description: "Mon-Fri from 8am to 6pm",
     },
     {
       icon: MapPin,
       title: "Visit Us",
-      content: "123 Creator Street, San Francisco, CA 94107",
+      content: "Gangamma Layout, Bengaluru, Karnataka 560050",
       description: "Our office address",
     },
     {
       icon: Clock,
       title: "Business Hours",
-      content: "Mon-Fri: 8am-6pm PST",
+      content: "Mon-Fri: 8am-6pm IST",
       description: "We're here to help",
     },
   ];
@@ -120,7 +123,7 @@ const Contact = () => {
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Have a question, suggestion, or just want to say hello? We'd love to
             hear from you. Our team is here to help you make the most of your
-            BlogHub experience.
+            SilentVoice experience.
           </p>
         </div>
 
@@ -148,12 +151,14 @@ const Contact = () => {
           })}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Contact Form */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Send us a Message</CardTitle>
-              <p className="text-muted-foreground">
+              <CardTitle className="text-center text-2xl">
+                Send us a Message
+              </CardTitle>
+              <p className="text-center text-muted-foreground">
                 Fill out the form below and we'll get back to you as soon as
                 possible.
               </p>
@@ -242,7 +247,7 @@ const Contact = () => {
                     onChange={handleInputChange}
                     required
                     disabled={isSubmitting}
-                    rows={6}
+                    rows={2}
                     className="w-full p-3 border border-input rounded-md bg-background resize-none"
                     placeholder="Tell us more about your inquiry..."
                   />
@@ -269,126 +274,123 @@ const Contact = () => {
             </CardContent>
           </Card>
 
-          {/* FAQ Section */}
-          <div>
-            <Card className="mb-8">
+          {/* Response Time and Contact Methods */}
+          <div className="space-y-14">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-2xl">
-                  Frequently Asked Questions
+                <CardTitle className="text-lg font-semibold text-center">
+                  Response Times
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h4 className="font-semibold mb-2">
-                    How do I reset my password?
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    You can reset your password by clicking "Forgot Password" on
-                    the login page or by going to your profile settings.
-                  </p>
+              <CardContent className="space-y-3 divide-y">
+                <div className="flex justify-between items-center py-2">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">
+                      General Inquiries
+                    </span>
+                  </div>
+                  <span className="text-xs text-primary font-semibold">
+                    Responds within 24h
+                  </span>
                 </div>
 
-                <div>
-                  <h4 className="font-semibold mb-2">
-                    Can I customize my blog's appearance?
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Yes! BlogHub offers various customization options including
-                    themes, fonts, and layout settings in your dashboard.
-                  </p>
+                <div className="flex justify-between items-center py-2">
+                  <div className="flex items-center gap-2">
+                    <Wrench className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">
+                      Technical Support
+                    </span>
+                  </div>
+                  <span className="text-xs text-primary font-semibold">
+                    Responds within 12h
+                  </span>
                 </div>
 
-                <div>
-                  <h4 className="font-semibold mb-2">
-                    Is BlogHub free to use?
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    BlogHub offers both free and premium plans. The free plan
-                    includes basic blogging features, while premium plans offer
-                    advanced tools.
-                  </p>
+                <div className="flex justify-between items-center py-2">
+                  <div className="flex items-center gap-2">
+                    <Bug className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">Bug Reports</span>
+                  </div>
+                  <span className="text-xs text-primary font-semibold">
+                    Responds within 6h
+                  </span>
                 </div>
 
-                <div>
-                  <h4 className="font-semibold mb-2">
-                    How do I delete my account?
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    You can delete your account from your profile settings.
-                    Please note that this action is irreversible.
-                  </p>
+                <div className="flex justify-between items-center py-2">
+                  <div className="flex items-center gap-2">
+                    <Briefcase className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm font-medium">
+                      Business Inquiries
+                    </span>
+                  </div>
+                  <span className="text-xs text-primary font-semibold">
+                    Responds within 48h
+                  </span>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Response Time Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Response Times</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">General Inquiries</span>
-                  <span className="text-sm text-primary font-medium">
-                    24 hours
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Technical Support</span>
-                  <span className="text-sm text-primary font-medium">
-                    12 hours
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Bug Reports</span>
-                  <span className="text-sm text-primary font-medium">
-                    6 hours
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm">Business Inquiries</span>
-                  <span className="text-sm text-primary font-medium">
-                    48 hours
-                  </span>
+            {/* Additional Contact Methods */}
+
+            <Card className="mt-6">
+              <CardContent className="pt-8 pb-8">
+                <h2 className="text-2xl font-bold mb-4 text-center">
+                  Other Ways to Reach Us
+                </h2>
+                <div className="space-y-3 divide-y">
+                  <div className="flex justify-between items-center py-2">
+                    <div className="flex items-center gap-2">
+                      <Twitter className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">
+                        Follow us on Twitter
+                      </span>
+                    </div>
+                    <a
+                      href="https://twitter.com/SilentVoice"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary font-semibold hover:underline"
+                    >
+                      Follow
+                    </a>
+                  </div>
+
+                  <div className="flex justify-between items-center py-2">
+                    <div className="flex items-center gap-2">
+                      <Github className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">
+                        Contribute on GitHub
+                      </span>
+                    </div>
+                    <a
+                      href="https://github.com/SilentVoice"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary font-semibold hover:underline"
+                    >
+                      Contribute
+                    </a>
+                  </div>
+
+                  <div className="flex justify-between items-center py-2">
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium">
+                        Browse Help Center
+                      </span>
+                    </div>
+                    <a
+                      href="/help"
+                      className="text-xs text-primary font-semibold hover:underline"
+                    >
+                      Browse
+                    </a>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-        </div>
-
-        {/* Additional Contact Methods */}
-        <div className="mt-16 text-center">
-          <Card className="bg-primary/5 border-primary/20">
-            <CardContent className="pt-8 pb-8">
-              <h2 className="text-2xl font-bold mb-4">
-                Other Ways to Reach Us
-              </h2>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="https://twitter.com/bloghub"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border border-primary text-primary hover:bg-primary/10 px-6 py-3 rounded-md font-semibold transition-colors"
-                >
-                  Follow us on Twitter
-                </a>
-                <a
-                  href="https://github.com/bloghub"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="border border-primary text-primary hover:bg-primary/10 px-6 py-3 rounded-md font-semibold transition-colors"
-                >
-                  Contribute on GitHub
-                </a>
-                <a
-                  href="/help"
-                  className="border border-primary text-primary hover:bg-primary/10 px-6 py-3 rounded-md font-semibold transition-colors"
-                >
-                  Browse Help Center
-                </a>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </PageWrapper>
@@ -396,3 +398,6 @@ const Contact = () => {
 };
 
 export default Contact;
+
+
+//this page is good to go only have to implement the send message functionality

@@ -7,7 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { communityService } from "@/services/communityService";
 import CommunityReply from "./CommunityReply";
+<<<<<<< HEAD
 import { InstagramComments } from "@/components/shared/InstagramComments";
+=======
+>>>>>>> refs/remotes/origin/main
 import {
   Heart,
   MessageCircle,
@@ -501,6 +504,7 @@ export const CommunityPost = ({
           </div>
         )}
 
+<<<<<<< HEAD
         {/* Instagram-Style Comments Section */}
         {showReplies && (
           <div className="mt-6 border-t bg-white rounded-lg">
@@ -517,6 +521,50 @@ export const CommunityPost = ({
                 }
               }}
             />
+=======
+        {/* Replies Section */}
+        {showReplies && (
+          <div className="mt-6 space-y-4">
+            {loadingReplies ? (
+              <div className="flex justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin" />
+              </div>
+            ) : replies.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground">
+                <MessageCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p>No replies yet. Be the first to reply!</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {replies.map((reply) => (
+                  <CommunityReply
+                    key={reply._id}
+                    reply={reply}
+                    currentUser={currentUser}
+                    postId={post._id}
+                    onUpdate={(updatedReply) => {
+                      setReplies((prev) =>
+                        prev.map((r) =>
+                          r._id === updatedReply._id ? updatedReply : r,
+                        ),
+                      );
+                    }}
+                    onDelete={(replyId) => {
+                      setReplies((prev) =>
+                        prev.filter((r) => r._id !== replyId),
+                      );
+                      if (onUpdate) {
+                        onUpdate({
+                          ...post,
+                          replyCount: Math.max(0, (post.replyCount || 0) - 1),
+                        });
+                      }
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+>>>>>>> refs/remotes/origin/main
           </div>
         )}
       </CardContent>

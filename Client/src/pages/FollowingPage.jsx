@@ -174,6 +174,7 @@ export const FollowingPage = () => {
   return (
     <PageWrapper className="px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-6">
+<<<<<<< HEAD
         {/* Header */}
         <div className="flex items-start space-x-4">
           <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
@@ -217,6 +218,8 @@ export const FollowingPage = () => {
           </div>
         </div>
 
+=======
+>>>>>>> refs/remotes/origin/main
         {/* Navigation Tabs */}
         <div className="flex items-center space-x-4 sm:space-x-6 border-b overflow-x-auto">
           <Link
@@ -250,3 +253,7 @@ export const FollowingPage = () => {
 };
 
 export default FollowingPage;
+
+
+
+//ok need some change that is the folowing count is static

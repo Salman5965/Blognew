@@ -14,7 +14,7 @@ export const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <Link to={ROUTES.HOME} className="flex items-center space-x-2 mb-4">
               <BookOpen className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">BlogHub</span>
+              <span className="text-xl font-bold">SilentVoice</span>
             </Link>
             <p className="text-sm text-muted-foreground mb-4 max-w-md">
               A platform for sharing ideas, stories, and knowledge. Write, read,
@@ -22,7 +22,7 @@ export const Footer = () => {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://github.com/bloghub"
+                href="https://github.com/SilentVoice"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -31,7 +31,7 @@ export const Footer = () => {
                 <Github className="h-5 w-5" />
               </a>
               <a
-                href="https://twitter.com/bloghub"
+                href="https://twitter.com/SilentVoice"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -40,7 +40,7 @@ export const Footer = () => {
                 <Twitter className="h-5 w-5" />
               </a>
               <a
-                href="https://linkedin.com/company/bloghub"
+                href="https://linkedin.com/company/SilentVoice"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -49,7 +49,7 @@ export const Footer = () => {
                 <Linkedin className="h-5 w-5" />
               </a>
               <a
-                href="mailto:contact@bloghub.com"
+                href="mailto:contact@SilentVoice.com"
                 className="text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Email"
               >
@@ -147,37 +147,19 @@ export const Footer = () => {
 
         <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-sm text-muted-foreground">
-            © {currentYear} BlogHub. All rights reserved.
+            © {currentYear} SilentVoice. All rights reserved.
           </p>
           <div className="flex items-center space-x-4 mt-4 md:mt-0">
             <p className="text-sm text-muted-foreground">
               Made with ❤️ for the blogging community
             </p>
-            <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-              <Link
-                to={ROUTES.PRIVACY}
-                className="hover:text-foreground transition-colors"
-              >
-                Privacy
-              </Link>
-              <span>•</span>
-              <Link
-                to={ROUTES.TERMS}
-                className="hover:text-foreground transition-colors"
-              >
-                Terms
-              </Link>
-              <span>•</span>
-              <Link
-                to={ROUTES.COOKIES}
-                className="hover:text-foreground transition-colors"
-              >
-                Cookies
-              </Link>
-            </div>
           </div>
         </div>
       </div>
     </footer>
   );
 };
+
+
+
+//good to go 

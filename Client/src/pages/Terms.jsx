@@ -24,7 +24,7 @@ const Terms = () => {
       content: (
         <div className="space-y-4">
           <p>
-            By accessing and using BlogHub ("the Service"), you accept and agree
+            By accessing and using SilentVoice ("the Service"), you accept and agree
             to be bound by the terms and provision of this agreement. If you do
             not agree to abide by the above, please do not use this service.
           </p>
@@ -44,7 +44,7 @@ const Terms = () => {
       icon: FileText,
       content: (
         <div className="space-y-4">
-          <p>BlogHub is a platform that allows users to:</p>
+          <p>SilentVoice is a platform that allows users to:</p>
           <ul className="list-disc list-inside space-y-2 ml-4">
             <li>Create and publish blog posts and articles</li>
             <li>Read and interact with content from other users</li>
@@ -118,7 +118,7 @@ const Terms = () => {
         <div className="space-y-4">
           <h4 className="font-semibold">Your Content</h4>
           <p>
-            You retain ownership of content you create and post on BlogHub.
+            You retain ownership of content you create and post on SilentVoice.
             However, by posting content, you grant us:
           </p>
           <ul className="list-disc list-inside space-y-2 ml-4">
@@ -198,7 +198,7 @@ const Terms = () => {
       content: (
         <div className="space-y-4">
           <p>
-            You agree to use BlogHub responsibly and in accordance with these
+            You agree to use SilentVoice responsibly and in accordance with these
             guidelines:
           </p>
 
@@ -322,7 +322,7 @@ const Terms = () => {
 
           <p>To the maximum extent permitted by law:</p>
           <ul className="list-disc list-inside space-y-2 ml-4">
-            <li>BlogHub is provided "as is" without warranties of any kind</li>
+            <li>SilentVoice is provided "as is" without warranties of any kind</li>
             <li>
               We do not guarantee the accuracy, completeness, or reliability of
               user-generated content
@@ -344,7 +344,7 @@ const Terms = () => {
             <li>You are responsible for your interactions with other users</li>
             <li>You should verify information before relying on it</li>
             <li>
-              You agree to indemnify BlogHub against claims arising from your
+              You agree to indemnify SilentVoice against claims arising from your
               use of the Service
             </li>
           </ul>
@@ -394,7 +394,7 @@ const Terms = () => {
           </h1>
           <p className="text-lg text-muted-foreground mb-4">
             Please read these terms carefully before using our service. They
-            govern your use of BlogHub.
+            govern your use of SilentVoice.
           </p>
           <Badge variant="outline" className="text-sm">
             Last updated: {lastUpdated}
@@ -471,14 +471,13 @@ const Terms = () => {
             </p>
             <div className="space-y-2 text-sm">
               <p>
-                <strong>Email:</strong> legal@bloghub.com
+                <strong>Email:</strong> silentvoice.app@gmail.com
               </p>
               <p>
-                <strong>Address:</strong> 123 Creator Street, San Francisco, CA
-                94107
+                <strong>Address:</strong> Gangamma Layout, Bengaluru, Karnataka 560050
               </p>
               <p>
-                <strong>Phone:</strong> +1 (555) 123-4567
+                <strong>Phone:</strong> Not Available
               </p>
             </div>
             <div className="mt-6">
@@ -497,3 +496,7 @@ const Terms = () => {
 };
 
 export default Terms;
+
+
+
+//good to go

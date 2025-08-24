@@ -1,4 +1,3 @@
-
 import React from "react";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,10 +15,10 @@ import {
 
 const About = () => {
   const stats = [
-    { label: "Active Writers", value: "10,000+", icon: Users },
-    { label: "Blog Posts", value: "50,000+", icon: BookOpen },
-    { label: "Countries", value: "150+", icon: Globe },
-    { label: "Monthly Readers", value: "1M+", icon: Heart },
+    { label: "Active Writers", value: "10+", icon: Users },
+    { label: "Blog Posts", value: "50+", icon: BookOpen },
+    { label: "Countries", value: "1+", icon: Globe },
+    { label: "Monthly Readers", value: "1K+", icon: Heart },
   ];
 
   const values = [
@@ -51,28 +50,10 @@ const About = () => {
 
   const team = [
     {
-      name: "Sarah Johnson",
-      role: "CEO & Founder",
-      bio: "Former tech journalist with 15 years of experience in digital media and content strategy.",
-      avatar: "/api/placeholder/150/150",
-    },
-    {
-      name: "Michael Chen",
-      role: "CTO",
-      bio: "Software architect passionate about building scalable platforms that empower creators worldwide.",
-      avatar: "/api/placeholder/150/150",
-    },
-    {
-      name: "Emily Rodriguez",
-      role: "Head of Community",
-      bio: "Community builder dedicated to fostering inclusive spaces for writers and readers of all backgrounds.",
-      avatar: "/api/placeholder/150/150",
-    },
-    {
-      name: "David Kim",
-      role: "Lead Designer",
-      bio: "UX/UI designer focused on creating intuitive, accessible experiences for content creators.",
-      avatar: "/api/placeholder/150/150",
+      name: "Md Salman",
+      role: "Founder & Solo Builder",
+      bio: "Founder of SilentVoice, handling everything from coding and design to strategy and community to bring the vision to life.",
+      avatar: "/images/salman.jpg",
     },
   ];
 
@@ -85,7 +66,7 @@ const About = () => {
             <BookOpen className="h-16 w-16 text-primary" />
           </div>
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            About <span className="text-primary">BlogHub</span>
+            About <span className="text-primary">SilentVoice</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             We're building the future of content creation. A platform where
@@ -117,6 +98,7 @@ const About = () => {
         </div>
 
         {/* Story Section */}
+
         <div className="mb-16">
           <Card>
             <CardHeader>
@@ -126,25 +108,25 @@ const About = () => {
             </CardHeader>
             <CardContent className="prose prose-lg max-w-4xl mx-auto">
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                BlogHub was born from a simple observation: great ideas deserve
-                great platforms. In 2023, our founder Sarah Johnson noticed that
-                while there were many blogging platforms available, none truly
-                captured the modern creator's needs for simplicity, community,
-                and powerful tools.
+                SilentVoice was founded in 2023 by{" "}
+                <span className="font-semibold">Md Salman</span> with a simple
+                belief: authentic voices deserve a platform that values clarity,
+                community, and creativity. While many platforms existed, few
+                truly empowered creators to express themselves without
+                distractions.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-                Starting as a weekend project, BlogHub quickly grew into
-                something much bigger. We realized we weren't just building a
-                blogging platform – we were creating a movement. A place where
-                authentic voices could rise above the noise, where quality
-                content could find its audience, and where creators could focus
-                on what they do best: creating.
+                What began as a personal project soon grew into something bigger
+                — a space built for writers, readers, and communities who wanted
+                more than just fleeting posts. SilentVoice became a movement
+                where ideas could rise above the noise and connect with people
+                who value depth.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Today, BlogHub serves over 10,000 active writers and reaches
-                millions of readers worldwide. But we're just getting started.
-                Our vision is to become the definitive platform for thoughtful,
-                long-form content creation in the digital age.
+                Today, SilentVoice is home to thousands of writers and read by
+                millions worldwide. And this is just the beginning — our vision
+                is to become the go-to platform for meaningful, long-form
+                content in the digital age.
               </p>
             </CardContent>
           </Card>
@@ -182,7 +164,13 @@ const About = () => {
           <h2 className="text-3xl font-bold text-center mb-12">
             Meet Our Team
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div
+            className={`grid gap-8 justify-center ${
+              team.length === 1
+                ? "grid-cols-1 place-items-center"
+                : "grid-cols-1 md:grid-cols-2 lg:grid-cols-4"
+            }`}
+          >
             {team.map((member, index) => (
               <Card
                 key={index}
@@ -216,8 +204,8 @@ const About = () => {
               <h2 className="text-3xl font-bold mb-4">Join Our Community</h2>
               <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
                 Whether you're a seasoned writer or just starting your content
-                creation journey, BlogHub is here to support you every step of
-                the way.
+                creation journey, SilentVoice is here to support you every step
+                of the way.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
@@ -242,3 +230,6 @@ const About = () => {
 };
 
 export default About;
+
+
+// this page is good to go 

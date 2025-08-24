@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/main
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -73,12 +77,21 @@ export const StoryAnalytics = () => {
       setUserStats(stats);
 
       // TODO: Load story analytics when story service is available
+<<<<<<< HEAD
       // const storiesResponse = await storyService.getMyStories({
       //   limit: 100,
       //   sortBy: sortBy,
       //   sortOrder: "desc",
       // });
       // setStoryAnalytics(storiesResponse.stories || storiesResponse.data || []);
+=======
+      const storiesResponse = await storyService.getMyStories({
+        limit: 100,
+        sortBy: sortBy,
+        sortOrder: "desc",
+      });
+      setStoryAnalytics(storiesResponse.stories || storiesResponse.data || []);
+>>>>>>> refs/remotes/origin/main
 
       // Placeholder for now
       setStoryAnalytics([]);
@@ -282,6 +295,7 @@ export const StoryAnalytics = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="flex items-center space-x-4">
+<<<<<<< HEAD
             <Button
               variant="ghost"
               size="sm"
@@ -291,6 +305,8 @@ export const StoryAnalytics = () => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
+=======
+>>>>>>> refs/remotes/origin/main
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
                 <BookOpen className="h-8 w-8 mr-3 text-purple-600 dark:text-purple-400" />

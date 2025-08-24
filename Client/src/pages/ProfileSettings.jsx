@@ -363,6 +363,7 @@ const ProfileSettings = () => {
   return (
     <PageWrapper className="py-8">
       <div className="max-w-6xl mx-auto space-y-8">
+<<<<<<< HEAD
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center">
@@ -373,6 +374,8 @@ const ProfileSettings = () => {
             Manage your account, privacy, and notification preferences
           </p>
         </div>
+=======
+>>>>>>> refs/remotes/origin/main
 
         {/* Error Alert */}
         {error && (
@@ -1130,3 +1133,12 @@ const ProfileSettings = () => {
 };
 
 export default ProfileSettings;
+<<<<<<< HEAD
+=======
+
+
+
+
+
+//good to go
+>>>>>>> refs/remotes/origin/main

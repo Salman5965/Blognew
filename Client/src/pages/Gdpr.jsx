@@ -532,14 +532,13 @@ const Gdpr = () => {
             </p>
             <div className="space-y-2 text-sm">
               <p>
-                <strong>Email:</strong> dpo@bloghub.com
+                <strong>Email:</strong> silentvoice.app@gmail.com
               </p>
               <p>
-                <strong>Address:</strong> Data Protection Officer, BlogHub, 123
-                Creator Street, San Francisco, CA 94107
+                <strong>Address:</strong> Gangamma Layout, Bengaluru, Karnataka 560050
               </p>
               <p>
-                <strong>Phone:</strong> +1 (555) 123-4567
+                <strong>Phone:</strong> Not Available
               </p>
             </div>
             <div className="mt-6">
@@ -558,3 +557,7 @@ const Gdpr = () => {
 };
 
 export default Gdpr;
+
+
+
+//good to go

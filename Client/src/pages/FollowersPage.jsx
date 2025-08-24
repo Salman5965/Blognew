@@ -154,6 +154,7 @@ export const FollowersPage = () => {
   return (
     <PageWrapper className="px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-6">
+<<<<<<< HEAD
         {/* Header */}
         <div className="flex items-start space-x-4">
           <div className="flex items-start space-x-3 sm:space-x-4 flex-1 min-w-0">
@@ -197,6 +198,9 @@ export const FollowersPage = () => {
           </div>
         </div>
 
+=======
+  
+>>>>>>> refs/remotes/origin/main
         {/* Navigation Tabs */}
         <div className="flex items-center space-x-4 sm:space-x-6 border-b overflow-x-auto">
           <div className="flex items-center space-x-2 pb-3 border-b-2 border-primary flex-shrink-0">
@@ -230,3 +234,6 @@ export const FollowersPage = () => {
 };
 
 export default FollowersPage;
+
+
+// need some change need follower count to change 

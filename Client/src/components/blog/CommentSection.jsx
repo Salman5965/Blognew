@@ -29,7 +29,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+<<<<<<< HEAD
 import { InstagramComment } from "./InstagramComment";
+=======
+import { CommentThread } from "./CommentThread";
+>>>>>>> refs/remotes/origin/main
 import { useAuthContext } from "@/contexts/AuthContext";
 import { ROUTES } from "@/utils/constant";
 import apiService from "@/services/api";
@@ -381,7 +385,11 @@ export const CommentSection = ({
       ) : comments.length > 0 ? (
         <div className="space-y-4 divide-y divide-border/30">
           {comments.map((comment) => (
+<<<<<<< HEAD
             <InstagramComment
+=======
+            <CommentThread
+>>>>>>> refs/remotes/origin/main
               key={comment._id || comment.id}
               comment={comment}
               onReply={handleReply}

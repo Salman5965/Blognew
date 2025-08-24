@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/main
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -291,6 +295,7 @@ export const BlogAnalytics = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div className="flex items-center space-x-4">
+<<<<<<< HEAD
             <Button
               variant="ghost"
               size="sm"
@@ -300,6 +305,9 @@ export const BlogAnalytics = () => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
+=======
+           
+>>>>>>> refs/remotes/origin/main
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center">
                 <BarChart3 className="h-8 w-8 mr-3 text-blue-600 dark:text-blue-400" />

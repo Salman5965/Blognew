@@ -144,7 +144,7 @@ const Cookies = () => {
           <h1 className="text-4xl md:text-6xl font-bold mb-4">Cookie Policy</h1>
           <p className="text-lg text-muted-foreground mb-4">
             Learn about how we use cookies and similar technologies to improve
-            your experience on BlogHub.
+            your experience on SilentVoice.
           </p>
           <Badge variant="outline" className="text-sm">
             Last updated: {lastUpdated}
@@ -171,7 +171,7 @@ const Cookies = () => {
                 <Globe className="h-8 w-8 text-primary mx-auto mb-2" />
                 <h4 className="font-semibold mb-1">First-Party Cookies</h4>
                 <p className="text-sm text-muted-foreground">
-                  Set directly by BlogHub
+                  Set directly by SilentVoice
                 </p>
               </div>
               <div className="text-center p-4 bg-muted/50 rounded-lg">
@@ -454,14 +454,13 @@ const Cookies = () => {
             </p>
             <div className="space-y-2 text-sm">
               <p>
-                <strong>Email:</strong> privacy@bloghub.com
+                <strong>Email:</strong> silentvoice.app@gmail.com
               </p>
               <p>
-                <strong>Address:</strong> 123 Creator Street, San Francisco, CA
-                94107
+                <strong>Address:</strong> Gangamma Layout, Bengaluru, Karnataka 560050
               </p>
               <p>
-                <strong>Phone:</strong> +1 (555) 123-4567
+                <strong>Phone:</strong> Not Available
               </p>
             </div>
             <div className="mt-6">
@@ -480,3 +479,5 @@ const Cookies = () => {
 };
 
 export default Cookies;
+
+//page is good to go

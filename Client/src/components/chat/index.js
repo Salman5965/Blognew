@@ -1,11 +1,5 @@
-
-// Chat components exports
-export { ChatButton } from "./ChatButton";
-export { ChatPanel } from "./ChatPanel";
-export { ConversationsList } from "./ConversationsList";
-export { ChatWindow } from "./ChatWindow";
-export { NewChatTab } from "./NewChatTab";
-
-// Main chat components
 export { default as ChatButton } from "./ChatButton";
 export { default as ChatPanel } from "./ChatPanel";
+export { default as ConversationsList } from "./ConversationsList";
+export { default as ChatWindow } from "./ChatWindow";
+export { default as NewChatTab } from "./NewChatTab";

@@ -265,6 +265,7 @@ export const BlogDetails = () => {
 
         {/* Comments Section - Instagram Style */}
         <section id="comments" className="mt-12">
+<<<<<<< HEAD
           <div className="border-t bg-white rounded-lg shadow-sm">
             <InstagramComments
               contentType="blog"
@@ -274,6 +275,13 @@ export const BlogDetails = () => {
                 // Update blog comment count if needed
                 console.log('Comment count updated:', count);
               }}
+=======
+          <div className="border-t pt-8">
+            <CommentSection
+              blogId={currentBlog._id || currentBlog.id}
+              allowComments={currentBlog.allowComments}
+              blogAuthorId={currentBlog.author._id || currentBlog.author.id}
+>>>>>>> refs/remotes/origin/main
             />
           </div>
         </section>

@@ -255,12 +255,6 @@ export const Navbar = () => {
                   Feed
                 </Link>
                 <Link
-                  to="/explore"
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Explore
-                </Link>
-                <Link
                   to="/stories"
                   className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 >
@@ -468,6 +462,12 @@ export const Navbar = () => {
             </div>
           </div>
 
+          <Link
+            to="/explore"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Explore
+          </Link>
           {/* Actions */}
           <div className="flex items-center space-x-3">
             {isAuthenticated ? (
@@ -478,11 +478,18 @@ export const Navbar = () => {
                     <Button
                       variant="ghost"
                       size="sm"
+<<<<<<< HEAD
                       className="hidden md:flex items-center space-x-2"
                     >
                       <Plus className={`h-4 w-4 ${iconColors.success}`} />
                       <span>Create</span>
                       <ChevronDown className="h-3 w-3 ml-1" />
+=======
+                      className="hidden md:flex items-center space-x-0"
+                    >
+                      <Plus className={`h-4 w-4 ${iconColors.success}`} />
+                      <span>Create</span>
+>>>>>>> refs/remotes/origin/main
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
@@ -712,3 +719,11 @@ export const Navbar = () => {
     </nav>
   );
 };
+
+
+
+
+
+
+
+//good to go

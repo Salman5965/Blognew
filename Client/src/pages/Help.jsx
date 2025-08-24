@@ -33,48 +33,17 @@ const Help = () => {
   const [expandedFaq, setExpandedFaq] = useState(null);
 
   const categories = [
-    { id: "all", name: "All Topics", icon: HelpCircle, count: 47 },
-    { id: "getting-started", name: "Getting Started", icon: Zap, count: 8 },
-    { id: "writing", name: "Writing & Publishing", icon: Edit, count: 12 },
-    { id: "account", name: "Account Management", icon: User, count: 9 },
-    { id: "settings", name: "Settings & Privacy", icon: Settings, count: 7 },
-    { id: "troubleshooting", name: "Troubleshooting", icon: Shield, count: 6 },
+    { id: "all", name: "All Topics", icon: HelpCircle, count: 12 },
+    { id: "getting-started", name: "Getting Started", icon: Zap, count: 2 },
+    { id: "writing", name: "Writing & Publishing", icon: Edit, count: 2 },
+    { id: "account", name: "Account Management", icon: User, count: 2 },
+    { id: "settings", name: "Settings & Privacy", icon: Settings, count: 2 },
+    { id: "troubleshooting", name: "Troubleshooting", icon: Shield, count: 2 },
     {
       id: "billing",
       name: "Billing & Subscriptions",
       icon: FileText,
-      count: 5,
-    },
-  ];
-
-  const quickLinks = [
-    {
-      title: "Getting Started Guide",
-      description: "Complete guide for new users",
-      icon: Book,
-      link: "/help/getting-started",
-      category: "getting-started",
-    },
-    {
-      title: "Writing Your First Blog",
-      description: "Step-by-step tutorial",
-      icon: Edit,
-      link: "/help/first-blog",
-      category: "writing",
-    },
-    {
-      title: "Video Tutorials",
-      description: "Watch and learn",
-      icon: Video,
-      link: "/help/videos",
-      category: "getting-started",
-    },
-    {
-      title: "Contact Support",
-      description: "Get personalized help",
-      icon: MessageCircle,
-      link: "/contact",
-      category: "all",
+      count: 2,
     },
   ];
 
@@ -89,9 +58,9 @@ const Help = () => {
     {
       id: 2,
       category: "getting-started",
-      question: "Is BlogHub free to use?",
+      question: "Is SilentVoice free to use?",
       answer:
-        "Yes! BlogHub offers a free plan that includes basic blogging features, unlimited posts, and community access. We also offer premium plans with advanced features like custom domains, analytics, and priority support.",
+        "Yes! SilentVoice offers a free plan that includes basic blogging features, unlimited posts, and community access. We also offer premium plans with advanced features like custom domains, analytics, and priority support.",
     },
     {
       id: 3,
@@ -179,10 +148,6 @@ const Help = () => {
     setExpandedFaq(expandedFaq === faqId ? null : faqId);
   };
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
   return (
     <PageWrapper className="py-8">
       <div className="max-w-6xl mx-auto">
@@ -195,53 +160,95 @@ const Help = () => {
             Help <span className="text-primary">Center</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Find answers to common questions, learn how to use BlogHub features,
-            and get the support you need to create amazing content.
+            Find answers to common questions, learn how to use SilentVoice
+            features, and get the support you need to create amazing content.
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="max-w-2xl mx-auto mb-12">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
-            <Input
-              placeholder="Search for help articles, tutorials, or FAQs..."
-              value={searchQuery}
-              onChange={handleSearch}
-              className="pl-12 h-14 text-lg"
-            />
-          </div>
-        </div>
-
-        {/* Quick Links */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6 text-center">Quick Start</h2>
+        {/* Additional Resources */}
+        <div className="my-16">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {quickLinks.map((link, index) => {
-              const Icon = link.icon;
-              return (
-                <Card
-                  key={index}
-                  className="hover:shadow-lg transition-shadow cursor-pointer group"
+            {/* User Guide */}
+            <Card className="text-center hover:shadow-lg transition-transform hover:scale-105 rounded-xl">
+              <CardContent className="h-full flex flex-col justify-between pt-6">
+                <Book className="h-12 w-12 text-primary mx-auto mb-4 transition-transform group-hover:scale-110" />
+                <div>
+                  <h3 className="font-semibold mb-2">User Guide</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Comprehensive documentation covering all SilentVoice
+                    features
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                   onClick={() => navigate("/user-guide")}
+                  aria-label="Read User Guide"
                 >
-                  <CardContent className="p-6 text-center">
-                    <div className="mb-4">
-                      <div className="inline-flex p-3 bg-primary/10 rounded-full group-hover:bg-primary/20 transition-colors">
-                        <Icon className="h-6 w-6 text-primary" />
-                      </div>
-                    </div>
-                    <h3 className="font-semibold mb-2">{link.title}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {link.description}
-                    </p>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Learn More
-                      <ExternalLink className="h-3 w-3 ml-2" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                  Read Guide
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Writing Blog */}
+            <Card className="text-center hover:shadow-lg transition-transform hover:scale-105 rounded-xl">
+              <CardContent className="h-full flex flex-col justify-between pt-6">
+                <Edit className="h-12 w-12 text-primary mx-auto mb-4 transition-transform group-hover:scale-110" />
+                <div>
+                  <h3 className="font-semibold mb-2">
+                    Test Toutorial 
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Step-by-step tutorial to start your writing journey
+                  </p>
+                </div>
+                <Button variant="outline" size="sm"  onClick={() => navigate("/tutorial")} aria-label="Start Writing">
+                  Start Writing
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Video Tutorials */}
+            <Card className="text-center hover:shadow-lg transition-transform hover:scale-105 rounded-xl">
+              <CardContent className="h-full flex flex-col justify-between pt-6">
+                <Video className="h-12 w-12 text-primary mx-auto mb-4 transition-transform group-hover:scale-110" />
+                <div>
+                  <h3 className="font-semibold mb-2">Video Tutorials</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Easy step-by-step video guides for visual learners
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                   onClick={() => navigate("/watch-tutorials")}
+                  aria-label="Watch Tutorials"
+                >
+                  Watch Tutorials
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Community Forum */}
+            <Card className="text-center hover:shadow-lg transition-transform hover:scale-105 rounded-xl">
+              <CardContent className="h-full flex flex-col justify-between pt-6">
+                <MessageCircle className="h-12 w-12 text-primary mx-auto mb-4 transition-transform group-hover:scale-110" />
+                <div>
+                  <h3 className="font-semibold mb-2">Community Forum</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Connect with other users and get community support
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate("/community")}
+                  aria-label="Join Forum"
+                >
+                  Join Forum
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
@@ -294,7 +301,7 @@ const Help = () => {
                   <div>
                     <p className="font-medium">Email Support</p>
                     <p className="text-sm text-muted-foreground">
-                      support@bloghub.com
+                      support@SilentVoice.com
                     </p>
                   </div>
                 </div>
@@ -398,57 +405,6 @@ const Help = () => {
             )}
           </div>
         </div>
-
-        {/* Additional Resources */}
-        <div className="mt-16">
-          <h2 className="text-2xl font-bold mb-6 text-center">
-            Additional Resources
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <Book className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">User Guide</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Comprehensive documentation covering all BlogHub features
-                </p>
-                <Button variant="outline" size="sm">
-                  Read Guide
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <Video className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Video Tutorials</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Step-by-step video guides for visual learners
-                </p>
-                <Button variant="outline" size="sm">
-                  Watch Videos
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardContent className="pt-6">
-                <MessageCircle className="h-12 w-12 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold mb-2">Community Forum</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Connect with other users and get community support
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate("/community")}
-                >
-                  Join Forum
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
       </div>
 
       {/* Help Chatbot */}
@@ -458,3 +414,12 @@ const Help = () => {
 };
 
 export default Help;
+
+
+
+
+
+
+
+///
+// The page is good to go further extension such as writing tutorial and video tutorial page is not implemented 

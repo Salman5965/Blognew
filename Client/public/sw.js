@@ -1,11 +1,11 @@
 /**
- * Service Worker for BlogHub - Performance & Caching
+ * Service Worker for SilentVoice - Performance & Caching
  */
 
-const CACHE_NAME = "bloghub-v1";
-const STATIC_CACHE = "bloghub-static-v1";
-const DYNAMIC_CACHE = "bloghub-dynamic-v1";
-const API_CACHE = "bloghub-api-v1";
+const CACHE_NAME = "SilentVoice-v1";
+const STATIC_CACHE = "SilentVoice-static-v1";
+const DYNAMIC_CACHE = "SilentVoice-dynamic-v1";
+const API_CACHE = "SilentVoice-api-v1";
 
 // Assets to cache immediately
 const STATIC_ASSETS = [
